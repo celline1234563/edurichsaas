@@ -5,6 +5,8 @@ import Link from 'next/link'
 
 export default function DemoPage() {
   const [isLoading, setIsLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // iframe 로딩 시뮬레이션
@@ -14,6 +16,27 @@ export default function DemoPage() {
     return () => clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+  }
+
   return (
     <div style={{
       width: '100vw',
@@ -21,8 +44,90 @@ export default function DemoPage() {
       background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
       display: 'flex',
       flexDirection: 'column',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      position: 'relative'
     }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+          style={{
+            position: 'fixed',
+            top: '16px',
+            left: '16px',
+            width: '44px',
+            height: '44px',
+            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.15))',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#ffffff',
+            zIndex: 100
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
+            <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="mobile-menu-link active" onClick={closeMobileMenu}>데모</a>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/signup"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              로그인
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Top Bar */}
       <div style={{
         width: '100%',
@@ -33,87 +138,92 @@ export default function DemoPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 24px',
+        padding: isMobile ? '0 16px' : '0 24px',
         position: 'relative',
         zIndex: 10
       }}>
         {/* Left: Logo & Back */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '20px' }}>
           <Link
             href="/"
             style={{
-              fontSize: '18px',
+              fontSize: isMobile ? '16px' : '18px',
               fontWeight: '700',
               color: '#ffffff',
               textDecoration: 'none',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              marginLeft: isMobile ? '48px' : '0'
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            EduRichBrain
+            {!isMobile && 'EduRichBrain'}
           </Link>
         </div>
 
         {/* Center: Demo Label */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(59, 130, 246, 0.3)',
-          padding: '8px 20px',
-          borderRadius: '12px'
-        }}>
+        {!isMobile && (
           <div style={{
-            width: '24px',
-            height: '24px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-            borderRadius: '6px',
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            gap: '12px',
+            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            padding: '8px 20px',
+            borderRadius: '12px'
           }}>
-            <span style={{ fontSize: '14px' }}>✨</span>
-          </div>
-          <span style={{
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#3b82f6'
-          }}>
-            실시간 데모 체험
-          </span>
-        </div>
-
-        {/* Right: Actions */}
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <Link
-            href="/pricing"
-            style={{
-              padding: '8px 20px',
+            <div style={{
+              width: '24px',
+              height: '24px',
               background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              border: 'none',
-              borderRadius: '8px',
-              color: '#ffffff',
-              fontSize: '14px',
-              fontWeight: '600',
-              textDecoration: 'none',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            요금제 보기
-          </Link>
-        </div>
+              justifyContent: 'center'
+            }}>
+              <span style={{ fontSize: '14px' }}>✨</span>
+            </div>
+            <span style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#3b82f6'
+            }}>
+              실시간 데모 체험
+            </span>
+          </div>
+        )}
+
+        {/* Right: Actions */}
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Link
+              href="/pricing"
+              style={{
+                padding: '8px 20px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: '600',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              요금제 보기
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Loading Overlay */}
@@ -160,7 +270,7 @@ export default function DemoPage() {
       <div style={{
         flex: 1,
         width: '100%',
-        padding: '20px',
+        padding: isMobile ? '10px' : '20px',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -223,21 +333,33 @@ export default function DemoPage() {
       {/* Bottom Info Bar */}
       <div style={{
         width: '100%',
-        padding: '12px 24px',
+        padding: isMobile ? '12px 16px' : '12px 24px',
         background: 'rgba(10, 14, 39, 0.8)',
         backdropFilter: 'blur(10px)',
         borderTop: '1px solid rgba(59, 130, 246, 0.2)',
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        fontSize: '13px',
-        color: 'rgba(255, 255, 255, 0.6)'
+        fontSize: isMobile ? '11px' : '13px',
+        color: 'rgba(255, 255, 255, 0.6)',
+        gap: isMobile ? '12px' : '0'
       }}>
-        <div style={{ display: 'flex', gap: '20px' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '8px' : '20px',
+          textAlign: isMobile ? 'center' : 'left'
+        }}>
           <span>💡 모든 기능을 자유롭게 둘러보세요</span>
           <span>📊 예시 데이터로 구성되어 있습니다</span>
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '12px' : '16px',
+          alignItems: 'center'
+        }}>
           <a
             href="mailto:support@edurichbrain.com"
             style={{
@@ -253,7 +375,7 @@ export default function DemoPage() {
             </svg>
             문의하기
           </a>
-          <span>|</span>
+          {!isMobile && <span>|</span>}
           <Link
             href="/signup"
             style={{

@@ -7,11 +7,26 @@ export default function AboutPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const categories = ['전체', '회사소개', '제품소개'];
 
   useEffect(() => {
     fetchStories();
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const fetchStories = async () => {
@@ -82,10 +97,82 @@ export default function AboutPage() {
     ? stories
     : stories.filter(story => story.category === selectedCategory);
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)' }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link active" onClick={closeMobileMenu}>회사</Link>
+            <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="mobile-menu-link" onClick={closeMobileMenu}>데모</a>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/signup"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              로그인
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Left Sidebar Navigation */}
-      <aside style={{
+      <aside className="sidebar" style={{
         width: '260px',
         background: 'rgba(10, 14, 39, 0.95)',
         borderRight: '1px solid rgba(255, 255, 255, 0.1)',
@@ -169,7 +256,7 @@ export default function AboutPage() {
       </aside>
 
       {/* Main Content */}
-      <div style={{
+      <div className="main-area" style={{
         flex: 1,
         background: 'transparent',
         overflowY: 'auto',
@@ -181,7 +268,7 @@ export default function AboutPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 40px',
+          padding: isMobile ? '0 20px' : '0 40px',
         }}>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <button style={{
@@ -223,12 +310,12 @@ export default function AboutPage() {
             width: '100%',
             maxWidth: '100%',
             textAlign: 'center',
-            padding: '140px 40px 80px',
+            padding: isMobile ? '80px 20px 40px' : '140px 40px 80px',
           }}>
             <div style={{
-              fontSize: '13px',
+              fontSize: isMobile ? '11px' : '13px',
               color: 'rgba(255, 255, 255, 0.5)',
-              marginBottom: '24px',
+              marginBottom: isMobile ? '16px' : '24px',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
             }}>
@@ -236,41 +323,48 @@ export default function AboutPage() {
             </div>
 
             <h1 style={{
-              fontSize: '72px',
+              fontSize: isMobile ? '36px' : '72px',
               fontWeight: '600',
               color: 'white',
               margin: '0 auto',
-              marginBottom: '32px',
+              marginBottom: isMobile ? '20px' : '32px',
               lineHeight: '1.1',
               letterSpacing: '-0.03em',
-              maxWidth: '900px',
+              maxWidth: isMobile ? '100%' : '900px',
             }}>
               교육 현장의 혁신을 위한<br />EduRichBrain의 비전
             </h1>
 
             <p style={{
-              fontSize: '22px',
+              fontSize: isMobile ? '16px' : '22px',
               color: 'rgba(255, 255, 255, 0.65)',
               lineHeight: '1.6',
-              marginBottom: '48px',
-              maxWidth: '800px',
-              margin: '0 auto 48px',
+              marginBottom: isMobile ? '32px' : '48px',
+              maxWidth: isMobile ? '100%' : '800px',
+              margin: `0 auto ${isMobile ? '32px' : '48px'}`,
             }}>
               우리의 사명은 일반적으로 인간보다 더 스마트한 AI 시스템을 만들어 인류 전체의 이익을 누리게 하는 것입니다.
               우리는 모든 학원이 AI 기반 솔루션을 통해 더 효율적으로 운영되고, 학생들에게 더 나은 교육을 제공할 수 있도록 돕고자 합니다.
             </p>
 
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: '12px',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
               <button style={{
                 background: 'white',
                 color: '#0a0e27',
                 border: 'none',
-                padding: '16px 32px',
+                padding: isMobile ? '14px 28px' : '16px 32px',
                 borderRadius: '6px',
-                fontSize: '15px',
+                fontSize: isMobile ? '14px' : '15px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
+                width: isMobile ? '100%' : 'auto',
               }}>
                 Our plan for EduRichBrain
               </button>
@@ -278,15 +372,17 @@ export default function AboutPage() {
                 background: 'transparent',
                 color: 'white',
                 border: '1px solid rgba(255, 255, 255, 0.25)',
-                padding: '16px 32px',
+                padding: isMobile ? '14px 28px' : '16px 32px',
                 borderRadius: '6px',
-                fontSize: '15px',
+                fontSize: isMobile ? '14px' : '15px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
+                width: isMobile ? '100%' : 'auto',
               }}>
                 Our Charter
                 <span>→</span>
@@ -298,11 +394,11 @@ export default function AboutPage() {
           <div style={{
             width: '100%',
             maxWidth: '1400px',
-            padding: '0 80px 120px',
+            padding: isMobile ? '0 20px 60px' : '0 80px 120px',
           }}>
             <div style={{
               width: '100%',
-              height: '600px',
+              height: isMobile ? '300px' : '600px',
               borderRadius: '16px',
               background: `url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&h=900&fit=crop')`,
               backgroundSize: 'cover',
