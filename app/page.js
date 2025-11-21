@@ -1,10 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 export default function HomePage() {
   const [mainInput, setMainInput] = useState('')
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleEnter = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -26,9 +41,81 @@ export default function HomePage() {
     document.getElementById('mainInput').focus()
   }
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+  }
+
   return (
     <div className="app-layout">
-      {/* Left Sidebar Navigation */}
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link active" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
+            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/signup"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              로그인
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Left Sidebar Navigation (Desktop Only) */}
       <aside className="sidebar">
         <Link href="/" className="sidebar-logo">
           EduRichBrain
