@@ -1,11 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 export default function PricingPage() {
   const [showPointModal, setShowPointModal] = useState(false)
   const [billingCycle, setBillingCycle] = useState('monthly') // 'monthly' or 'yearly'
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // 모바일 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false)
+      }
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // 요금제 데이터
   const plans = [
@@ -164,9 +179,81 @@ export default function PricingPage() {
     window.location.href = `/payment?plan=${planId}&cycle=${billingCycle}`
   }
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+  }
+
   return (
     <div className="app-layout">
-      {/* Sidebar */}
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link active" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
+            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/signup"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              로그인
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar (Desktop Only) */}
       <aside className="sidebar">
         <Link href="/" className="sidebar-logo">
           EduRichBrain
@@ -206,14 +293,18 @@ export default function PricingPage() {
         </header>
 
         {/* Hero Section */}
-        <main style={{ padding: '100px 32px 120px', maxWidth: '1400px', margin: '0 auto' }}>
+        <main style={{
+          padding: isMobile ? '60px 20px 80px' : '100px 32px 120px',
+          maxWidth: '1400px',
+          margin: '0 auto'
+        }}>
           {/* Page Title */}
-          <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? '48px' : '80px' }}>
             <h1 style={{
-              fontSize: '52px',
+              fontSize: isMobile ? '32px' : '52px',
               fontWeight: '500',
               letterSpacing: '-0.02em',
-              marginBottom: '24px',
+              marginBottom: isMobile ? '16px' : '24px',
               background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
@@ -222,10 +313,11 @@ export default function PricingPage() {
               성장에 집중하세요
             </h1>
             <p style={{
-              fontSize: '20px',
+              fontSize: isMobile ? '16px' : '20px',
               color: 'rgba(255, 255, 255, 0.6)',
               lineHeight: '1.6',
-              marginBottom: '40px'
+              marginBottom: isMobile ? '32px' : '40px',
+              padding: isMobile ? '0 10px' : '0'
             }}>
               효율적인 AI 포인트 시스템으로 필요한 만큼만 사용하세요
             </p>
@@ -233,18 +325,21 @@ export default function PricingPage() {
             {/* Billing Cycle Toggle */}
             <div style={{
               display: 'inline-flex',
+              flexDirection: isMobile ? 'column' : 'row',
               alignItems: 'center',
               gap: '4px',
               padding: '4px',
               background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
               backdropFilter: 'blur(16px)',
               border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px'
+              borderRadius: '12px',
+              width: isMobile ? '100%' : 'auto',
+              maxWidth: isMobile ? '320px' : 'none'
             }}>
               <button
                 onClick={() => setBillingCycle('monthly')}
                 style={{
-                  padding: '10px 24px',
+                  padding: isMobile ? '12px 20px' : '10px 24px',
                   background: billingCycle === 'monthly'
                     ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
                     : 'transparent',
@@ -255,7 +350,8 @@ export default function PricingPage() {
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.3s',
-                  boxShadow: billingCycle === 'monthly' ? '0 4px 12px rgba(59, 130, 246, 0.4)' : 'none'
+                  boxShadow: billingCycle === 'monthly' ? '0 4px 12px rgba(59, 130, 246, 0.4)' : 'none',
+                  width: isMobile ? '100%' : 'auto'
                 }}
               >
                 월간 결제
@@ -263,7 +359,7 @@ export default function PricingPage() {
               <button
                 onClick={() => setBillingCycle('yearly')}
                 style={{
-                  padding: '10px 24px',
+                  padding: isMobile ? '12px 20px' : '10px 24px',
                   background: billingCycle === 'yearly'
                     ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
                     : 'transparent',
@@ -277,7 +373,9 @@ export default function PricingPage() {
                   boxShadow: billingCycle === 'yearly' ? '0 4px 12px rgba(59, 130, 246, 0.4)' : 'none',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: isMobile ? '100%' : 'auto'
                 }}
               >
                 연간 결제
@@ -295,9 +393,9 @@ export default function PricingPage() {
           {/* Main Pricing Plans */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '20px',
-            marginBottom: '120px'
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
+            gap: isMobile ? '24px' : '20px',
+            marginBottom: isMobile ? '80px' : '120px'
           }}>
             {plans.map((plan, index) => (
               <div
@@ -309,28 +407,32 @@ export default function PricingPage() {
                   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                   border: plan.popular ? '2px solid rgba(59, 130, 246, 0.5)' : '1px solid rgba(59, 130, 246, 0.2)',
                   borderRadius: '24px',
-                  padding: '40px 32px',
+                  padding: isMobile ? '32px 24px' : '40px 32px',
                   boxShadow: plan.popular
                     ? '0 20px 60px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     : '0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   cursor: 'pointer',
-                  transform: plan.popular ? 'scale(1.05)' : 'scale(1)',
+                  transform: (plan.popular && !isMobile) ? 'scale(1.05)' : 'scale(1)',
                   zIndex: plan.popular ? 10 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05) translateY(-8px)'
-                  e.currentTarget.style.borderColor = plan.popular ? 'rgba(59, 130, 246, 0.7)' : 'rgba(59, 130, 246, 0.4)'
-                  e.currentTarget.style.boxShadow = plan.popular
-                    ? '0 30px 80px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.3)'
-                    : '0 20px 60px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.2)'
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'scale(1.05) translateY(-8px)'
+                    e.currentTarget.style.borderColor = plan.popular ? 'rgba(59, 130, 246, 0.7)' : 'rgba(59, 130, 246, 0.4)'
+                    e.currentTarget.style.boxShadow = plan.popular
+                      ? '0 30px 80px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.3)'
+                      : '0 20px 60px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.2)'
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = plan.popular ? 'scale(1.05)' : 'scale(1)'
-                  e.currentTarget.style.borderColor = plan.popular ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.2)'
-                  e.currentTarget.style.boxShadow = plan.popular
-                    ? '0 20px 60px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                    : '0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = plan.popular ? 'scale(1.05)' : 'scale(1)'
+                    e.currentTarget.style.borderColor = plan.popular ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.2)'
+                    e.currentTarget.style.boxShadow = plan.popular
+                      ? '0 20px 60px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      : '0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                  }
                 }}
               >
                 {/* Popular Badge */}
@@ -353,9 +455,9 @@ export default function PricingPage() {
                 )}
 
                 {/* Plan Header */}
-                <div style={{ marginBottom: '32px' }}>
+                <div style={{ marginBottom: isMobile ? '24px' : '32px' }}>
                   <h3 style={{
-                    fontSize: '24px',
+                    fontSize: isMobile ? '20px' : '24px',
                     fontWeight: '600',
                     color: '#ffffff',
                     marginBottom: '12px'
@@ -367,7 +469,7 @@ export default function PricingPage() {
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
                       <span style={{
-                        fontSize: '32px',
+                        fontSize: isMobile ? '28px' : '32px',
                         fontWeight: '700',
                         color: plan.color
                       }}>
@@ -376,7 +478,7 @@ export default function PricingPage() {
                           : Math.round(plan.yearlyPrice / 12).toLocaleString()
                         }원
                       </span>
-                      <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '14px' }}>/월</span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: isMobile ? '13px' : '14px' }}>/월</span>
                     </div>
                     {billingCycle === 'yearly' && (
                       <p style={{
@@ -578,12 +680,12 @@ export default function PricingPage() {
           </div>
 
           {/* Additional Staff Section */}
-          <div style={{ marginBottom: '120px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ marginBottom: isMobile ? '80px' : '120px' }}>
+            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
               <h2 style={{
-                fontSize: '36px',
+                fontSize: isMobile ? '28px' : '36px',
                 fontWeight: '500',
-                marginBottom: '16px',
+                marginBottom: isMobile ? '12px' : '16px',
                 background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
@@ -591,14 +693,14 @@ export default function PricingPage() {
               }}>
                 팀 확장 옵션
               </h2>
-              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '16px' }}>
+              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: isMobile ? '14px' : '16px' }}>
                 성장하는 조직을 위한 유연한 인력 관리
               </p>
             </div>
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '24px',
               maxWidth: '900px',
               margin: '0 auto'
@@ -611,19 +713,23 @@ export default function PricingPage() {
                     backdropFilter: 'blur(16px)',
                     border: '1px solid rgba(59, 130, 246, 0.2)',
                     borderRadius: '16px',
-                    padding: '32px 24px',
+                    padding: isMobile ? '24px 20px' : '32px 24px',
                     textAlign: 'center',
                     transition: 'all 0.3s'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)'
-                    e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.4)'
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(30, 58, 138, 0.3)'
+                    if (!isMobile) {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.4)'
+                      e.currentTarget.style.boxShadow = '0 12px 32px rgba(30, 58, 138, 0.3)'
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.2)'
-                    e.currentTarget.style.boxShadow = 'none'
+                    if (!isMobile) {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.2)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
                   }}
                 >
                   <div style={{
@@ -654,12 +760,12 @@ export default function PricingPage() {
           </div>
 
           {/* Point Packages Section */}
-          <div style={{ marginBottom: '120px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ marginBottom: isMobile ? '80px' : '120px' }}>
+            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
               <h2 style={{
-                fontSize: '36px',
+                fontSize: isMobile ? '28px' : '36px',
                 fontWeight: '500',
-                marginBottom: '16px',
+                marginBottom: isMobile ? '12px' : '16px',
                 background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
@@ -667,14 +773,14 @@ export default function PricingPage() {
               }}>
                 AI 포인트 충전
               </h2>
-              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '16px' }}>
+              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: isMobile ? '14px' : '16px' }}>
                 필요할 때 언제든지 포인트를 추가하세요
               </p>
             </div>
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '24px',
               maxWidth: '1000px',
               margin: '0 auto'
@@ -688,22 +794,26 @@ export default function PricingPage() {
                     backdropFilter: 'blur(20px)',
                     border: pkg.popular ? '2px solid rgba(59, 130, 246, 0.5)' : '1px solid rgba(59, 130, 246, 0.2)',
                     borderRadius: '20px',
-                    padding: '36px 28px',
+                    padding: isMobile ? '28px 24px' : '36px 28px',
                     textAlign: 'center',
                     transition: 'all 0.3s',
-                    transform: pkg.popular ? 'scale(1.05)' : 'scale(1)'
+                    transform: (pkg.popular && !isMobile) ? 'scale(1.05)' : 'scale(1)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05) translateY(-4px)'
-                    e.currentTarget.style.borderColor = pkg.popular ? 'rgba(59, 130, 246, 0.7)' : 'rgba(59, 130, 246, 0.4)'
-                    e.currentTarget.style.boxShadow = pkg.popular
-                      ? '0 20px 60px rgba(59, 130, 246, 0.3)'
-                      : '0 12px 32px rgba(59, 130, 246, 0.3)'
+                    if (!isMobile) {
+                      e.currentTarget.style.transform = 'scale(1.05) translateY(-4px)'
+                      e.currentTarget.style.borderColor = pkg.popular ? 'rgba(59, 130, 246, 0.7)' : 'rgba(59, 130, 246, 0.4)'
+                      e.currentTarget.style.boxShadow = pkg.popular
+                        ? '0 20px 60px rgba(59, 130, 246, 0.3)'
+                        : '0 12px 32px rgba(59, 130, 246, 0.3)'
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = pkg.popular ? 'scale(1.05)' : 'scale(1)'
-                    e.currentTarget.style.borderColor = pkg.popular ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.2)'
-                    e.currentTarget.style.boxShadow = 'none'
+                    if (!isMobile) {
+                      e.currentTarget.style.transform = pkg.popular ? 'scale(1.05)' : 'scale(1)'
+                      e.currentTarget.style.borderColor = pkg.popular ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.2)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
                   }}
                 >
                   {pkg.popular && (
@@ -724,16 +834,16 @@ export default function PricingPage() {
                   )}
 
                   <div style={{
-                    fontSize: '20px',
+                    fontSize: isMobile ? '18px' : '20px',
                     fontWeight: '600',
                     color: '#ffffff',
-                    marginBottom: '20px'
+                    marginBottom: isMobile ? '16px' : '20px'
                   }}>
                     {pkg.name} 패키지
                   </div>
 
                   <div style={{
-                    fontSize: '36px',
+                    fontSize: isMobile ? '32px' : '36px',
                     fontWeight: '700',
                     color: pkg.popular ? '#3b82f6' : '#60a5fa',
                     marginBottom: '12px'
@@ -742,21 +852,21 @@ export default function PricingPage() {
                   </div>
 
                   <div style={{
-                    fontSize: '14px',
+                    fontSize: isMobile ? '13px' : '14px',
                     color: 'rgba(255, 255, 255, 0.5)',
-                    marginBottom: '24px'
+                    marginBottom: isMobile ? '20px' : '24px'
                   }}>
                     VAT 포함
                   </div>
 
                   <div style={{
                     background: 'rgba(59, 130, 246, 0.1)',
-                    padding: '16px',
+                    padding: isMobile ? '14px' : '16px',
                     borderRadius: '12px',
                     marginBottom: '16px'
                   }}>
                     <div style={{
-                      fontSize: '32px',
+                      fontSize: isMobile ? '28px' : '32px',
                       fontWeight: '700',
                       color: '#ffffff',
                       marginBottom: '4px'
@@ -817,12 +927,12 @@ export default function PricingPage() {
           </div>
 
           {/* AI Features Pricing Table */}
-          <div style={{ marginBottom: '120px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ marginBottom: isMobile ? '80px' : '120px' }}>
+            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
               <h2 style={{
-                fontSize: '36px',
+                fontSize: isMobile ? '28px' : '36px',
                 fontWeight: '500',
-                marginBottom: '16px',
+                marginBottom: isMobile ? '12px' : '16px',
                 background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
@@ -830,7 +940,7 @@ export default function PricingPage() {
               }}>
                 AI 기능별 소모 포인트
               </h2>
-              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '16px' }}>
+              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: isMobile ? '14px' : '16px' }}>
                 투명하고 합리적인 포인트 정책
               </p>
             </div>
@@ -932,7 +1042,7 @@ export default function PricingPage() {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '20px 24px',
+                        padding: isMobile ? '16px 20px' : '20px 24px',
                         borderBottom: idx < aiFeatures.premium.length - 1 ? '1px solid rgba(59, 130, 246, 0.15)' : 'none',
                         transition: 'all 0.2s'
                       }}
@@ -950,18 +1060,18 @@ export default function PricingPage() {
                           gap: '8px',
                           marginBottom: '4px'
                         }}>
-                          <span style={{ color: '#ffffff', fontSize: '15px', fontWeight: '500' }}>
+                          <span style={{ color: '#ffffff', fontSize: isMobile ? '14px' : '15px', fontWeight: '500' }}>
                             {feature.name}
                           </span>
-                          {feature.hot && <span style={{ fontSize: '18px' }}>🔥</span>}
-                          {feature.veryHot && <span style={{ fontSize: '18px' }}>🔥🔥</span>}
+                          {feature.hot && <span style={{ fontSize: isMobile ? '16px' : '18px' }}>🔥</span>}
+                          {feature.veryHot && <span style={{ fontSize: isMobile ? '16px' : '18px' }}>🔥🔥</span>}
                         </div>
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '13px' }}>
+                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: isMobile ? '12px' : '13px' }}>
                           {feature.unit}
                         </div>
                       </div>
                       <div style={{
-                        fontSize: '20px',
+                        fontSize: isMobile ? '18px' : '20px',
                         fontWeight: '700',
                         color: '#60a5fa'
                       }}>
@@ -975,12 +1085,12 @@ export default function PricingPage() {
           </div>
 
           {/* FAQ Section */}
-          <div style={{ marginBottom: '120px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ marginBottom: isMobile ? '80px' : '120px' }}>
+            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
               <h2 style={{
-                fontSize: '36px',
+                fontSize: isMobile ? '28px' : '36px',
                 fontWeight: '500',
-                marginBottom: '16px',
+                marginBottom: isMobile ? '12px' : '16px',
                 background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
@@ -1021,13 +1131,13 @@ export default function PricingPage() {
                     background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.4))',
                     backdropFilter: 'blur(16px)',
                     border: '1px solid rgba(59, 130, 246, 0.2)',
-                    borderRadius: '16px',
-                    padding: '24px 28px',
+                    borderRadius: isMobile ? '12px' : '16px',
+                    padding: isMobile ? '20px 20px' : '24px 28px',
                     transition: 'all 0.3s'
                   }}
                 >
                   <summary style={{
-                    fontSize: '16px',
+                    fontSize: isMobile ? '15px' : '16px',
                     fontWeight: '600',
                     color: '#ffffff',
                     cursor: 'pointer',
@@ -1036,11 +1146,11 @@ export default function PricingPage() {
                     alignItems: 'center'
                   }}>
                     {faq.q}
-                    <span style={{ color: '#60a5fa', fontSize: '20px' }}>+</span>
+                    <span style={{ color: '#60a5fa', fontSize: isMobile ? '18px' : '20px' }}>+</span>
                   </summary>
                   <p style={{
-                    marginTop: '16px',
-                    fontSize: '14px',
+                    marginTop: isMobile ? '12px' : '16px',
+                    fontSize: isMobile ? '13px' : '14px',
                     color: 'rgba(255, 255, 255, 0.7)',
                     lineHeight: '1.6'
                   }}>
@@ -1054,15 +1164,15 @@ export default function PricingPage() {
           {/* CTA Section */}
           <div style={{
             textAlign: 'center',
-            padding: '80px 40px',
+            padding: isMobile ? '48px 24px' : '80px 40px',
             background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05))',
-            borderRadius: '24px',
+            borderRadius: isMobile ? '16px' : '24px',
             border: '1px solid rgba(59, 130, 246, 0.2)'
           }}>
             <h2 style={{
-              fontSize: '40px',
+              fontSize: isMobile ? '28px' : '40px',
               fontWeight: '500',
-              marginBottom: '20px',
+              marginBottom: isMobile ? '16px' : '20px',
               background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
@@ -1071,32 +1181,35 @@ export default function PricingPage() {
               지금 바로 시작하세요
             </h2>
             <p style={{
-              fontSize: '18px',
+              fontSize: isMobile ? '15px' : '18px',
               color: 'rgba(255, 255, 255, 0.6)',
-              marginBottom: '40px',
+              marginBottom: isMobile ? '32px' : '40px',
               lineHeight: '1.6'
             }}>
               14일 무료 체험으로 모든 기능을 경험해보세요
             </p>
             <div style={{
               display: 'flex',
-              gap: '16px',
+              gap: isMobile ? '12px' : '16px',
               justifyContent: 'center',
-              flexWrap: 'wrap'
+              flexWrap: 'wrap',
+              flexDirection: isMobile ? 'column' : 'row',
+              alignItems: isMobile ? 'stretch' : 'center'
             }}>
               <Link
                 href="/signup"
                 style={{
-                  padding: '16px 40px',
+                  padding: isMobile ? '14px 32px' : '16px 40px',
                   background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                   borderRadius: '12px',
                   color: '#ffffff',
-                  fontSize: '16px',
+                  fontSize: isMobile ? '15px' : '16px',
                   fontWeight: '600',
                   textDecoration: 'none',
                   display: 'inline-block',
                   transition: 'all 0.3s',
-                  boxShadow: '0 8px 24px rgba(30, 58, 138, 0.4)'
+                  boxShadow: '0 8px 24px rgba(30, 58, 138, 0.4)',
+                  textAlign: 'center'
                 }}
               >
                 무료 체험 시작
@@ -1104,13 +1217,14 @@ export default function PricingPage() {
               <Link
                 href="/demo"
                 style={{
-                  padding: '16px 40px',
+                  padding: isMobile ? '14px 32px' : '16px 40px',
                   background: 'transparent',
                   border: '2px solid rgba(59, 130, 246, 0.4)',
                   borderRadius: '12px',
                   color: '#ffffff',
-                  fontSize: '16px',
+                  fontSize: isMobile ? '15px' : '16px',
                   fontWeight: '600',
+                  textAlign: 'center',
                   textDecoration: 'none',
                   display: 'inline-block',
                   transition: 'all 0.3s',
