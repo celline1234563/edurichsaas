@@ -7,6 +7,7 @@ export default function HomePage() {
   const [mainInput, setMainInput] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [blogPosts, setBlogPosts] = useState([])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -19,6 +20,14 @@ export default function HomePage() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  useEffect(() => {
+    // Notion 블로그 데이터 가져오기
+    fetch('/api/blog')
+      .then(res => res.json())
+      .then(data => setBlogPosts(data.slice(0, 4))) // 최신 4개만
+      .catch(err => console.error('블로그 데이터 로드 실패:', err))
   }, [])
 
   const handleEnter = (event) => {
@@ -210,41 +219,38 @@ export default function HomePage() {
         {/* Latest News Section */}
         <section className="content-section">
           <div className="section-title-bar">
-            <a href="#" className="see-all">모두 보기</a>
+            <Link href="/blog" className="see-all">모두 보기</Link>
           </div>
 
           <div className="card-grid">
-            <article className="info-card">
-              <div className="card-thumb"></div>
-              <div className="card-body">
-                <span className="card-date">2025년 11월 20일</span>
-                <h3>외부 테스트를 통한 이전 세대와 강화</h3>
-              </div>
-            </article>
-
-            <article className="info-card">
-              <div className="card-thumb"></div>
-              <div className="card-body">
-                <span className="card-date">2025년 11월 19일</span>
-                <h3>학원 경영 AI 솔루션 업데이트</h3>
-              </div>
-            </article>
-
-            <article className="info-card">
-              <div className="card-thumb"></div>
-              <div className="card-body">
-                <span className="card-date">2025년 11월 17일</span>
-                <h3>EduRichBrain, AI 교육 부문 선도 기업 선정</h3>
-              </div>
-            </article>
-
-            <article className="info-card">
-              <div className="card-thumb"></div>
-              <div className="card-body">
-                <span className="card-date">2025년 11월 15일</span>
-                <h3>교사를 위한 무료 버전 출시</h3>
-              </div>
-            </article>
+            {blogPosts.length > 0 ? (
+              blogPosts.map((post) => (
+                <Link href={`/blog/${post.id}`} key={post.id} style={{ textDecoration: 'none' }}>
+                  <article className="info-card">
+                    <div className="card-thumb" style={{
+                      backgroundImage: `url(${post.coverImage})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}></div>
+                    <div className="card-body">
+                      <span className="card-date">{post.date}</span>
+                      <h3>{post.title}</h3>
+                    </div>
+                  </article>
+                </Link>
+              ))
+            ) : (
+              // 로딩 중 스켈레톤
+              <>
+                <article className="info-card">
+                  <div className="card-thumb"></div>
+                  <div className="card-body">
+                    <span className="card-date">로딩 중...</span>
+                    <h3>블로그 글을 불러오는 중입니다</h3>
+                  </div>
+                </article>
+              </>
+            )}
           </div>
         </section>
 

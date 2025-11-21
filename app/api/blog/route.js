@@ -8,6 +8,9 @@ const notion = new Client({
 
 const databaseId = process.env.NOTION_DATABASE_ID;
 
+// 60초마다 캐시 갱신 (ISR)
+export const revalidate = 60;
+
 export async function GET() {
   try {
     // Notion 설정이 없으면 Mock 데이터 반환
@@ -21,7 +24,7 @@ export async function GET() {
       database_id: databaseId,
       sorts: [
         {
-          property: 'Date',
+          property: '컨텐츠 발행일',
           direction: 'descending',
         },
       ],
@@ -33,14 +36,14 @@ export async function GET() {
 
       return {
         id: page.id,
-        title: properties.Title?.title?.[0]?.plain_text || '제목 없음',
-        category: properties.Category?.select?.name || '전체',
-        excerpt: properties.Excerpt?.rich_text?.[0]?.plain_text || '',
-        coverImage: properties.CoverImage?.files?.[0]?.file?.url ||
-                   properties.CoverImage?.files?.[0]?.external?.url ||
+        title: properties.Name?.title?.[0]?.plain_text || '제목 없음',
+        category: properties.학원정보?.select?.name || '전체',
+        excerpt: properties.비고?.rich_text?.[0]?.plain_text || '',
+        coverImage: page.cover?.external?.url ||
+                   page.cover?.file?.url ||
                    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop',
-        date: formatDate(properties.Date?.date?.start),
-        author: properties.Author?.rich_text?.[0]?.plain_text || 'EduRichBrain',
+        date: formatDate(properties['컨텐츠 발행일']?.date?.start),
+        author: properties.기획?.rich_text?.[0]?.plain_text || 'EduRichBrain',
         published: properties.Published?.checkbox || false,
       };
     });

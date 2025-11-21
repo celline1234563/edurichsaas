@@ -11,7 +11,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@notionhq/client": "^5.4.0",
+    "@notionhq/client": "^2.3.0",
     "@supabase/supabase-js": "^2.83.0",
     "chart.js": "^4.5.1",
     "marked": "^17.0.0",

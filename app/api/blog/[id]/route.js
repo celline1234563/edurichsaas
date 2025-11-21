@@ -7,9 +7,9 @@ const notion = new Client({
 });
 
 export async function GET(request, { params }) {
-  try {
-    const { id } = params;
+  const { id } = await params;
 
+  try {
     // Notion 설정이 없으면 Mock 데이터 반환
     if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATABASE_ID) {
       console.log('Notion 설정이 없습니다. Mock 데이터를 반환합니다.');
@@ -30,13 +30,13 @@ export async function GET(request, { params }) {
 
     const story = {
       id: page.id,
-      title: properties.Title?.title?.[0]?.plain_text || '제목 없음',
-      category: properties.Category?.select?.name || '전체',
-      coverImage: properties.CoverImage?.files?.[0]?.file?.url ||
-                 properties.CoverImage?.files?.[0]?.external?.url ||
+      title: properties.Name?.title?.[0]?.plain_text || '제목 없음',
+      category: properties.학원정보?.select?.name || '전체',
+      coverImage: page.cover?.external?.url ||
+                 page.cover?.file?.url ||
                  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=600&fit=crop',
-      date: formatDate(properties.Date?.date?.start),
-      author: properties.Author?.rich_text?.[0]?.plain_text || 'EduRichBrain',
+      date: formatDate(properties['컨텐츠 발행일']?.date?.start),
+      author: properties.기획?.rich_text?.[0]?.plain_text || 'EduRichBrain',
       content: content,
     };
 
@@ -44,7 +44,7 @@ export async function GET(request, { params }) {
   } catch (error) {
     console.error('Notion API 에러:', error);
     // 에러 발생 시 Mock 데이터 반환
-    return NextResponse.json(getMockStory(params.id));
+    return NextResponse.json(getMockStory(id));
   }
 }
 

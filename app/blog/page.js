@@ -7,11 +7,23 @@ export default function BlogPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('전체');
-
-  const categories = ['전체', 'EduRichBrain', '교육리서치', '경영리서치', 'AI'];
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categories, setCategories] = useState(['전체']);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     fetchStories();
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const fetchStories = async () => {
@@ -20,9 +32,16 @@ export default function BlogPage() {
       const response = await fetch('/api/blog');
       const data = await response.json();
       setStories(data);
+
+      // 카테고리 동적 생성
+      const uniqueCategories = ['전체', ...new Set(data.map(story => story.category).filter(Boolean))];
+      setCategories(uniqueCategories);
     } catch (error) {
       console.error('블로그 로딩 실패:', error);
-      setStories(getMockStories());
+      const mockData = getMockStories();
+      setStories(mockData);
+      const uniqueCategories = ['전체', ...new Set(mockData.map(story => story.category).filter(Boolean))];
+      setCategories(uniqueCategories);
     } finally {
       setLoading(false);
     }
@@ -89,149 +108,132 @@ export default function BlogPage() {
     ? stories
     : stories.filter(story => story.category === selectedCategory);
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)' }}>
-      {/* Left Sidebar Navigation */}
-      <aside style={{
-        width: '260px',
-        background: 'rgba(10, 14, 39, 0.95)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '20px',
-      }}>
-        <Link href="/" style={{
-          fontSize: '20px',
-          fontWeight: 'bold',
-          color: 'white',
-          textDecoration: 'none',
-          marginBottom: '40px',
-        }}>
+    <div className="app-layout">
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link active" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
+            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/signup"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              로그인
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar (Desktop Only) */}
+      <aside className="sidebar">
+        <Link href="/" className="sidebar-logo">
           EduRichBrain
         </Link>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Link href="/" style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            textDecoration: 'none',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            transition: 'all 0.2s',
-          }}>
-            제품
-          </Link>
-          <Link href="/pricing" style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            textDecoration: 'none',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            transition: 'all 0.2s',
-          }}>
-            요금제
-          </Link>
-          <Link href="/diagnosis" style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            textDecoration: 'none',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            transition: 'all 0.2s',
-          }}>
-            경영진단
-          </Link>
-          <Link href="/blog" style={{
-            color: 'white',
-            background: 'rgba(59, 130, 246, 0.2)',
-            textDecoration: 'none',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            transition: 'all 0.2s',
-          }}>
-            블로그
-          </Link>
-          <Link href="/about" style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            textDecoration: 'none',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            transition: 'all 0.2s',
-          }}>
-            회사
-          </Link>
-          <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            textDecoration: 'none',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            transition: 'all 0.2s',
-          }}>
-            데모
-          </a>
+        <nav className="sidebar-nav">
+          <Link href="/" className="sidebar-link">제품</Link>
+          <Link href="/pricing" className="sidebar-link">요금제</Link>
+          <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
+          <Link href="/blog" className="sidebar-link active">블로그</Link>
+          <Link href="/about" className="sidebar-link">회사</Link>
+          <Link href="/demo" className="sidebar-link">데모</Link>
         </nav>
+
+        <div className="sidebar-footer">
+          <button className="sidebar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <div style={{
-        flex: 1,
-        background: 'transparent',
-        overflowY: 'auto',
-      }}>
+      <div className="main-area">
         {/* Top Bar */}
-        <header style={{
-          height: '60px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 40px',
-        }}>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <button style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'rgba(255, 255, 255, 0.6)',
-              cursor: 'pointer',
-              padding: '8px',
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-                <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button style={{
-              background: 'transparent',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}>
-              로그인
-            </button>
-          </div>
+        <header className="top-bar">
+          <button className="search-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+              <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+          <Link href="/signup" className="login-btn">
+            로그인
+          </Link>
         </header>
 
-        <div style={{ padding: '60px 40px' }}>
+        <div style={{ padding: isMobile ? '40px 20px' : '60px 40px' }}>
           {/* Header */}
           <div style={{
             maxWidth: '1400px',
             margin: '0 auto',
-            marginBottom: '40px',
+            marginBottom: isMobile ? '32px' : '40px',
           }}>
             <h1 style={{
-              fontSize: '48px',
+              fontSize: isMobile ? '32px' : '48px',
               fontWeight: '600',
               color: 'white',
               margin: 0,
-              marginBottom: '30px',
+              marginBottom: isMobile ? '24px' : '30px',
               letterSpacing: '-0.02em',
             }}>
               고객사례
@@ -242,6 +244,8 @@ export default function BlogPage() {
               display: 'flex',
               gap: '0',
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              overflowX: isMobile ? 'auto' : 'visible',
+              WebkitOverflowScrolling: 'touch'
             }}>
               {categories.map((category) => (
                 <button
@@ -253,21 +257,22 @@ export default function BlogPage() {
                     borderBottom: selectedCategory === category
                       ? '2px solid white'
                       : '2px solid transparent',
-                    padding: '12px 24px',
+                    padding: isMobile ? '10px 16px' : '12px 24px',
                     color: selectedCategory === category ? 'white' : 'rgba(255, 255, 255, 0.5)',
                     cursor: 'pointer',
-                    fontSize: '16px',
+                    fontSize: isMobile ? '14px' : '16px',
                     fontWeight: '400',
                     transition: 'all 0.2s ease',
                     marginBottom: '-1px',
+                    whiteSpace: 'nowrap'
                   }}
                   onMouseEnter={(e) => {
-                    if (selectedCategory !== category) {
+                    if (selectedCategory !== category && !isMobile) {
                       e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (selectedCategory !== category) {
+                    if (selectedCategory !== category && !isMobile) {
                       e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
                     }
                   }}
@@ -297,9 +302,9 @@ export default function BlogPage() {
             ) : (
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '24px',
-                marginTop: '40px',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: isMobile ? '20px' : '24px',
+                marginTop: isMobile ? '32px' : '40px',
               }}>
                 {filteredStories.map((story) => (
                   <Link
@@ -310,25 +315,29 @@ export default function BlogPage() {
                     <div
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: '12px',
+                        borderRadius: isMobile ? '12px' : '16px',
                         overflow: 'hidden',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-5px)';
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                        if (!isMobile) {
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        if (!isMobile) {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        }
                       }}
                     >
                       {/* Square Thumbnail */}
                       <div style={{
                         width: '100%',
-                        paddingBottom: '100%',
+                        paddingBottom: '75%',
                         background: `url(${story.coverImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
@@ -337,28 +346,28 @@ export default function BlogPage() {
 
                       {/* Content */}
                       <div style={{
-                        padding: '20px',
+                        padding: isMobile ? '16px' : '20px',
                       }}>
                         {/* Category Badge */}
                         <div style={{
                           display: 'inline-block',
                           background: getCategoryColor(story.category),
-                          padding: '4px 10px',
+                          padding: isMobile ? '3px 8px' : '4px 10px',
                           borderRadius: '20px',
-                          fontSize: '11px',
+                          fontSize: isMobile ? '10px' : '11px',
                           color: 'white',
                           fontWeight: '600',
-                          marginBottom: '12px',
+                          marginBottom: isMobile ? '10px' : '12px',
                         }}>
                           {story.category}
                         </div>
 
                         {/* Title */}
                         <h3 style={{
-                          fontSize: '18px',
+                          fontSize: isMobile ? '16px' : '18px',
                           fontWeight: '700',
                           color: 'white',
-                          marginBottom: '8px',
+                          marginBottom: isMobile ? '6px' : '8px',
                           lineHeight: '1.4',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -371,11 +380,11 @@ export default function BlogPage() {
 
                         {/* Excerpt */}
                         <p style={{
-                          fontSize: '13px',
+                          fontSize: isMobile ? '12px' : '13px',
                           color: 'rgba(255, 255, 255, 0.6)',
                           lineHeight: '1.5',
                           margin: 0,
-                          marginBottom: '12px',
+                          marginBottom: isMobile ? '10px' : '12px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           display: '-webkit-box',
@@ -387,7 +396,7 @@ export default function BlogPage() {
 
                         {/* Date */}
                         <div style={{
-                          fontSize: '12px',
+                          fontSize: isMobile ? '11px' : '12px',
                           color: 'rgba(255, 255, 255, 0.4)',
                         }}>
                           {story.date}
@@ -402,15 +411,53 @@ export default function BlogPage() {
             {filteredStories.length === 0 && !loading && (
               <div style={{
                 textAlign: 'center',
-                padding: '80px 20px',
+                padding: isMobile ? '60px 20px' : '80px 20px',
                 color: 'rgba(255, 255, 255, 0.5)',
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
               }}>
                 해당 카테고리의 스토리가 없습니다.
               </div>
             )}
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="page-footer">
+          <div className="footer-grid">
+            <div className="footer-col">
+              <h4>제품</h4>
+              <ul>
+                <li><a href="#">기능</a></li>
+                <li><a href="#">예시</a></li>
+                <li><a href="#">요금</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h4>지원</h4>
+              <ul>
+                <li><a href="#">고객센터</a></li>
+                <li><a href="#">가이드</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h4>회사</h4>
+              <ul>
+                <li><a href="#">소개</a></li>
+                <li><a href="#">블로그</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h4>법률</h4>
+              <ul>
+                <li><a href="#">이용약관</a></li>
+                <li><a href="#">개인정보처리방침</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="footer-copyright">
+            <p>© 2024 EduRichBrain. All rights reserved.</p>
+          </div>
+        </footer>
       </div>
     </div>
   );
