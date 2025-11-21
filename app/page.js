@@ -35,13 +35,12 @@ export default function HomePage() {
         </Link>
 
         <nav className="sidebar-nav">
-          <a href="#" className="sidebar-link active">제품</a>
-          <a href="#" className="sidebar-link">요금제</a>
-          <a href="#" className="sidebar-link">경영진단</a>
-          <a href="#" className="sidebar-link">고객사례</a>
-          <a href="#" className="sidebar-link">블로그</a>
-          <a href="#" className="sidebar-link">회사</a>
-          <a href="#" className="sidebar-link">데모</a>
+          <Link href="/" className="sidebar-link active">제품</Link>
+          <Link href="/pricing" className="sidebar-link">요금제</Link>
+          <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
+          <Link href="/blog" className="sidebar-link">블로그</Link>
+          <Link href="/about" className="sidebar-link">회사</Link>
+          <Link href="/demo" className="sidebar-link">데모</Link>
         </nav>
 
         <div className="sidebar-footer">
@@ -167,7 +166,9 @@ export default function HomePage() {
           <div className="diagnosis-container">
             <h2 className="diagnosis-title">우리 학원 경영 레벨은?</h2>
             <p className="diagnosis-desc">3분 만에 확인하는 무료 경영 진단 테스트</p>
-            <button className="diagnosis-btn">경영진단 시작하기</button>
+            <Link href="/diagnosis" className="diagnosis-btn" style={{ display: 'inline-block', textDecoration: 'none' }}>
+              경영진단 시작하기
+            </Link>
           </div>
         </section>
 
@@ -177,8 +178,8 @@ export default function HomePage() {
             <h2 className="cta-title">EduRichBrain 시작하기</h2>
             <p className="cta-desc">지금 바로 시작하고 학원 경영의 새로운 기준을 경험하세요</p>
             <div className="cta-buttons">
-              <button className="cta-btn-primary">무료 체험</button>
-              <button className="cta-btn-secondary">데모 보기</button>
+              <Link href="/demo" className="cta-btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>무료 체험</Link>
+              <Link href="/demo" className="cta-btn-secondary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>데모 보기</Link>
             </div>
           </div>
         </section>
