@@ -53,12 +53,14 @@ export default function SignupPage() {
     }
     if (!formData.phone) newErrors.phone = '연락처를 입력해주세요'
 
+    // 공통 동의 검증 (모든 역할)
+    if (!formData.agreeTerms) newErrors.agreeTerms = '이용약관에 동의해주세요'
+    if (!formData.agreePrivacy) newErrors.agreePrivacy = '개인정보 처리방침에 동의해주세요'
+    if (!formData.agreeDataStorage) newErrors.agreeDataStorage = 'AI 대화 내용 저장에 동의해주세요'
+
     // 역할별 검증
     if (role === 'director') {
       if (!formData.academyName) newErrors.academyName = '학원명을 입력해주세요'
-      if (!formData.agreeTerms) newErrors.agreeTerms = '이용약관에 동의해주세요'
-      if (!formData.agreePrivacy) newErrors.agreePrivacy = '개인정보 처리방침에 동의해주세요'
-      if (!formData.agreeDataStorage) newErrors.agreeDataStorage = 'AI 대화 내용 저장에 동의해주세요'
     } else {
       // 강사/알바
       if (!formData.inviteCode) {
@@ -899,31 +901,68 @@ export default function SignupPage() {
                   )}
                 </div>
 
-                {/* 동의서 - 원장만 */}
-                {role === 'director' && (
-                  <div style={{
-                    marginBottom: '32px',
-                    padding: '24px',
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(59, 130, 246, 0.15)'
+                {/* 동의서 - 모든 역할 */}
+                <div style={{
+                  marginBottom: '32px',
+                  padding: '24px',
+                  background: 'rgba(59, 130, 246, 0.08)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(59, 130, 246, 0.15)'
+                }}>
+                  {/* 전체 동의 */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '16px',
+                    marginBottom: '16px',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    border: '1px solid rgba(59, 130, 246, 0.2)'
                   }}>
-                    <div style={{
-                      fontSize: '15px',
-                      fontWeight: '600',
-                      color: '#ffffff',
-                      marginBottom: '16px'
-                    }}>
-                      서비스 이용 동의 (필수)
-                    </div>
+                    <input
+                      type="checkbox"
+                      checked={formData.agreeTerms && formData.agreePrivacy && formData.agreeDataStorage && formData.agreeMarketing}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setFormData(prev => ({
+                          ...prev,
+                          agreeTerms: checked,
+                          agreePrivacy: checked,
+                          agreeDataStorage: checked,
+                          agreeMarketing: checked
+                        }))
+                      }}
+                      style={{
+                        marginRight: '12px',
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span style={{ fontSize: '15px', fontWeight: '600', color: '#ffffff' }}>
+                      전체 동의하기
+                    </span>
+                  </label>
 
-                    {/* 이용약관 */}
-                    <label style={{
-                      display: 'flex',
-                      alignItems: 'start',
-                      marginBottom: '12px',
-                      cursor: 'pointer'
-                    }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    marginBottom: '12px'
+                  }}>
+                    필수 동의
+                  </div>
+
+                  {/* 이용약관 */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '12px',
+                    cursor: 'pointer'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                       <input
                         type="checkbox"
                         name="agreeTerms"
@@ -931,29 +970,45 @@ export default function SignupPage() {
                         onChange={handleChange}
                         style={{
                           marginRight: '12px',
-                          marginTop: '3px',
                           width: '18px',
                           height: '18px',
                           cursor: 'pointer'
                         }}
                       />
-                      <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)', lineHeight: '1.5' }}>
+                      <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
                         <span style={{ color: '#ef4444' }}>*</span> 이용약관에 동의합니다
                       </span>
-                    </label>
-                    {errors.agreeTerms && (
-                      <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginBottom: '8px' }}>
-                        {errors.agreeTerms}
-                      </p>
-                    )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); window.open('/terms', '_blank') }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        padding: '4px 8px'
+                      }}
+                    >
+                      보기 &gt;
+                    </button>
+                  </label>
+                  {errors.agreeTerms && (
+                    <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginBottom: '8px' }}>
+                      {errors.agreeTerms}
+                    </p>
+                  )}
 
-                    {/* 개인정보 */}
-                    <label style={{
-                      display: 'flex',
-                      alignItems: 'start',
-                      marginBottom: '12px',
-                      cursor: 'pointer'
-                    }}>
+                  {/* 개인정보 */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '12px',
+                    cursor: 'pointer'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                       <input
                         type="checkbox"
                         name="agreePrivacy"
@@ -961,92 +1016,105 @@ export default function SignupPage() {
                         onChange={handleChange}
                         style={{
                           marginRight: '12px',
-                          marginTop: '3px',
                           width: '18px',
                           height: '18px',
                           cursor: 'pointer'
                         }}
                       />
-                      <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)', lineHeight: '1.5' }}>
+                      <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
                         <span style={{ color: '#ef4444' }}>*</span> 개인정보 처리방침에 동의합니다
                       </span>
-                    </label>
-                    {errors.agreePrivacy && (
-                      <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginBottom: '8px' }}>
-                        {errors.agreePrivacy}
-                      </p>
-                    )}
-
-                    {/* AI 대화 저장 */}
-                    <label style={{
-                      display: 'flex',
-                      alignItems: 'start',
-                      marginBottom: '12px',
-                      cursor: 'pointer'
-                    }}>
-                      <input
-                        type="checkbox"
-                        name="agreeDataStorage"
-                        checked={formData.agreeDataStorage}
-                        onChange={handleChange}
-                        style={{
-                          marginRight: '12px',
-                          marginTop: '3px',
-                          width: '18px',
-                          height: '18px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                      <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)', lineHeight: '1.5' }}>
-                        <span style={{ color: '#ef4444' }}>*</span> AI 대화 내용 및 생성 결과물을 서비스 개선을 위해 데이터베이스에 저장하는 것에 동의합니다
-                      </span>
-                    </label>
-                    {errors.agreeDataStorage && (
-                      <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginBottom: '8px' }}>
-                        {errors.agreeDataStorage}
-                      </p>
-                    )}
-
-                    <div style={{
-                      height: '1px',
-                      background: 'rgba(59, 130, 246, 0.2)',
-                      margin: '16px 0'
-                    }}></div>
-
-                    <div style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '12px'
-                    }}>
-                      선택 동의
                     </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); window.open('/privacy', '_blank') }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        padding: '4px 8px'
+                      }}
+                    >
+                      보기 &gt;
+                    </button>
+                  </label>
+                  {errors.agreePrivacy && (
+                    <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginBottom: '8px' }}>
+                      {errors.agreePrivacy}
+                    </p>
+                  )}
 
-                    {/* 마케팅 동의 */}
-                    <label style={{
-                      display: 'flex',
-                      alignItems: 'start',
-                      cursor: 'pointer'
-                    }}>
-                      <input
-                        type="checkbox"
-                        name="agreeMarketing"
-                        checked={formData.agreeMarketing}
-                        onChange={handleChange}
-                        style={{
-                          marginRight: '12px',
-                          marginTop: '3px',
-                          width: '18px',
-                          height: '18px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                      <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.5' }}>
-                        AI 생성 결과물(블로그, 리포트 등)을 마케팅 목적으로 활용하는 것에 동의합니다
-                      </span>
-                    </label>
+                  {/* AI 대화 저장 */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'start',
+                    marginBottom: '12px',
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="checkbox"
+                      name="agreeDataStorage"
+                      checked={formData.agreeDataStorage}
+                      onChange={handleChange}
+                      style={{
+                        marginRight: '12px',
+                        marginTop: '3px',
+                        width: '18px',
+                        height: '18px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)', lineHeight: '1.5' }}>
+                      <span style={{ color: '#ef4444' }}>*</span> AI 대화 내용 저장에 동의합니다 (맞춤형 추천 및 이어서 대화하기 기능 제공)
+                    </span>
+                  </label>
+                  {errors.agreeDataStorage && (
+                    <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginBottom: '8px' }}>
+                      {errors.agreeDataStorage}
+                    </p>
+                  )}
+
+                  <div style={{
+                    height: '1px',
+                    background: 'rgba(59, 130, 246, 0.2)',
+                    margin: '16px 0'
+                  }}></div>
+
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    marginBottom: '12px'
+                  }}>
+                    선택 동의
                   </div>
-                )}
+
+                  {/* 마케팅 동의 */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'start',
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="checkbox"
+                      name="agreeMarketing"
+                      checked={formData.agreeMarketing}
+                      onChange={handleChange}
+                      style={{
+                        marginRight: '12px',
+                        marginTop: '3px',
+                        width: '18px',
+                        height: '18px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.5' }}>
+                      신규 기능 및 학원 운영 팁 소식 받기
+                    </span>
+                  </label>
+                </div>
 
                 {/* Submit Button */}
                 <button

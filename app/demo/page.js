@@ -164,42 +164,6 @@ export default function DemoPage() {
           </Link>
         </div>
 
-        {/* Center: Demo Label */}
-        {!isMobile && (
-          <div style={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            padding: '8px 20px',
-            borderRadius: '12px'
-          }}>
-            <div style={{
-              width: '24px',
-              height: '24px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <span style={{ fontSize: '14px' }}>✨</span>
-            </div>
-            <span style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#3b82f6'
-            }}>
-              실시간 데모 체험
-            </span>
-          </div>
-        )}
-
         {/* Right: Actions */}
         {!isMobile && (
           <div style={{ display: 'flex', gap: '12px' }}>

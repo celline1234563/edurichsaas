@@ -1237,43 +1237,6 @@ export default function PricingPage() {
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="page-footer">
-          <div className="footer-grid">
-            <div className="footer-col">
-              <h4>제품</h4>
-              <ul>
-                <li><a href="#">기능</a></li>
-                <li><a href="#">예시</a></li>
-                <li><a href="#">요금</a></li>
-              </ul>
-            </div>
-            <div className="footer-col">
-              <h4>지원</h4>
-              <ul>
-                <li><a href="#">고객센터</a></li>
-                <li><a href="#">가이드</a></li>
-              </ul>
-            </div>
-            <div className="footer-col">
-              <h4>회사</h4>
-              <ul>
-                <li><a href="#">소개</a></li>
-                <li><a href="#">블로그</a></li>
-              </ul>
-            </div>
-            <div className="footer-col">
-              <h4>법률</h4>
-              <ul>
-                <li><a href="#">이용약관</a></li>
-                <li><a href="#">개인정보처리방침</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="footer-copyright">
-            <p>© 2024 EduRichBrain. All rights reserved.</p>
-          </div>
-        </footer>
       </div>
     </div>
   )
