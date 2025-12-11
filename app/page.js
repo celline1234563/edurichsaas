@@ -42,7 +42,7 @@ export default function HomePage() {
       alert('내용을 입력해주세요')
       return
     }
-    alert('회원가입 후 AI와 대화를 시작합니다!\n\n→ app.edurichbrain.com으로 이동')
+    window.open('https://edurichbrain.vercel.app/', '_blank')
   }
 
   const fillSuggestion = (text) => {
