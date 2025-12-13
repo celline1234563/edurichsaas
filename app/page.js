@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export default function HomePage() {
+  const { status } = useSession()
   const [mainInput, setMainInput] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null)
+  const [showAccessModal, setShowAccessModal] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -30,6 +34,34 @@ export default function HomePage() {
       .catch(err => console.error('블로그 데이터 로드 실패:', err))
   }, [])
 
+  // 구독 상태 확인
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (status === 'loading') return
+      if (status === 'unauthenticated') {
+        setSubscriptionStatus({ canUse: false, reason: 'unauthenticated' })
+        return
+      }
+
+      try {
+        const response = await fetch('/api/subscription')
+        const data = await response.json()
+        if (data.success) {
+          setSubscriptionStatus({
+            canUse: data.data.canUseService,
+            reason: data.data.serviceStatus,
+            credits: data.data.credits
+          })
+        } else {
+          setSubscriptionStatus({ canUse: false, reason: data.error })
+        }
+      } catch (error) {
+        setSubscriptionStatus({ canUse: false, reason: 'error' })
+      }
+    }
+    checkSubscription()
+  }, [status])
+
   const handleEnter = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
@@ -37,11 +69,25 @@ export default function HomePage() {
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!mainInput.trim()) {
       alert('내용을 입력해주세요')
       return
     }
+
+    // 로그인 확인
+    if (status === 'unauthenticated') {
+      setShowAccessModal(true)
+      return
+    }
+
+    // 구독 상태 확인
+    if (subscriptionStatus && !subscriptionStatus.canUse) {
+      setShowAccessModal(true)
+      return
+    }
+
+    // 구독이 있으면 바로 이동
     window.open('https://edurichbrain.vercel.app/', '_blank')
   }
 
@@ -278,6 +324,201 @@ export default function HomePage() {
         </section>
 
       </div>
+
+      {/* Access Required Modal */}
+      {showAccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            maxWidth: '480px',
+            width: '100%',
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9))',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            borderRadius: '24px',
+            padding: isMobile ? '32px 24px' : '48px 40px',
+            textAlign: 'center',
+            position: 'relative',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => setShowAccessModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'rgba(255, 255, 255, 0.6)'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            {/* Icon */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 24px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {subscriptionStatus?.reason === 'unauthenticated' ? (
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : (
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+
+            {/* Title */}
+            <h2 style={{
+              fontSize: isMobile ? '22px' : '26px',
+              fontWeight: '600',
+              color: '#ffffff',
+              marginBottom: '16px'
+            }}>
+              {subscriptionStatus?.reason === 'unauthenticated' && '로그인이 필요합니다'}
+              {subscriptionStatus?.reason === 'no_subscription' && '구독이 필요합니다'}
+              {subscriptionStatus?.reason === 'subscription_expired' && '구독이 만료되었습니다'}
+              {subscriptionStatus?.reason === 'insufficient_credits' && '크레딧이 부족합니다'}
+              {!subscriptionStatus && '서비스 이용 불가'}
+            </h2>
+
+            {/* Description */}
+            <p style={{
+              fontSize: '15px',
+              color: 'rgba(255, 255, 255, 0.6)',
+              lineHeight: '1.6',
+              marginBottom: '32px'
+            }}>
+              {subscriptionStatus?.reason === 'unauthenticated' && 'AI 학원 경영 도구를 사용하려면 먼저 로그인해주세요.'}
+              {subscriptionStatus?.reason === 'no_subscription' && '서비스를 이용하려면 요금제를 선택해주세요.'}
+              {subscriptionStatus?.reason === 'subscription_expired' && '계속 이용하시려면 구독을 갱신해주세요.'}
+              {subscriptionStatus?.reason === 'insufficient_credits' && `현재 보유 크레딧: ${subscriptionStatus?.credits || 0}P`}
+            </p>
+
+            {/* Credits Display */}
+            {subscriptionStatus?.credits !== undefined && subscriptionStatus?.reason !== 'unauthenticated' && (
+              <div style={{
+                background: 'rgba(59, 130, 246, 0.1)',
+                padding: '16px',
+                borderRadius: '12px',
+                marginBottom: '24px',
+                border: '1px solid rgba(59, 130, 246, 0.2)'
+              }}>
+                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                  보유 크레딧
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: '700', color: '#60a5fa' }}>
+                  {(subscriptionStatus?.credits || 0).toLocaleString()}P
+                </div>
+              </div>
+            )}
+
+            {/* CTA Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {subscriptionStatus?.reason === 'unauthenticated' ? (
+                <>
+                  <Link
+                    href="/login"
+                    style={{
+                      padding: '16px 32px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                      boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
+                    }}
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/signup"
+                    style={{
+                      padding: '16px 32px',
+                      background: 'transparent',
+                      border: '2px solid rgba(59, 130, 246, 0.4)',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      textAlign: 'center'
+                    }}
+                  >
+                    회원가입
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/pricing"
+                    style={{
+                      padding: '16px 32px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                      boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
+                    }}
+                  >
+                    {subscriptionStatus?.reason === 'insufficient_credits' ? '크레딧 충전하기' : '요금제 선택하기'}
+                  </Link>
+                  <button
+                    onClick={() => setShowAccessModal(false)}
+                    style={{
+                      padding: '16px 32px',
+                      background: 'transparent',
+                      border: '2px solid rgba(59, 130, 246, 0.4)',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    닫기
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
