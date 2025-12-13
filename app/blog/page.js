@@ -9,7 +9,7 @@ export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [categories, setCategories] = useState(['전체']);
+  const [categories, setCategories] = useState(['전체', 'EduRichBrain', '교육리서치', '경영리서치', 'AI']);
 
   useEffect(() => {
     const checkMobile = () => {
