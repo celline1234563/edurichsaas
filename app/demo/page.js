@@ -23,6 +23,13 @@ export default function DemoPage() {
         return
       }
 
+      // 데모 사용자는 바로 접근 허용
+      if (session?.user?.isDemo) {
+        setCheckingSubscription(false)
+        setSubscriptionStatus({ canUse: true, reason: 'demo_user' })
+        return
+      }
+
       try {
         const response = await fetch('/api/subscription')
         const data = await response.json()
@@ -46,7 +53,7 @@ export default function DemoPage() {
     }
 
     checkSubscription()
-  }, [status])
+  }, [status, session])
 
   useEffect(() => {
     // iframe 로딩 시뮬레이션

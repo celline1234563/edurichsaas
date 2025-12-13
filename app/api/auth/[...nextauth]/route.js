@@ -1,9 +1,37 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import KakaoProvider from 'next-auth/providers/kakao'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 export const authOptions = {
   providers: [
+    // 이메일/비밀번호 로그인 (데모 계정 포함)
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' }
+      },
+      async authorize(credentials) {
+        // 데모 계정 확인
+        if (credentials?.email === 'demo@edurichbrain.com' && credentials?.password === 'demo1234') {
+          return {
+            id: 'demo-user-001',
+            email: 'demo@edurichbrain.com',
+            name: '데모 사용자',
+            isDemo: true
+          }
+        }
+
+        // TODO: 실제 DB에서 사용자 확인 로직 추가
+        // const user = await supabase.from('users').select().eq('email', credentials.email).single()
+        // if (user && verifyPassword(credentials.password, user.password)) {
+        //   return { id: user.id, email: user.email, name: user.name }
+        // }
+
+        return null
+      }
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
@@ -31,6 +59,7 @@ export const authOptions = {
       }
       if (user) {
         token.id = user.id
+        token.isDemo = user.isDemo || false
       }
       return token
     },
@@ -39,6 +68,7 @@ export const authOptions = {
       session.accessToken = token.accessToken
       session.provider = token.provider
       session.user.id = token.id
+      session.user.isDemo = token.isDemo || false
       return session
     },
     async redirect({ url, baseUrl }) {

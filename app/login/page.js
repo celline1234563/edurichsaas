@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function LoginPage() {
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+  const [loginError, setLoginError] = useState('')
 
   const validateForm = () => {
     const newErrors = {}
@@ -33,16 +35,19 @@ export default function LoginPage() {
     if (!validateForm()) return
 
     setIsLoading(true)
+    setLoginError('')
 
-    // 임시 로직 - 나중에 Supabase 연동
-    setTimeout(() => {
-      // localStorage에서 유저 정보 확인 (임시)
-      const savedUser = localStorage.getItem('userData') || localStorage.getItem('user')
+    try {
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false
+      })
 
-      if (savedUser) {
-        const user = JSON.parse(savedUser)
-        alert(`환영합니다, ${user.directorName || user.academyName} 님!`)
-
+      if (result?.error) {
+        setLoginError('이메일 또는 비밀번호가 일치하지 않습니다.')
+        setIsLoading(false)
+      } else if (result?.ok) {
         // 결제 대기 중인 정보가 있는지 확인
         const pendingPayment = sessionStorage.getItem('pendingPayment')
         if (pendingPayment) {
@@ -50,14 +55,14 @@ export default function LoginPage() {
           sessionStorage.removeItem('pendingPayment')
           window.location.href = `/payment?plan=${plan}&cycle=${cycle}`
         } else {
-          // 메인 앱으로 리다이렉션
-          window.location.href = 'http://localhost:3000' // edurichbrain 앱으로
+          // 데모 페이지로 이동
+          window.location.href = '/demo'
         }
-      } else {
-        alert('로그인 정보가 일치하지 않습니다.\n\n(테스트: 먼저 회원가입을 해주세요)')
-        setIsLoading(false)
       }
-    }, 1000)
+    } catch (error) {
+      setLoginError('로그인 중 오류가 발생했습니다.')
+      setIsLoading(false)
+    }
   }
 
   const handleChange = (e) => {
@@ -70,32 +75,36 @@ export default function LoginPage() {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
+    if (loginError) {
+      setLoginError('')
+    }
   }
 
-  const handleDemoLogin = () => {
-    // 데모 계정으로 자동 로그인
-    setFormData({
-      email: 'demo@edurichbrain.com',
-      password: 'demo1234',
-      rememberMe: false
-    })
+  const handleDemoLogin = async () => {
+    setIsLoading(true)
+    setLoginError('')
 
-    // 데모 유저 정보 저장
-    localStorage.setItem('userData', JSON.stringify({
-      academyName: '에듀리치 시범학원',
-      directorName: '데모',
-      email: 'demo@edurichbrain.com',
-      role: 'director',
-      subscriptionType: 'trial',
-      trialTurnsUsed: 0,
-      trialTurnsLimit: 3,
-      signupDate: new Date().toISOString()
-    }))
+    try {
+      const result = await signIn('credentials', {
+        email: 'demo@edurichbrain.com',
+        password: 'demo1234',
+        redirect: false
+      })
 
-    alert('데모 계정으로 로그인합니다.')
-    setTimeout(() => {
-      window.location.href = 'http://localhost:3000'
-    }, 1000)
+      if (result?.ok) {
+        window.location.href = '/demo'
+      } else {
+        setLoginError('데모 로그인에 실패했습니다.')
+        setIsLoading(false)
+      }
+    } catch (error) {
+      setLoginError('로그인 중 오류가 발생했습니다.')
+      setIsLoading(false)
+    }
+  }
+
+  const handleSocialLogin = (provider) => {
+    signIn(provider, { callbackUrl: '/demo' })
   }
 
   return (
@@ -289,6 +298,21 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {/* Login Error Message */}
+            {loginError && (
+              <div style={{
+                padding: '12px 16px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px',
+                marginBottom: '16px'
+              }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#ef4444' }}>
+                  {loginError}
+                </p>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
@@ -360,22 +384,25 @@ export default function LoginPage() {
 
           {/* Social Login */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <button style={{
-              width: '100%',
-              padding: '14px',
-              background: 'rgba(59, 130, 246, 0.08)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px',
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}>
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('google')}
+              style={{
+                width: '100%',
+                padding: '14px',
+                background: 'rgba(59, 130, 246, 0.08)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                borderRadius: '12px',
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '15px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -385,55 +412,25 @@ export default function LoginPage() {
               Google로 계속하기
             </button>
 
-            <button style={{
-              width: '100%',
-              padding: '14px',
-              background: 'rgba(59, 130, 246, 0.08)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px',
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}>
-              <div style={{
-                width: '20px',
-                height: '20px',
-                background: '#03C75A',
-                borderRadius: '4px',
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('kakao')}
+              style={{
+                width: '100%',
+                padding: '14px',
+                background: 'rgba(59, 130, 246, 0.08)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                borderRadius: '12px',
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '15px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#000000',
-                fontWeight: '700',
-                fontSize: '12px'
+                gap: '8px'
               }}>
-                N
-              </div>
-              네이버로 계속하기
-            </button>
-
-            <button style={{
-              width: '100%',
-              padding: '14px',
-              background: 'rgba(59, 130, 246, 0.08)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px',
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}>
               <div style={{
                 width: '20px',
                 height: '20px',

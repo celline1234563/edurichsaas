@@ -18,7 +18,7 @@ export default function Footer() {
   return (
     <footer style={{
       marginLeft: isMobile ? '0' : '260px',
-      background: '#0a0a0a',
+      background: '#0a0a1a',
       color: '#9ca3af'
     }}>
       {/* 상단 푸터 */}
@@ -61,10 +61,9 @@ export default function Footer() {
             }}>제품</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {[
-                { href: '/features', label: '기능 소개' },
+                { href: '/#features', label: '기능 소개' },
                 { href: '/pricing', label: '가격 정책' },
-                { href: '/cases', label: '도입 사례' },
-                { href: '/api-docs', label: 'API 문서' }
+                { href: '/blog', label: '도입 사례' }
               ].map((item) => (
                 <li key={item.href} style={{ marginBottom: '12px' }}>
                   <Link href={item.href} style={{
@@ -94,9 +93,8 @@ export default function Footer() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {[
                 { href: '/about', label: '회사 소개' },
-                { href: '/careers', label: '채용 정보' },
-                { href: '/blog', label: '블로그' },
-                { href: '/press', label: '언론 보도' }
+                { href: '/coming-soon?page=careers', label: '채용 정보' },
+                { href: '/blog', label: '블로그' }
               ].map((item) => (
                 <li key={item.href} style={{ marginBottom: '12px' }}>
                   <Link href={item.href} style={{
@@ -125,10 +123,9 @@ export default function Footer() {
             }}>지원</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {[
-                { href: '/support', label: '고객센터' },
-                { href: '/guide', label: '사용 가이드' },
-                { href: '/faq', label: 'FAQ' },
-                { href: '/contact', label: '1:1 문의' }
+                { href: '/coming-soon?page=guide', label: '사용 가이드' },
+                { href: '/blog', label: 'FAQ' },
+                { href: '/coming-soon?page=contact', label: '1:1 문의' }
               ].map((item) => (
                 <li key={item.href} style={{ marginBottom: '12px' }}>
                   <Link href={item.href} style={{
@@ -163,8 +160,6 @@ export default function Footer() {
             fontSize: '14px',
             color: '#6b7280'
           }}>
-            <span>© 2024 EDU RICH BRAIN. All rights reserved.</span>
-            {!isMobile && <span>|</span>}
             <Link href="/privacy" style={{ color: '#6b7280', textDecoration: 'none' }}
               onMouseEnter={(e) => e.target.style.color = '#ffffff'}
               onMouseLeave={(e) => e.target.style.color = '#6b7280'}
