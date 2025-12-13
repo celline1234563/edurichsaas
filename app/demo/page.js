@@ -162,7 +162,7 @@ export default function DemoPage() {
               onClick={closeMobileMenu}
               style={{ width: '100%', textAlign: 'center' }}
             >
-              로그인
+              시작하기
             </Link>
           </div>
         </div>
@@ -389,7 +389,7 @@ export default function DemoPage() {
                       boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
                     }}
                   >
-                    로그인
+                    시작하기
                   </Link>
                   <Link
                     href="/signup"
@@ -405,7 +405,7 @@ export default function DemoPage() {
                       textAlign: 'center'
                     }}
                   >
-                    회원가입
+                    회원가입하기
                   </Link>
                 </>
               ) : (

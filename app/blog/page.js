@@ -176,7 +176,7 @@ export default function BlogPage() {
               onClick={closeMobileMenu}
               style={{ width: '100%', textAlign: 'center' }}
             >
-              로그인
+              시작하기
             </Link>
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function BlogPage() {
             </svg>
           </button>
           <Link href="/signup" className="login-btn">
-            로그인
+            시작하기
           </Link>
         </header>
 

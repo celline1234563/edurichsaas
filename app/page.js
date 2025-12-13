@@ -461,7 +461,7 @@ export default function HomePage() {
                       boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
                     }}
                   >
-                    로그인
+                    시작하기
                   </Link>
                   <Link
                     href="/signup"
@@ -477,7 +477,7 @@ export default function HomePage() {
                       textAlign: 'center'
                     }}
                   >
-                    회원가입
+                    회원가입하기
                   </Link>
                 </>
               ) : (

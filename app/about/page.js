@@ -165,7 +165,7 @@ export default function AboutPage() {
               onClick={closeMobileMenu}
               style={{ width: '100%', textAlign: 'center' }}
             >
-              로그인
+              시작하기
             </Link>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function AboutPage() {
               cursor: 'pointer',
               fontSize: '14px',
             }}>
-              로그인
+              시작하기
             </button>
           </div>
         </header>
