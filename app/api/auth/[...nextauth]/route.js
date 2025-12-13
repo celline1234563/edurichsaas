@@ -13,23 +13,23 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        // 데모 계정 확인
-        if (credentials?.email === 'demo@edurichbrain.com' && credentials?.password === 'demo1234') {
-          return {
-            id: 'demo-user-001',
-            email: 'demo@edurichbrain.com',
-            name: '데모 사용자',
-            isDemo: true
+        try {
+          // 데모 계정 확인
+          if (credentials?.email === 'demo@edurichbrain.com' && credentials?.password === 'demo1234') {
+            return {
+              id: 'demo-user-001',
+              email: 'demo@edurichbrain.com',
+              name: '데모 사용자',
+              isDemo: true
+            }
           }
+
+          // TODO: 실제 DB에서 사용자 확인 로직 추가
+          return null
+        } catch (error) {
+          console.error('Auth error:', error)
+          return null
         }
-
-        // TODO: 실제 DB에서 사용자 확인 로직 추가
-        // const user = await supabase.from('users').select().eq('email', credentials.email).single()
-        // if (user && verifyPassword(credentials.password, user.password)) {
-        //   return { id: user.id, email: user.email, name: user.name }
-        // }
-
-        return null
       }
     }),
     GoogleProvider({
@@ -82,7 +82,8 @@ export const authOptions = {
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development-only',
+  debug: process.env.NODE_ENV === 'development',
 }
 
 const handler = NextAuth(authOptions)
