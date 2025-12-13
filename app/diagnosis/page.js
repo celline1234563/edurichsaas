@@ -121,7 +121,7 @@ export default function DiagnosisPage() {
         <button
           onClick={() => {
             // edurichbrain 레벨테스트로 바로 이동
-            window.open('http://localhost:3000/level-test', '_blank')
+            window.open('https://edurichbrain.vercel.app/diagnosis', '_blank')
           }}
           style={{
             width: '100%',
