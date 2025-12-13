@@ -33,15 +33,15 @@ export default function BlogPage() {
       const data = await response.json();
       setStories(data);
 
-      // 카테고리 동적 생성
-      const uniqueCategories = ['전체', ...new Set(data.map(story => story.category).filter(Boolean))];
-      setCategories(uniqueCategories);
+      // 카테고리 동적 생성 (중복 제거)
+      const categorySet = new Set(data.map(story => story.category).filter(cat => cat && cat !== '전체'));
+      setCategories(['전체', ...categorySet]);
     } catch (error) {
       console.error('블로그 로딩 실패:', error);
       const mockData = getMockStories();
       setStories(mockData);
-      const uniqueCategories = ['전체', ...new Set(mockData.map(story => story.category).filter(Boolean))];
-      setCategories(uniqueCategories);
+      const categorySet = new Set(mockData.map(story => story.category).filter(cat => cat && cat !== '전체'));
+      setCategories(['전체', ...categorySet]);
     } finally {
       setLoading(false);
     }
@@ -236,7 +236,7 @@ export default function BlogPage() {
               marginBottom: isMobile ? '24px' : '30px',
               letterSpacing: '-0.02em',
             }}>
-              고객사례
+              스토리
             </h1>
 
             {/* Category Tabs */}
