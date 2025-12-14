@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
+import { MAIN_APP_URL } from '@/lib/constants'
 
 export default function SignupPage() {
   const [step, setStep] = useState(1) // 1: 역할 선택, 2: 정보 입력
@@ -27,6 +28,8 @@ export default function SignupPage() {
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+
+  const roleToDbRole = (r) => (r === 'director' ? 'owner' : r)
 
   const validateInviteCode = (code) => {
     // 임시 검증 로직 - 나중에 DB 연동
@@ -79,39 +82,55 @@ export default function SignupPage() {
     if (!validateForm()) return
 
     setIsLoading(true)
+    try {
+      const payload = {
+        role: role === 'director' ? 'owner' : role, // 너 서버는 owner/teacher/manager/assistant
+        academyName: role === 'director' ? formData.academyName : null,
+        inviteCode: role === 'director' ? null : formData.inviteCode,
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        agreeMarketing: formData.agreeMarketing,
+      }
 
-    setTimeout(() => {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      // ✅ JSON 아닌 에러 페이지(HTML) 대비
+      let data = null
+      const text = await res.text()
+
+      try { data = JSON.parse(text) } catch { data = { raw: text } }
+
+      let json = null
+      try { json = JSON.parse(raw) } catch {}
+
+      if (res.ok) {
+        alert('회원가입 완료!')
+        window.location.href = '/' // 또는 로그인 후 이동 페이지
+        return
+      }
+
+      // ✅ 상태코드별 처리
+      if (res.status === 409) {
+        // 서버가 EMAIL_OR_CODE_EXISTS 또는 EMAIL_EXISTS 줄거임
+        alert('이미 가입된 이메일입니다. 다른 이메일을 사용하거나 로그인 해주세요.')
+        return
+      }
+
+      if (res.status === 400 && data?.error === 'INVALID_INVITE_CODE') {
+        alert('초대코드가 유효하지 않습니다.')
+        return
+      }
+
+      alert(`회원가입 실패: ${data?.error || res.status}`)
+    } finally {
       setIsLoading(false)
-
-      const roleLabels = {
-        director: '원장',
-        teacher: '강사',
-        manager: '실장/정규직원',
-        assistant: '조교/알바'
-      }
-      const roleLabel = roleLabels[role]
-      alert(`${roleLabel} 계정으로 회원가입이 완료되었습니다!${role === 'director' ? '\n\n14일 무료 체험이 시작됩니다.' : ''}`)
-
-      localStorage.setItem('userData', JSON.stringify({
-        ...formData,
-        role: role,
-        subscriptionType: role === 'director' ? 'trial' : 'staff',
-        trialTurnsUsed: 0,
-        trialTurnsLimit: role === 'director' ? 3 : 0,
-        signupDate: new Date().toISOString()
-      }))
-
-      // 결제 대기 중인 정보가 있는지 확인
-      const pendingPayment = sessionStorage.getItem('pendingPayment')
-      if (pendingPayment && role === 'director') {
-        const { plan, cycle } = JSON.parse(pendingPayment)
-        sessionStorage.removeItem('pendingPayment')
-        window.location.href = `/payment?plan=${plan}&cycle=${cycle}`
-      } else {
-        // 메인 앱으로 리다이렉션
-        window.location.href = 'http://localhost:3000'
-      }
-    }, 1500)
+    }
   }
 
   const handleChange = (e) => {
