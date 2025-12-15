@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { BRAIN_BASE_URL, SAAS_BASE_URL } from '@/lib/constants'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +14,21 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
+
+  const searchParams = useSearchParams()
+
+  const getPostLoginRedirectUrl = () => {
+    // 진단 결과에서 넘어온 케이스만 복귀
+    const redirect = searchParams.get('redirect') // "diagnosis" 기대
+    const token = searchParams.get('token')
+
+    if (redirect === 'diagnosis' && token) {
+      return `${BRAIN_BASE_URL}/diagnosis/result?token=${encodeURIComponent(token)}`
+    }
+
+    // 일반 로그인 유저는 SAAS 기본 경로로
+    return '/' // 너희 기본 진입점에 맞게 / 로 바꿔도 됨
+  }
 
   const validateForm = () => {
     const newErrors = {}
@@ -80,7 +97,7 @@ export default function LoginPage() {
         sessionStorage.removeItem('pendingPayment')
         window.location.href = `/payment?plan=${plan}&cycle=${cycle}`
       } else {
-        window.location.href = '/'
+        window.location.href = getPostLoginRedirectUrl()
       }
     } catch (error) {
       setLoginError('로그인 중 오류가 발생했습니다.')
@@ -132,7 +149,7 @@ export default function LoginPage() {
         return
       }
 
-      window.location.href = '/'
+      window.location.href = getPostLoginRedirectUrl()
     } catch (error) {
       setLoginError('로그인 중 오류가 발생했습니다.')
       setIsLoading(false)
