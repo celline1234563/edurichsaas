@@ -156,8 +156,9 @@ export default function PaymentPage() {
         aiPoints: selectedPlan?.aiPoints
       }))
 
-      // 메인 앱으로 리다이렉션
-      window.location.href = 'http://localhost:3000'
+      // 결제 성공 페이지로 이동
+      const academyName = userData.academyName || userData.name || '회원'
+      window.location.href = `/payment-success?plan=${selectedPlan?.name}&academy=${encodeURIComponent(academyName)}`
     }, 2000)
   }
 
