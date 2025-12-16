@@ -155,7 +155,7 @@ export default function AboutPage() {
             <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
             <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
             <Link href="/about" className="mobile-menu-link active" onClick={closeMobileMenu}>회사</Link>
-            <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="mobile-menu-link" onClick={closeMobileMenu}>데모</a>
+            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
           </nav>
 
           <div className="mobile-menu-footer">
@@ -242,7 +242,7 @@ export default function AboutPage() {
           }}>
             회사
           </Link>
-          <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" style={{
+          <Link href="/demo" style={{
             color: 'rgba(255, 255, 255, 0.7)',
             textDecoration: 'none',
             padding: '10px 16px',
@@ -251,7 +251,7 @@ export default function AboutPage() {
             transition: 'all 0.2s',
           }}>
             데모
-          </a>
+          </Link>
         </nav>
       </aside>
 

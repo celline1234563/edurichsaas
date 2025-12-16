@@ -83,7 +83,7 @@ export default function HomePage() {
       return
     }
 
-    window.open('https://edurichbrain.vercel.app/', '_blank')
+    window.open('https://edurichbrain.ai.kr/', '_blank')
   }
 
   const fillSuggestion = (text) => {
