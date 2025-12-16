@@ -18,7 +18,7 @@ export default function PaymentSuccessPage() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer)
-          window.location.href = 'https://edurichbrain.vercel.app'
+          window.location.href = 'https://edurichbrain.ai.kr'
           return 0
         }
         return prev - 1
@@ -254,7 +254,7 @@ export default function PaymentSuccessPage() {
 
         {/* CTA Button */}
         <button
-          onClick={() => window.location.href = 'https://edurichbrain.vercel.app'}
+          onClick={() => window.location.href = 'https://edurichbrain.ai.kr'}
           style={{
             width: '100%',
             padding: '18px 32px',
