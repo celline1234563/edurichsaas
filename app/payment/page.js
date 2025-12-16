@@ -144,7 +144,6 @@ export default function PaymentPage() {
     // 임시 결제 처리 로직
     setTimeout(() => {
       setIsLoading(false)
-      alert(`결제가 완료되었습니다!\n\n플랜: ${selectedPlan?.name}\n금액: ${getPrice().toLocaleString()}원`)
 
       // 결제 정보 저장
       const userData = JSON.parse(localStorage.getItem('userData') || '{}')
@@ -156,7 +155,7 @@ export default function PaymentPage() {
         aiPoints: selectedPlan?.aiPoints
       }))
 
-      // 결제 성공 페이지로 이동
+      // 결제 성공 페이지로 바로 이동 (alert 제거)
       const academyName = userData.academyName || userData.name || '회원'
       window.location.href = `/payment-success?plan=${selectedPlan?.name}&academy=${encodeURIComponent(academyName)}`
     }, 2000)
