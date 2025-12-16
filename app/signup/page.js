@@ -4,10 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { MAIN_APP_URL } from '@/lib/constants'
+import useIsMobile from '@/hooks/useIsMobile'
 
 export default function SignupPage() {
   const [step, setStep] = useState(1) // 1: 역할 선택, 2: 정보 입력
   const [role, setRole] = useState('') // 'director', 'teacher', 'manager', 'assistant'
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const isMobile = useIsMobile()
   const [formData, setFormData] = useState({
     // 공통
     name: '',
@@ -149,9 +152,76 @@ export default function SignupPage() {
     setStep(2)
   }
 
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
+  const closeMobileMenu = () => setMobileMenuOpen(false)
+
   return (
     <div className="app-layout">
-      {/* Sidebar */}
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
+            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/login"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              로그인
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar (Desktop Only) */}
       <aside className="sidebar">
         <Link href="/" className="sidebar-logo">
           EduRichBrain
@@ -189,7 +259,7 @@ export default function SignupPage() {
           </Link>
         </header>
 
-        <main style={{ padding: '80px 32px' }}>
+        <main style={{ padding: isMobile ? '60px 16px 40px' : '80px 32px' }}>
           <div style={{
             maxWidth: step === 1 ? '900px' : '600px',
             margin: '0 auto'
@@ -227,7 +297,7 @@ export default function SignupPage() {
               textAlign: 'left'
             }}>
               <h3 style={{
-                fontSize: '18px',
+                fontSize: isMobile ? '16px' : '18px',
                 fontWeight: '600',
                 color: '#3b82f6',
                 marginBottom: '16px',
@@ -237,8 +307,8 @@ export default function SignupPage() {
               </h3>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: isMobile ? '16px' : '24px'
               }}>
             {/* 원장 */}
             <div
@@ -247,8 +317,8 @@ export default function SignupPage() {
                 background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
                 backdropFilter: 'blur(20px)',
                 border: '2px solid rgba(59, 130, 246, 0.3)',
-                borderRadius: '24px',
-                padding: '48px 32px',
+                borderRadius: isMobile ? '16px' : '24px',
+                padding: isMobile ? '24px 20px' : '48px 32px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s',
@@ -266,9 +336,9 @@ export default function SignupPage() {
               }}
             >
               <div style={{
-                width: '80px',
-                height: '80px',
-                margin: '0 auto 24px',
+                width: isMobile ? '56px' : '80px',
+                height: isMobile ? '56px' : '80px',
+                margin: isMobile ? '0 auto 16px' : '0 auto 24px',
                 background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                 borderRadius: '50%',
                 display: 'flex',
@@ -276,21 +346,21 @@ export default function SignupPage() {
                 justifyContent: 'center',
                 boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
               }}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <svg width={isMobile ? "28" : "40"} height={isMobile ? "28" : "40"} viewBox="0 0 24 24" fill="none">
                   <path d="M12 14l9-5-9-5-9 5 9 5z" fill="white" opacity="0.5"/>
                   <path d="M12 14l9-5v6.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 15.5V9l9 5z" fill="white"/>
                 </svg>
               </div>
               <h3 style={{
-                fontSize: '24px',
+                fontSize: isMobile ? '18px' : '24px',
                 fontWeight: '700',
                 color: '#ffffff',
-                marginBottom: '12px'
+                marginBottom: isMobile ? '8px' : '12px'
               }}>
                 원장
               </h3>
               <p style={{
-                fontSize: '14px',
+                fontSize: isMobile ? '13px' : '14px',
                 color: 'rgba(255, 255, 255, 0.6)',
                 lineHeight: '1.6'
               }}>
@@ -306,8 +376,8 @@ export default function SignupPage() {
                 background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
                 backdropFilter: 'blur(20px)',
                 border: '2px solid rgba(148, 163, 184, 0.3)',
-                borderRadius: '24px',
-                padding: '48px 32px',
+                borderRadius: isMobile ? '16px' : '24px',
+                padding: isMobile ? '24px 20px' : '48px 32px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s',
@@ -325,9 +395,9 @@ export default function SignupPage() {
               }}
             >
               <div style={{
-                width: '80px',
-                height: '80px',
-                margin: '0 auto 24px',
+                width: isMobile ? '56px' : '80px',
+                height: isMobile ? '56px' : '80px',
+                margin: isMobile ? '0 auto 16px' : '0 auto 24px',
                 background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
                 borderRadius: '50%',
                 display: 'flex',
@@ -335,21 +405,21 @@ export default function SignupPage() {
                 justifyContent: 'center',
                 boxShadow: '0 8px 24px rgba(148, 163, 184, 0.4)'
               }}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <svg width={isMobile ? "28" : "40"} height={isMobile ? "28" : "40"} viewBox="0 0 24 24" fill="none">
                   <path d="M12 6v6h6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                   <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="2"/>
                 </svg>
               </div>
               <h3 style={{
-                fontSize: '24px',
+                fontSize: isMobile ? '18px' : '24px',
                 fontWeight: '700',
                 color: '#ffffff',
-                marginBottom: '12px'
+                marginBottom: isMobile ? '8px' : '12px'
               }}>
                 강사
               </h3>
               <p style={{
-                fontSize: '14px',
+                fontSize: isMobile ? '13px' : '14px',
                 color: 'rgba(255, 255, 255, 0.6)',
                 lineHeight: '1.6'
               }}>
@@ -363,7 +433,7 @@ export default function SignupPage() {
             {/* 실무진 섹션 */}
             <div>
               <h3 style={{
-                fontSize: '18px',
+                fontSize: isMobile ? '16px' : '18px',
                 fontWeight: '600',
                 color: '#94a3b8',
                 marginBottom: '16px',
@@ -373,8 +443,8 @@ export default function SignupPage() {
               </h3>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: isMobile ? '16px' : '24px'
               }}>
             {/* 실장/정규직원 */}
             <div
@@ -383,8 +453,8 @@ export default function SignupPage() {
                 background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
                 backdropFilter: 'blur(20px)',
                 border: '2px solid rgba(148, 163, 184, 0.3)',
-                borderRadius: '24px',
-                padding: '48px 32px',
+                borderRadius: isMobile ? '16px' : '24px',
+                padding: isMobile ? '24px 20px' : '48px 32px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s',
@@ -402,9 +472,9 @@ export default function SignupPage() {
               }}
             >
               <div style={{
-                width: '80px',
-                height: '80px',
-                margin: '0 auto 24px',
+                width: isMobile ? '56px' : '80px',
+                height: isMobile ? '56px' : '80px',
+                margin: isMobile ? '0 auto 16px' : '0 auto 24px',
                 background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
                 borderRadius: '50%',
                 display: 'flex',
@@ -412,20 +482,20 @@ export default function SignupPage() {
                 justifyContent: 'center',
                 boxShadow: '0 8px 24px rgba(148, 163, 184, 0.4)'
               }}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <svg width={isMobile ? "28" : "40"} height={isMobile ? "28" : "40"} viewBox="0 0 24 24" fill="none">
                   <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4z" fill="white"/>
                 </svg>
               </div>
               <h3 style={{
-                fontSize: '24px',
+                fontSize: isMobile ? '18px' : '24px',
                 fontWeight: '700',
                 color: '#ffffff',
-                marginBottom: '12px'
+                marginBottom: isMobile ? '8px' : '12px'
               }}>
                 실장/정규직원
               </h3>
               <p style={{
-                fontSize: '14px',
+                fontSize: isMobile ? '13px' : '14px',
                 color: 'rgba(255, 255, 255, 0.6)',
                 lineHeight: '1.6'
               }}>
@@ -441,8 +511,8 @@ export default function SignupPage() {
                 background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
                 backdropFilter: 'blur(20px)',
                 border: '2px solid rgba(203, 213, 225, 0.3)',
-                borderRadius: '24px',
-                padding: '48px 32px',
+                borderRadius: isMobile ? '16px' : '24px',
+                padding: isMobile ? '24px 20px' : '48px 32px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s',
@@ -460,9 +530,9 @@ export default function SignupPage() {
               }}
             >
               <div style={{
-                width: '80px',
-                height: '80px',
-                margin: '0 auto 24px',
+                width: isMobile ? '56px' : '80px',
+                height: isMobile ? '56px' : '80px',
+                margin: isMobile ? '0 auto 16px' : '0 auto 24px',
                 background: 'linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%)',
                 borderRadius: '50%',
                 display: 'flex',
@@ -470,20 +540,20 @@ export default function SignupPage() {
                 justifyContent: 'center',
                 boxShadow: '0 8px 24px rgba(203, 213, 225, 0.4)'
               }}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <svg width={isMobile ? "28" : "40"} height={isMobile ? "28" : "40"} viewBox="0 0 24 24" fill="none">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="white"/>
                 </svg>
               </div>
               <h3 style={{
-                fontSize: '24px',
+                fontSize: isMobile ? '18px' : '24px',
                 fontWeight: '700',
                 color: '#ffffff',
-                marginBottom: '12px'
+                marginBottom: isMobile ? '8px' : '12px'
               }}>
                 조교/알바
               </h3>
               <p style={{
-                fontSize: '14px',
+                fontSize: isMobile ? '13px' : '14px',
                 color: 'rgba(255, 255, 255, 0.6)',
                 lineHeight: '1.6'
               }}>
@@ -502,12 +572,12 @@ export default function SignupPage() {
               onClick={() => setStep(1)}
               style={{
                 marginBottom: '24px',
-                padding: '12px 20px',
+                padding: isMobile ? '10px 16px' : '12px 20px',
                 background: 'rgba(59, 130, 246, 0.1)',
                 border: '1px solid rgba(59, 130, 246, 0.3)',
                 borderRadius: '12px',
                 color: '#93c5fd',
-                fontSize: '14px',
+                fontSize: isMobile ? '13px' : '14px',
                 fontWeight: '500',
                 cursor: 'pointer',
                 display: 'flex',
@@ -526,13 +596,13 @@ export default function SignupPage() {
               background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '24px',
-              padding: '48px 40px',
+              borderRadius: isMobile ? '16px' : '24px',
+              padding: isMobile ? '24px 20px' : '48px 40px',
               boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
             }}>
               {/* 소셜 로그인 버튼 */}
               <div style={{ marginBottom: '32px' }}>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '12px', marginBottom: '24px' }}>
                   <button
                     type="button"
                     onClick={() => {

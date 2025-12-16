@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import useIsMobile from '@/hooks/useIsMobile'
 
 export default function PaymentPage() {
+  const isMobile = useIsMobile()
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [billingCycle, setBillingCycle] = useState('monthly')
   const [formData, setFormData] = useState({
@@ -180,7 +182,7 @@ export default function PaymentPage() {
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
-      padding: '40px 20px'
+      padding: isMobile ? '24px 16px' : '40px 20px'
     }}>
       <div style={{
         maxWidth: '1200px',
@@ -188,11 +190,11 @@ export default function PaymentPage() {
       }}>
         {/* Header */}
         <div style={{
-          marginBottom: '40px',
+          marginBottom: isMobile ? '24px' : '40px',
           textAlign: 'center'
         }}>
           <Link href="/" style={{
-            fontSize: '24px',
+            fontSize: isMobile ? '20px' : '24px',
             fontWeight: '700',
             color: '#ffffff',
             textDecoration: 'none',
@@ -202,7 +204,7 @@ export default function PaymentPage() {
             EduRichBrain
           </Link>
           <h1 style={{
-            fontSize: '36px',
+            fontSize: isMobile ? '24px' : '36px',
             fontWeight: '600',
             color: '#ffffff',
             marginBottom: '8px'
@@ -210,7 +212,7 @@ export default function PaymentPage() {
             결제 정보 입력
           </h1>
           <p style={{
-            fontSize: '16px',
+            fontSize: isMobile ? '14px' : '16px',
             color: 'rgba(255, 255, 255, 0.6)'
           }}>
             안전한 결제를 위해 정보를 입력해주세요
@@ -218,18 +220,97 @@ export default function PaymentPage() {
         </div>
 
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 400px',
-          gap: '32px',
+          display: isMobile ? 'flex' : 'grid',
+          flexDirection: 'column',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 400px',
+          gap: isMobile ? '24px' : '32px',
           alignItems: 'start'
         }}>
+          {/* 주문 요약 (모바일에서 먼저 표시) */}
+          {isMobile && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '16px',
+              padding: '20px',
+              boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)',
+              order: -1
+            }}>
+              <h2 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#ffffff',
+                marginBottom: '16px'
+              }}>
+                주문 요약
+              </h2>
+
+              {selectedPlan ? (
+                <>
+                  <div style={{
+                    marginBottom: '16px',
+                    padding: '16px',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(59, 130, 246, 0.2)'
+                  }}>
+                    <div style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#3b82f6',
+                      marginBottom: '4px'
+                    }}>
+                      {selectedPlan.name}
+                    </div>
+                    <div style={{
+                      fontSize: '13px',
+                      color: 'rgba(255, 255, 255, 0.6)'
+                    }}>
+                      {billingCycle === 'monthly' ? '월간 구독' : '연간 구독'}
+                    </div>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#ffffff'
+                  }}>
+                    <span>총 결제금액</span>
+                    <span style={{ color: '#3b82f6' }}>
+                      {getPrice().toLocaleString()}원
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '20px',
+                  color: 'rgba(255, 255, 255, 0.5)'
+                }}>
+                  <p style={{ marginBottom: '8px', fontSize: '13px' }}>선택된 플랜이 없습니다</p>
+                  <Link href="/pricing" style={{
+                    color: '#3b82f6',
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    fontWeight: '500'
+                  }}>
+                    요금제 페이지로 이동 →
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 결제 폼 */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(59, 130, 246, 0.25)',
-            borderRadius: '24px',
-            padding: '40px',
+            borderRadius: isMobile ? '16px' : '24px',
+            padding: isMobile ? '24px 20px' : '40px',
             boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
           }}>
             <h2 style={{
@@ -481,7 +562,8 @@ export default function PaymentPage() {
             </form>
           </div>
 
-          {/* 주문 요약 */}
+          {/* 주문 요약 (데스크톱에서만 표시) */}
+          {!isMobile && (
           <div style={{
             position: 'sticky',
             top: '40px'
@@ -676,6 +758,7 @@ export default function PaymentPage() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

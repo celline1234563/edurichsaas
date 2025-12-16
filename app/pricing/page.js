@@ -2,25 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import useIsMobile from '@/hooks/useIsMobile'
 
 export default function PricingPage() {
   const [showPointModal, setShowPointModal] = useState(false)
   const [billingCycle, setBillingCycle] = useState('monthly') // 'monthly' or 'yearly'
-  const [isMobile, setIsMobile] = useState(false)
+  const isMobile = useIsMobile()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // 모바일 감지
+  // 모바일 메뉴 닫기
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false)
-      }
+    if (!isMobile) {
+      setMobileMenuOpen(false)
     }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  }, [isMobile])
 
   // 요금제 데이터
   const plans = [

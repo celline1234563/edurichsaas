@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BRAIN_BASE_URL } from '@/lib/constants'
+import useIsMobile from '@/hooks/useIsMobile'
 
 function LoginForm() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ function LoginForm() {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   const searchParams = useSearchParams()
 
@@ -156,9 +159,76 @@ function LoginForm() {
     }
   }
 
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
+  const closeMobileMenu = () => setMobileMenuOpen(false)
+
   return (
     <div className="app-layout">
-      {/* Sidebar */}
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label="메뉴 열기"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile Menu Panel */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <button
+            onClick={closeMobileMenu}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#ffffff'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          <div className="mobile-menu-logo">EduRichBrain</div>
+
+          <nav className="mobile-menu-nav">
+            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
+            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
+            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
+            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
+          </nav>
+
+          <div className="mobile-menu-footer">
+            <Link
+              href="/signup"
+              className="login-btn"
+              onClick={closeMobileMenu}
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              시작하기
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar (Desktop Only) */}
       <aside className="sidebar">
         <Link href="/" className="sidebar-logo">
           EduRichBrain
@@ -220,7 +290,7 @@ function LoginForm() {
 
         <main
           style={{
-            padding: '100px 32px',
+            padding: isMobile ? '80px 20px 40px' : '100px 32px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -264,8 +334,8 @@ function LoginForm() {
                   'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(59, 130, 246, 0.25)',
-                borderRadius: '24px',
-                padding: '40px',
+                borderRadius: isMobile ? '20px' : '24px',
+                padding: isMobile ? '28px 20px' : '40px',
                 boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)',
               }}
             >

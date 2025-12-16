@@ -3,28 +3,22 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import useIsMobile from '@/hooks/useIsMobile'
 
 export default function HomePage() {
   const { status } = useSession()
   const [mainInput, setMainInput] = useState('')
-  const [isMobile, setIsMobile] = useState(false)
+  const isMobile = useIsMobile()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
   const [subscriptionStatus, setSubscriptionStatus] = useState(null)
   const [showAccessModal, setShowAccessModal] = useState(false)
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false)
-      }
+    if (!isMobile) {
+      setMobileMenuOpen(false)
     }
-
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  }, [isMobile])
 
   useEffect(() => {
     fetch('/api/blog')

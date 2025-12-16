@@ -2,28 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import useIsMobile from '@/hooks/useIsMobile';
 
 export default function BlogPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('전체');
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState(['전체', 'EduRichBrain', '교육리서치', '경영리서치', 'AI']);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    if (!isMobile) {
+      setMobileMenuOpen(false);
+    }
+  }, [isMobile]);
 
+  useEffect(() => {
     fetchStories();
-
-    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const fetchStories = async () => {

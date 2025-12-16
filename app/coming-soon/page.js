@@ -4,20 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import useIsMobile from '@/hooks/useIsMobile';
 
 function ComingSoonContent() {
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
   const searchParams = useSearchParams();
   const pageName = searchParams.get('page') || '페이지';
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const pageNames = {
     'careers': '채용 정보',

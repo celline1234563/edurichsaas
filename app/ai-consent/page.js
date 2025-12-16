@@ -2,23 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import useIsMobile from '@/hooks/useIsMobile';
 
 export default function AIConsentPage() {
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    if (!isMobile) {
+      setMobileMenuOpen(false);
+    }
+  }, [isMobile]);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);

@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import useIsMobile from '@/hooks/useIsMobile'
 
 export default function DemoPage() {
   const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
+  const isMobile = useIsMobile()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [subscriptionStatus, setSubscriptionStatus] = useState(null)
   const [checkingSubscription, setCheckingSubscription] = useState(true)
@@ -64,17 +65,10 @@ export default function DemoPage() {
   }, [])
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false)
-      }
+    if (!isMobile) {
+      setMobileMenuOpen(false)
     }
-
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  }, [isMobile])
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
