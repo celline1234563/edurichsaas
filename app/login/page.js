@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { BRAIN_BASE_URL, SAAS_BASE_URL } from '@/lib/constants'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
-export default function LoginPage() {
+function LoginForm() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -501,5 +501,13 @@ export default function LoginPage() {
         </main>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#0a0e27' }} />}>
+      <LoginForm />
+    </Suspense>
   )
 }
