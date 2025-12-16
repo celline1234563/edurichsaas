@@ -77,7 +77,7 @@ function getMockStories() {
       title: '학부모님들께 우리 아이의 학습현황을 가장 빠르게 주는 방법 : 카카오톡 알림',
       category: 'EduRichBrain',
       excerpt: '학원 운영의 모든 알림을 카카오톡으로 자동 발송 — 학부모는 안심하고, 원장님은 업무에서 해방됩니다.',
-      coverImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=400&fit=crop',
+      coverImage: 'https://img.hankyung.com/photo/202511/02.41917781.1.jpg',
       date: '2025년 12월 16일',
       author: 'EduRichBrain',
       published: true,

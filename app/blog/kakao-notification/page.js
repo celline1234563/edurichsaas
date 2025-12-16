@@ -38,7 +38,7 @@ export default function KakaoNotificationBlogPage() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1974&auto=format&fit=crop"
+            src="https://img.hankyung.com/photo/202511/02.41917781.1.jpg"
             alt="Smartphone with messaging apps"
             className="w-full h-full object-cover opacity-60"
           />
