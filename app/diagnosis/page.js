@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import useIsMobile from '@/hooks/useIsMobile'
 import { Radar } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -27,6 +28,7 @@ ChartJS.register(
 
 export default function DiagnosisPage() {
   const router = useRouter()
+  const isMobile = useIsMobile()
 
   // 스텝 관리: intro, input, test, result
   const [step, setStep] = useState('intro')
@@ -64,19 +66,19 @@ export default function DiagnosisPage() {
 
   // Intro 화면
   const IntroScreen = () => (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 20px' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '16px 16px' : '24px 20px' }}>
       {/* Hero Section */}
       <div style={{
         background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.04))',
         border: '1px solid rgba(59, 130, 246, 0.2)',
-        borderRadius: '12px',
-        padding: '32px 28px',
-        marginBottom: '32px'
+        borderRadius: isMobile ? '10px' : '12px',
+        padding: isMobile ? '20px 16px' : '32px 28px',
+        marginBottom: isMobile ? '20px' : '32px'
       }}>
         <h1 style={{
-          fontSize: '28px',
+          fontSize: isMobile ? '20px' : '28px',
           fontWeight: '600',
-          marginBottom: '12px',
+          marginBottom: isMobile ? '8px' : '12px',
           color: '#e2e8f0',
           lineHeight: '1.3'
         }}>
@@ -84,9 +86,9 @@ export default function DiagnosisPage() {
         </h1>
 
         <p style={{
-          fontSize: '15px',
+          fontSize: isMobile ? '13px' : '15px',
           color: '#94a3b8',
-          marginBottom: '24px',
+          marginBottom: isMobile ? '16px' : '24px',
           lineHeight: '1.5'
         }}>
           실제 발로 뛰며 알게된 학원 경영의 비밀
@@ -95,8 +97,8 @@ export default function DiagnosisPage() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '12px',
-          marginBottom: '24px'
+          gap: isMobile ? '8px' : '12px',
+          marginBottom: isMobile ? '16px' : '24px'
         }}>
           {[
             { title: '커리큘럼', desc: '학습 관리 체계' },
@@ -106,14 +108,14 @@ export default function DiagnosisPage() {
             <div key={i} style={{
               background: 'rgba(15, 23, 42, 0.4)',
               border: '1px solid rgba(59, 130, 246, 0.15)',
-              borderRadius: '8px',
-              padding: '14px',
+              borderRadius: isMobile ? '6px' : '8px',
+              padding: isMobile ? '10px 6px' : '14px',
               textAlign: 'center'
             }}>
-              <h3 style={{ fontSize: '13px', fontWeight: '600', marginBottom: '4px', color: '#e2e8f0' }}>
+              <h3 style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '600', marginBottom: '2px', color: '#e2e8f0' }}>
                 {item.title}
               </h3>
-              <p style={{ fontSize: '11px', color: '#64748b' }}>{item.desc}</p>
+              <p style={{ fontSize: isMobile ? '9px' : '11px', color: '#64748b' }}>{item.desc}</p>
             </div>
           ))}
         </div>
@@ -127,9 +129,9 @@ export default function DiagnosisPage() {
             width: '100%',
             background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
             color: 'white',
-            fontSize: '14px',
+            fontSize: isMobile ? '13px' : '14px',
             fontWeight: '600',
-            padding: '12px 24px',
+            padding: isMobile ? '10px 20px' : '12px 24px',
             borderRadius: '8px',
             border: 'none',
             cursor: 'pointer',
@@ -139,7 +141,7 @@ export default function DiagnosisPage() {
           무료로 5분 진단 시작하기
         </button>
 
-        <p style={{ fontSize: '12px', color: '#64748b', marginTop: '10px', textAlign: 'center' }}>
+        <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginTop: isMobile ? '8px' : '10px', textAlign: 'center' }}>
           66개 질문 • 소요시간 약 5분
         </p>
       </div>
@@ -148,41 +150,41 @@ export default function DiagnosisPage() {
       <div style={{
         background: 'rgba(15, 23, 42, 0.3)',
         border: '1px solid rgba(59, 130, 246, 0.15)',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '32px'
+        borderRadius: isMobile ? '10px' : '12px',
+        padding: isMobile ? '16px' : '24px',
+        marginBottom: isMobile ? '20px' : '32px'
       }}>
         <h2 style={{
-          fontSize: '16px',
+          fontSize: isMobile ? '14px' : '16px',
           fontWeight: '600',
-          marginBottom: '14px',
+          marginBottom: isMobile ? '10px' : '14px',
           color: '#e2e8f0'
         }}>
           레벨테스트 소개 영상
         </h2>
         <div style={{
           aspectRatio: '16/9',
-          maxHeight: '280px',
+          maxHeight: isMobile ? '180px' : '280px',
           background: 'rgba(0, 0, 0, 0.3)',
-          borderRadius: '8px',
+          borderRadius: isMobile ? '6px' : '8px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           border: '1px dashed rgba(59, 130, 246, 0.2)'
         }}>
           <div style={{ textAlign: 'center', color: '#64748b' }}>
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>▶</div>
-            <p style={{ fontSize: '13px' }}>실제 촬영 영상 영역</p>
+            <div style={{ fontSize: isMobile ? '24px' : '32px', marginBottom: '8px' }}>▶</div>
+            <p style={{ fontSize: isMobile ? '11px' : '13px' }}>실제 촬영 영상 영역</p>
           </div>
         </div>
       </div>
 
       {/* 레벨별 설명 - 새 컴포넌트 사용 */}
-      <div style={{ marginBottom: '32px' }}>
+      <div style={{ marginBottom: isMobile ? '20px' : '32px' }}>
         <h2 style={{
-          fontSize: '18px',
+          fontSize: isMobile ? '15px' : '18px',
           fontWeight: '600',
-          marginBottom: '16px',
+          marginBottom: isMobile ? '12px' : '16px',
           color: '#e2e8f0'
         }}>
           단계별로 이런 업무를 자세하게 가이드 해드립니다
@@ -276,20 +278,20 @@ export default function DiagnosisPage() {
       <div style={{
         background: 'rgba(15, 23, 42, 0.3)',
         border: '1px solid rgba(59, 130, 246, 0.15)',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '32px'
+        borderRadius: isMobile ? '10px' : '12px',
+        padding: isMobile ? '16px' : '24px',
+        marginBottom: isMobile ? '20px' : '32px'
       }}>
         <h2 style={{
-          fontSize: '16px',
+          fontSize: isMobile ? '14px' : '16px',
           fontWeight: '600',
-          marginBottom: '16px',
+          marginBottom: isMobile ? '12px' : '16px',
           color: '#e2e8f0'
         }}>
           실제 원장님들의 후기
         </h2>
 
-        <div style={{ display: 'grid', gap: '12px' }}>
+        <div style={{ display: 'grid', gap: isMobile ? '10px' : '12px' }}>
           {[
             {
               name: '김** 원장님',
@@ -315,22 +317,22 @@ export default function DiagnosisPage() {
           ].map((item, i) => (
             <div key={i} style={{
               background: 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '8px',
-              padding: '14px',
+              borderRadius: isMobile ? '6px' : '8px',
+              padding: isMobile ? '12px' : '14px',
               border: '1px solid rgba(59, 130, 246, 0.1)'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '6px' : '8px' }}>
                 <div>
-                  <h4 style={{ fontSize: '13px', fontWeight: '600', color: '#e2e8f0', marginBottom: '2px' }}>
+                  <h4 style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#e2e8f0', marginBottom: '2px' }}>
                     {item.name}
                   </h4>
-                  <p style={{ fontSize: '11px', color: '#64748b' }}>{item.academy}</p>
+                  <p style={{ fontSize: isMobile ? '10px' : '11px', color: '#64748b' }}>{item.academy}</p>
                 </div>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '11px',
+                  gap: isMobile ? '4px' : '6px',
+                  fontSize: isMobile ? '10px' : '11px',
                   fontWeight: '600'
                 }}>
                   <span style={{ color: '#f59e0b' }}>{item.before}</span>
@@ -339,7 +341,7 @@ export default function DiagnosisPage() {
                 </div>
               </div>
 
-              <p style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.5' }}>
+              <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#94a3b8', lineHeight: '1.5' }}>
                 "{item.review}"
               </p>
             </div>
