@@ -18,37 +18,45 @@ export default function PaymentPage() {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [authChecking, setAuthChecking] = useState(true)
 
   useEffect(() => {
-    // 로그인 체크
-    const userData = localStorage.getItem('userData') || localStorage.getItem('user')
+    // 커스텀 세션 체크
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) {
+          // 로그인되지 않은 경우 로그인 페이지로 리다이렉션
+          alert('결제를 진행하려면 먼저 로그인이 필요합니다.')
+          const params = new URLSearchParams(window.location.search)
+          const plan = params.get('plan')
+          const cycle = params.get('cycle')
+          sessionStorage.setItem('pendingPayment', JSON.stringify({ plan, cycle }))
+          window.location.href = '/login'
+          return
+        }
 
-    if (!userData) {
-      // 로그인되지 않은 경우 로그인 페이지로 리다이렉션
-      alert('결제를 진행하려면 먼저 로그인이 필요합니다.')
-      const params = new URLSearchParams(window.location.search)
-      const plan = params.get('plan')
-      const cycle = params.get('cycle')
-      // 로그인 후 다시 결제 페이지로 돌아올 수 있도록 정보 저장
-      sessionStorage.setItem('pendingPayment', JSON.stringify({ plan, cycle }))
-      window.location.href = '/login'
-      return
+        setIsLoggedIn(true)
+        setAuthChecking(false)
+
+        // URL에서 선택한 플랜 가져오기
+        const params = new URLSearchParams(window.location.search)
+        const plan = params.get('plan')
+        const cycle = params.get('cycle')
+
+        if (plan) {
+          const planData = plans.find(p => p.id === plan)
+          setSelectedPlan(planData)
+        }
+        if (cycle) {
+          setBillingCycle(cycle)
+        }
+      } catch {
+        alert('인증 확인 중 오류가 발생했습니다.')
+        window.location.href = '/login'
+      }
     }
-
-    setIsLoggedIn(true)
-
-    // URL에서 선택한 플랜 가져오기
-    const params = new URLSearchParams(window.location.search)
-    const plan = params.get('plan')
-    const cycle = params.get('cycle')
-
-    if (plan) {
-      const planData = plans.find(p => p.id === plan)
-      setSelectedPlan(planData)
-    }
-    if (cycle) {
-      setBillingCycle(cycle)
-    }
+    checkAuth()
   }, [])
 
   const plans = [
