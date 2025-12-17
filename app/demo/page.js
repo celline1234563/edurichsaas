@@ -2,32 +2,41 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import useIsMobile from '@/hooks/useIsMobile'
 
 export default function DemoPage() {
-  const { data: session, status } = useSession()
+  const [authStatus, setAuthStatus] = useState('loading')
   const [isLoading, setIsLoading] = useState(true)
   const isMobile = useIsMobile()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [subscriptionStatus, setSubscriptionStatus] = useState(null)
   const [checkingSubscription, setCheckingSubscription] = useState(true)
 
+  // 커스텀 세션 체크
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (res.ok) {
+          setAuthStatus('authenticated')
+        } else {
+          setAuthStatus('unauthenticated')
+        }
+      } catch {
+        setAuthStatus('unauthenticated')
+      }
+    }
+    checkAuth()
+  }, [])
+
   // 구독 상태 확인
   useEffect(() => {
     const checkSubscription = async () => {
-      if (status === 'loading') return
+      if (authStatus === 'loading') return
 
-      if (status === 'unauthenticated') {
+      if (authStatus === 'unauthenticated') {
         setCheckingSubscription(false)
         setSubscriptionStatus({ canUse: false, reason: 'unauthenticated' })
-        return
-      }
-
-      // 데모 사용자는 바로 접근 허용
-      if (session?.user?.isDemo) {
-        setCheckingSubscription(false)
-        setSubscriptionStatus({ canUse: true, reason: 'demo_user' })
         return
       }
 
@@ -54,7 +63,7 @@ export default function DemoPage() {
     }
 
     checkSubscription()
-  }, [status, session])
+  }, [authStatus])
 
   useEffect(() => {
     // iframe 로딩 시뮬레이션
