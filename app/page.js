@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import useIsMobile from '@/hooks/useIsMobile'
 
 export default function HomePage() {
-  const { status } = useSession()
+  const [authStatus, setAuthStatus] = useState('loading')
   const [mainInput, setMainInput] = useState('')
   const isMobile = useIsMobile()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -27,10 +26,27 @@ export default function HomePage() {
       .catch(err => console.error('블로그 데이터 로드 실패:', err))
   }, [])
 
+  // 커스텀 세션 체크
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (res.ok) {
+          setAuthStatus('authenticated')
+        } else {
+          setAuthStatus('unauthenticated')
+        }
+      } catch {
+        setAuthStatus('unauthenticated')
+      }
+    }
+    checkAuth()
+  }, [])
+
   useEffect(() => {
     const checkSubscription = async () => {
-      if (status === 'loading') return
-      if (status === 'unauthenticated') {
+      if (authStatus === 'loading') return
+      if (authStatus === 'unauthenticated') {
         setSubscriptionStatus({ canUse: false, reason: 'unauthenticated' })
         return
       }
@@ -52,7 +68,7 @@ export default function HomePage() {
       }
     }
     checkSubscription()
-  }, [status])
+  }, [authStatus])
 
   const handleEnter = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -67,7 +83,7 @@ export default function HomePage() {
       return
     }
 
-    if (status === 'unauthenticated') {
+    if (authStatus === 'unauthenticated') {
       setShowAccessModal(true)
       return
     }
