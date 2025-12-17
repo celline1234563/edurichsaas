@@ -1,1310 +1,350 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import useIsMobile from '@/hooks/useIsMobile'
-import { Radar } from 'react-chartjs-2'
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-} from 'chart.js'
-import { supabase } from '@/lib/supabase'
 import LevelProgressSelector from '@/components/LevelProgressSelector'
 
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-)
-
 export default function DiagnosisPage() {
-  const router = useRouter()
   const isMobile = useIsMobile()
 
-  // 스텝 관리: intro, input, test, result
-  const [step, setStep] = useState('intro')
-  const [selectedLevel, setSelectedLevel] = useState(null)
-
-  // 입력 데이터
-  const [studentCount, setStudentCount] = useState('')
-  const [staffCount, setStaffCount] = useState('')
-
-  // 테스트 데이터
-  const [assessmentId, setAssessmentId] = useState(null)
-  const [sessionId, setSessionId] = useState(null)
-  const [questions, setQuestions] = useState([])
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [answers, setAnswers] = useState({})
-
-  // 결과 데이터
-  const [result, setResult] = useState(null)
-  const [user, setUser] = useState(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [showSignupPrompt, setShowSignupPrompt] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-
-  // 사용자 로그인 상태 확인
-  useEffect(() => {
-    checkUser()
-  }, [])
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-    setIsLoggedIn(!!user)
-  }
-
-  // Intro 화면
-  const IntroScreen = () => (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '16px 16px' : '24px 20px' }}>
-      {/* Hero Section */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.04))',
-        border: '1px solid rgba(59, 130, 246, 0.2)',
-        borderRadius: isMobile ? '10px' : '12px',
-        padding: isMobile ? '20px 16px' : '32px 28px',
-        marginBottom: isMobile ? '20px' : '32px'
-      }}>
-        <h1 style={{
-          fontSize: isMobile ? '20px' : '28px',
-          fontWeight: '600',
-          marginBottom: isMobile ? '8px' : '12px',
-          color: '#e2e8f0',
-          lineHeight: '1.3'
-        }}>
-          우리 학원은 지금 어느 단계일까요?
-        </h1>
-
-        <p style={{
-          fontSize: isMobile ? '13px' : '15px',
-          color: '#94a3b8',
-          marginBottom: isMobile ? '16px' : '24px',
-          lineHeight: '1.5'
-        }}>
-          실제 발로 뛰며 알게된 학원 경영의 비밀
-        </p>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: isMobile ? '8px' : '12px',
-          marginBottom: isMobile ? '16px' : '24px'
-        }}>
-          {[
-            { title: '커리큘럼', desc: '학습 관리 체계' },
-            { title: '시스템', desc: '운영 효율성' },
-            { title: '마케팅', desc: '홍보 & 브랜딩' }
-          ].map((item, i) => (
-            <div key={i} style={{
-              background: 'rgba(15, 23, 42, 0.4)',
-              border: '1px solid rgba(59, 130, 246, 0.15)',
-              borderRadius: isMobile ? '6px' : '8px',
-              padding: isMobile ? '10px 6px' : '14px',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '600', marginBottom: '2px', color: '#e2e8f0' }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: isMobile ? '9px' : '11px', color: '#64748b' }}>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={() => {
-            // edurichbrain 레벨테스트로 바로 이동
-            window.open('https://edurichbrain.ai.kr/diagnosis', '_blank')
-          }}
-          style={{
-            width: '100%',
-            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-            color: 'white',
-            fontSize: isMobile ? '13px' : '14px',
-            fontWeight: '600',
-            padding: isMobile ? '10px 20px' : '12px 24px',
-            borderRadius: '8px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
-          }}
-        >
-          무료로 5분 진단 시작하기
-        </button>
-
-        <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginTop: isMobile ? '8px' : '10px', textAlign: 'center' }}>
-          66개 질문 • 소요시간 약 5분
-        </p>
-      </div>
-
-      {/* 영상 섹션 - 컴팩트 */}
-      <div style={{
-        background: 'rgba(15, 23, 42, 0.3)',
-        border: '1px solid rgba(59, 130, 246, 0.15)',
-        borderRadius: isMobile ? '10px' : '12px',
-        padding: isMobile ? '16px' : '24px',
-        marginBottom: isMobile ? '20px' : '32px'
-      }}>
-        <h2 style={{
-          fontSize: isMobile ? '14px' : '16px',
-          fontWeight: '600',
-          marginBottom: isMobile ? '10px' : '14px',
-          color: '#e2e8f0'
-        }}>
-          레벨테스트 소개 영상
-        </h2>
-        <div style={{
-          aspectRatio: '16/9',
-          maxHeight: isMobile ? '180px' : '280px',
-          background: 'rgba(0, 0, 0, 0.3)',
-          borderRadius: isMobile ? '6px' : '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '1px dashed rgba(59, 130, 246, 0.2)'
-        }}>
-          <div style={{ textAlign: 'center', color: '#64748b' }}>
-            <div style={{ fontSize: isMobile ? '24px' : '32px', marginBottom: '8px' }}>▶</div>
-            <p style={{ fontSize: isMobile ? '11px' : '13px' }}>실제 촬영 영상 영역</p>
-          </div>
-        </div>
-      </div>
-
-      {/* 레벨별 설명 - 새 컴포넌트 사용 */}
-      <div style={{ marginBottom: isMobile ? '20px' : '32px' }}>
-        <h2 style={{
-          fontSize: isMobile ? '15px' : '18px',
-          fontWeight: '600',
-          marginBottom: isMobile ? '12px' : '16px',
-          color: '#e2e8f0'
-        }}>
-          단계별로 이런 업무를 자세하게 가이드 해드립니다
-        </h2>
-
-        <LevelProgressSelector
-          levels={[
-            {
-              level: 1,
-              name: '과외/1인원장 시작',
-              range: '원생 1-10명',
-              tasks: [
-                '처음 학원을 시작하거나 과외로 운영 중인 단계입니다.',
-                '아직 체계적인 시스템 없이 원장님 혼자 모든 것을 관리하고 있습니다.'
-              ]
-            },
-            {
-              level: 2,
-              name: '기본 시스템 구축',
-              range: '원생 10-30명',
-              tasks: [
-                '학생 진도 관리 시트 만들기',
-                '네이버 플레이스 등록하기',
-                '월별 수업 계획표 작성'
-              ]
-            },
-            {
-              level: 3,
-              name: '전문화 시작',
-              range: '원생 30-50명',
-              tasks: [
-                '자체교재 1종 개발하기',
-                '인스타그램 계정 운영 시작',
-                '성적대별 반 편성 시스템 구축'
-              ]
-            },
-            {
-              level: 4,
-              name: '시스템화',
-              range: '원생 50-100명',
-              tasks: [
-                'CRM 시스템 도입하기',
-                '대표 학교 3곳 확보하기',
-                '레벨별 커리큘럼 3단계 이상 구축'
-              ]
-            },
-            {
-              level: 5,
-              name: '조직화',
-              range: '원생 100-200명',
-              tasks: [
-                '레벨테스트 입소문 만들기',
-                '100명 설명회 2회 개최',
-                '파워 실무자 육성 시스템 구축'
-              ]
-            },
-            {
-              level: 6,
-              name: '확장',
-              range: '원생 200+명',
-              tasks: [
-                '2호점 오픈 준비하기',
-                '입시 컨텐츠를 프로그램과 연계',
-                '지역 브랜드 구축 전략 실행'
-              ]
-            },
-            {
-              level: 7,
-              name: '전국 브랜드화 시작',
-              range: '3개 지점 이상',
-              tasks: [
-                '여러 지점을 운영하며 지역을 넘어 전국적인 브랜드 구축을 시작합니다.',
-                '표준화된 시스템과 프로세스로 각 지점이 독립적으로 운영됩니다.'
-              ]
-            },
-            {
-              level: 8,
-              name: '상장/매각 등 대기업화',
-              range: '10개 지점 이상',
-              tasks: [
-                '기업공개(IPO)나 M&A를 준비하는 단계로 조직이 완전히 체계화되었습니다.',
-                '원장님은 경영자로서 전략과 비전에 집중하며 실무는 전문 경영진이 담당합니다.'
-              ]
-            }
-          ]}
-          defaultLevel={null}
-        />
-      </div>
-
-      {/* 실제 사용자 후기 - 심플 */}
-      <div style={{
-        background: 'rgba(15, 23, 42, 0.3)',
-        border: '1px solid rgba(59, 130, 246, 0.15)',
-        borderRadius: isMobile ? '10px' : '12px',
-        padding: isMobile ? '16px' : '24px',
-        marginBottom: isMobile ? '20px' : '32px'
-      }}>
-        <h2 style={{
-          fontSize: isMobile ? '14px' : '16px',
-          fontWeight: '600',
-          marginBottom: isMobile ? '12px' : '16px',
-          color: '#e2e8f0'
-        }}>
-          실제 원장님들의 후기
-        </h2>
-
-        <div style={{ display: 'grid', gap: isMobile ? '10px' : '12px' }}>
-          {[
-            {
-              name: '김** 원장님',
-              academy: '서울 강남구 학원',
-              before: 'Level 3',
-              after: 'Level 4',
-              review: '마케팅 부분이 병목이라는 걸 처음 알았어요. 조언대로 SNS를 시작했더니 3개월 만에 원생 15명이 늘었습니다!'
-            },
-            {
-              name: '이** 원장님',
-              academy: '경기 분당구 교습소',
-              before: 'Level 2',
-              after: 'Level 3',
-              review: '시스템이 없다는 게 가장 큰 문제였어요. CRM 도입하고 체계를 잡으니 학부모 만족도가 확 올랐습니다.'
-            },
-            {
-              name: '박** 원장님',
-              academy: '부산 해운대구 학원',
-              before: 'Level 4',
-              after: 'Level 5',
-              review: '레벨테스트 결과를 토대로 커리큘럼을 재정비했습니다. 특히 자체교재 비중을 50%까지 올린 게 큰 변화였어요.'
-            }
-          ].map((item, i) => (
-            <div key={i} style={{
-              background: 'rgba(0, 0, 0, 0.2)',
-              borderRadius: isMobile ? '6px' : '8px',
-              padding: isMobile ? '12px' : '14px',
-              border: '1px solid rgba(59, 130, 246, 0.1)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '6px' : '8px' }}>
-                <div>
-                  <h4 style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#e2e8f0', marginBottom: '2px' }}>
-                    {item.name}
-                  </h4>
-                  <p style={{ fontSize: isMobile ? '10px' : '11px', color: '#64748b' }}>{item.academy}</p>
-                </div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: isMobile ? '4px' : '6px',
-                  fontSize: isMobile ? '10px' : '11px',
-                  fontWeight: '600'
-                }}>
-                  <span style={{ color: '#f59e0b' }}>{item.before}</span>
-                  <span style={{ color: '#64748b' }}>→</span>
-                  <span style={{ color: '#10b981' }}>{item.after}</span>
-                </div>
-              </div>
-
-              <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#94a3b8', lineHeight: '1.5' }}>
-                "{item.review}"
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-
-  // Input 화면
-  const InputScreen = () => {
-    const handleStart = () => {
-      if (!studentCount || !staffCount) {
-        alert('원생 수와 직원 수를 모두 입력해주세요.')
-        return
-      }
-
-      // edurichbrain으로 리디렉션 (실제 레벨테스트는 edurichbrain에서 진행)
-      const params = new URLSearchParams({
-        student_count: studentCount,
-        staff_count: staffCount
-      })
-
-      // 새 탭에서 edurichbrain 레벨테스트 열기
-      window.open(`https://app.edurichbrain.com/diagnosis?${params.toString()}`, '_blank')
-
-      // 또는 현재 페이지에서 이동하려면:
-      // window.location.href = `https://app.edurichbrain.com/diagnosis?${params.toString()}`
-    }
-
-    return (
-      <div style={{ maxWidth: '500px', margin: '0 auto', padding: '24px 20px' }}>
-        <div style={{
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
-          borderRadius: '12px',
-          padding: '28px'
-        }}>
-          <h2 style={{
-            fontSize: '20px',
-            fontWeight: '600',
-            marginBottom: '10px',
-            color: '#e2e8f0'
-          }}>
-            기본 정보 입력
-          </h2>
-          <p style={{
-            fontSize: '13px',
-            color: '#94a3b8',
-            marginBottom: '24px'
-          }}>
-            정확한 진단을 위해 현재 학원 현황을 알려주세요
-          </p>
-
-          {error && (
-            <div style={{
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '6px',
-              padding: '10px',
-              marginBottom: '20px',
-              color: '#fca5a5',
-              fontSize: '12px'
-            }}>
-              {error}
-            </div>
-          )}
-
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '600',
-              marginBottom: '6px',
-              color: '#e2e8f0'
-            }}>
-              현재 원생 수
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={studentCount}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9]/g, '')
-                setStudentCount(value)
-              }}
-              placeholder="대략적인 인원을 입력해주세요 (예: 50)"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                background: 'rgba(0, 0, 0, 0.3)',
-                color: '#e2e8f0',
-                fontSize: '14px'
-              }}
-            />
-            <p style={{
-              fontSize: '11px',
-              color: '#64748b',
-              marginTop: '6px'
-            }}>
-              * 정확한 인원이 아니어도 괜찮습니다. 대략 몇 명대인지만 알려주세요.
-            </p>
-          </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '600',
-              marginBottom: '6px',
-              color: '#e2e8f0'
-            }}>
-              직원 수 (원장님 포함)
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={staffCount}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9]/g, '')
-                setStaffCount(value)
-              }}
-              placeholder="예: 3"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                background: 'rgba(0, 0, 0, 0.3)',
-                color: '#e2e8f0',
-                fontSize: '14px'
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => setStep('intro')}
-              style={{
-                flex: 1,
-                padding: '10px',
-                borderRadius: '6px',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                background: 'transparent',
-                color: '#94a3b8',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
-              이전
-            </button>
-            <button
-              onClick={handleStart}
-              disabled={!studentCount || !staffCount}
-              style={{
-                flex: 2,
-                padding: '10px',
-                borderRadius: '6px',
-                border: 'none',
-                background: (!studentCount || !staffCount) ? '#64748b' : 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: (!studentCount || !staffCount) ? 'not-allowed' : 'pointer',
-                opacity: (!studentCount || !staffCount) ? 0.5 : 1
-              }}
-            >
-              테스트 시작
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Test 화면
-  const TestScreen = () => {
-    if (questions.length === 0) {
-      return <div style={{ textAlign: 'center', padding: '100px', color: '#94a3b8' }}>질문을 불러오는 중...</div>
-    }
-
-    const currentQuestion = questions[currentQuestionIndex]
-    const progress = ((currentQuestionIndex + 1) / questions.length) * 100
-
-    const handleAnswer = async (answer) => {
-      try {
-        await fetch(`/api/level-test/${assessmentId}/answer`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            question_id: currentQuestion.id,
-            answer: answer
-          })
-        })
-
-        setAnswers(prev => ({
-          ...prev,
-          [currentQuestion.id]: answer
-        }))
-
-        if (currentQuestionIndex < questions.length - 1) {
-          setCurrentQuestionIndex(currentQuestionIndex + 1)
-        } else {
-          handleComplete()
-        }
-      } catch (err) {
-        console.error('Answer error:', err)
-        alert('답변 저장 중 오류가 발생했습니다.')
-      }
-    }
-
-    const handleComplete = async () => {
-      setLoading(true)
-      try {
-        const response = await fetch(`/api/level-test/${assessmentId}/complete`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ assessment_id: assessmentId })
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.error || '결과 처리 중 오류가 발생했습니다.')
-        }
-
-        setResult(data.result)
-        setStep('result')
-
-        if (!isLoggedIn) {
-          setTimeout(() => {
-            setShowSignupPrompt(true)
-          }, 1000)
-        }
-      } catch (err) {
-        console.error('Complete error:', err)
-        alert(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    const handlePrevious = () => {
-      if (currentQuestionIndex > 0) {
-        setCurrentQuestionIndex(currentQuestionIndex - 1)
-      }
-    }
-
-    const getCategoryColor = (category) => {
-      switch (category) {
-        case 'curriculum': return '#10b981'
-        case 'system': return '#8b5cf6'
-        case 'marketing': return '#f59e0b'
-        default: return '#3b82f6'
-      }
-    }
-
-    const getCategoryName = (category) => {
-      switch (category) {
-        case 'curriculum': return '커리큘럼'
-        case 'system': return '시스템'
-        case 'marketing': return '마케팅'
-        default: return ''
-      }
-    }
-
-    return (
-      <div style={{ maxWidth: '700px', margin: '0 auto', padding: '24px 20px' }}>
-        {/* 진행률 바 */}
-        <div style={{ marginBottom: '20px' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '8px'
-          }}>
-            <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: '600' }}>
-              질문 {currentQuestionIndex + 1} / {questions.length}
-            </span>
-            <span style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '600' }}>
-              {Math.round(progress)}% 완료
-            </span>
-          </div>
-          <div style={{
-            width: '100%',
-            height: '6px',
-            background: 'rgba(59, 130, 246, 0.1)',
-            borderRadius: '999px',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              width: `${progress}%`,
-              height: '100%',
-              background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
-              transition: 'width 0.3s',
-              borderRadius: '999px'
-            }} />
-          </div>
-        </div>
-
-        {/* 질문 카드 */}
-        <div style={{
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
-          borderRadius: '12px',
-          padding: '28px',
-          marginBottom: '16px'
-        }}>
-          {/* 카테고리 뱃지 */}
-          <div style={{ marginBottom: '16px' }}>
-            <span style={{
-              display: 'inline-block',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              fontSize: '11px',
-              fontWeight: '600',
-              background: `${getCategoryColor(currentQuestion.category)}20`,
-              color: getCategoryColor(currentQuestion.category),
-              border: `1px solid ${getCategoryColor(currentQuestion.category)}40`
-            }}>
-              {getCategoryName(currentQuestion.category)}
-            </span>
-          </div>
-
-          {/* 질문 */}
-          <h2 style={{
-            fontSize: '20px',
-            fontWeight: '600',
-            lineHeight: '1.4',
-            color: '#e2e8f0',
-            marginBottom: '24px'
-          }}>
-            {currentQuestion.question_text}
-          </h2>
-
-          {/* O/X 버튼 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <button
-              onClick={() => handleAnswer(true)}
-              style={{
-                padding: '16px',
-                borderRadius: '8px',
-                border: '2px solid #10b981',
-                background: 'rgba(16, 185, 129, 0.1)',
-                color: '#10b981',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'rgba(16, 185, 129, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'rgba(16, 185, 129, 0.1)'
-              }}
-            >
-              예
-            </button>
-            <button
-              onClick={() => handleAnswer(false)}
-              style={{
-                padding: '16px',
-                borderRadius: '8px',
-                border: '2px solid #ef4444',
-                background: 'rgba(239, 68, 68, 0.1)',
-                color: '#ef4444',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'rgba(239, 68, 68, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'rgba(239, 68, 68, 0.1)'
-              }}
-            >
-              아니오
-            </button>
-          </div>
-        </div>
-
-        {/* 이전 버튼 */}
-        {currentQuestionIndex > 0 && (
-          <button
-            onClick={handlePrevious}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '6px',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              background: 'transparent',
-              color: '#94a3b8',
-              fontSize: '12px',
-              cursor: 'pointer',
-              display: 'block',
-              margin: '0 auto'
-            }}
-          >
-            ← 이전 질문
-          </button>
-        )}
-
-        {loading && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.7)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999
-          }}>
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.95)',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              borderRadius: '12px',
-              padding: '24px',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                border: '3px solid rgba(59, 130, 246, 0.2)',
-                borderTopColor: '#3b82f6',
-                borderRadius: '50%',
-                margin: '0 auto 12px',
-                animation: 'spin 1s linear infinite'
-              }} />
-              <p style={{ color: '#e2e8f0', fontSize: '14px' }}>결과를 분석하는 중...</p>
-            </div>
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  // Result 화면
-  const ResultScreen = () => {
-    if (!result) {
-      return <div style={{ textAlign: 'center', padding: '100px', color: '#94a3b8' }}>결과를 불러오는 중...</div>
-    }
-
-    const getLevelName = (level) => {
-      const names = {
-        2: '기본 시스템 구축',
-        3: '전문화 시작',
-        4: '시스템화',
-        5: '조직화',
-        6: '확장'
-      }
-      return names[level] || ''
-    }
-
-    const getLevelColor = (level) => {
-      const colors = {
-        2: '#10b981',
-        3: '#3b82f6',
-        4: '#8b5cf6',
-        5: '#f59e0b',
-        6: '#ef4444'
-      }
-      return colors[level] || '#3b82f6'
-    }
-
-    const getCategoryNameKo = (category) => {
-      const names = {
-        curriculum: '커리큘럼',
-        system: '시스템',
-        marketing: '마케팅'
-      }
-      return names[category] || category
-    }
-
-    // 레이더 차트 데이터
-    const chartData = {
-      labels: ['커리큘럼', '시스템', '마케팅'],
-      datasets: [{
-        label: '현재 점수',
-        data: [
-          result.category_scores?.curriculum || 0,
-          result.category_scores?.system || 0,
-          result.category_scores?.marketing || 0
-        ],
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        borderColor: 'rgb(59, 130, 246)',
-        borderWidth: 2,
-        pointBackgroundColor: 'rgb(59, 130, 246)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(59, 130, 246)'
-      }]
-    }
-
-    const chartOptions = {
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 100,
-          ticks: {
-            stepSize: 20,
-            color: '#64748b'
-          },
-          grid: {
-            color: 'rgba(59, 130, 246, 0.1)'
-          },
-          pointLabels: {
-            color: '#e2e8f0',
-            font: {
-              size: 12
-            }
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          display: false
-        }
-      }
-    }
-
-    const isBlurred = !isLoggedIn && showSignupPrompt
-
-    return (
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 20px', position: 'relative' }}>
-        {/* 비회원 블러 처리 + 회원가입 모달 */}
-        {isBlurred && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(10px)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}>
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              borderRadius: '12px',
-              padding: '32px',
-              maxWidth: '420px',
-              textAlign: 'center'
-            }}>
-              <h2 style={{
-                fontSize: '22px',
-                fontWeight: '600',
-                marginBottom: '12px',
-                color: '#e2e8f0'
-              }}>
-                진단이 완료되었습니다
-              </h2>
-
-              <p style={{
-                fontSize: '14px',
-                color: '#94a3b8',
-                marginBottom: '24px',
-                lineHeight: '1.5'
-              }}>
-                상세한 결과와 맞춤 액션 플랜을 확인하려면<br />
-                회원가입이 필요합니다.
-              </p>
-
-              <div style={{
-                background: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                borderRadius: '8px',
-                padding: '16px',
-                marginBottom: '24px',
-                textAlign: 'left'
-              }}>
-                <p style={{ fontSize: '12px', color: '#cbd5e1', marginBottom: '10px', fontWeight: '600' }}>
-                  회원가입 후 확인 가능:
-                </p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {[
-                    '정확한 레벨 및 카테고리별 점수',
-                    '레이더 차트로 한눈에 보는 균형도',
-                    '병목 지점 상세 분석',
-                    '다음 레벨로 가는 액션 플랜',
-                    '히스토리 추적 및 개선 추이'
-                  ].map((text, i) => (
-                    <li key={i} style={{
-                      fontSize: '12px',
-                      color: '#94a3b8',
-                      marginBottom: '6px',
-                      paddingLeft: '16px',
-                      position: 'relative'
-                    }}>
-                      <span style={{ position: 'absolute', left: 0, color: '#3b82f6' }}>•</span>
-                      {text}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                onClick={() => router.push('/signup/role')}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  marginBottom: '10px'
-                }}
-              >
-                회원가입하고 결과 확인하기
-              </button>
-
-              <button
-                onClick={() => setShowSignupPrompt(false)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(59, 130, 246, 0.3)',
-                  background: 'transparent',
-                  color: '#94a3b8',
-                  fontSize: '12px',
-                  cursor: 'pointer'
-                }}
-              >
-                미리보기 (제한됨)
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* 실제 결과 화면 */}
-        <div style={{ filter: isBlurred ? 'blur(8px)' : 'none', pointerEvents: isBlurred ? 'none' : 'auto' }}>
-          {/* 레벨 표시 */}
-          <div style={{
-            background: `linear-gradient(135deg, ${getLevelColor(result.effective_level)}15, ${getLevelColor(result.effective_level)}08)`,
-            border: `2px solid ${getLevelColor(result.effective_level)}`,
-            borderRadius: '12px',
-            padding: '28px',
-            textAlign: 'center',
-            marginBottom: '24px'
-          }}>
-            <div style={{
-              fontSize: '48px',
-              fontWeight: '700',
-              color: getLevelColor(result.effective_level),
-              marginBottom: '6px'
-            }}>
-              Level {result.effective_level}
-            </div>
-            <div style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#e2e8f0'
-            }}>
-              {getLevelName(result.effective_level)}
-            </div>
-          </div>
-
-          {/* 카테고리별 점수 & 레이더 차트 */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '20px',
-            marginBottom: '24px'
-          }}>
-            {/* 카테고리별 진행바 */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.3)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px',
-              padding: '20px'
-            }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px', color: '#e2e8f0' }}>
-                카테고리별 완성도
-              </h3>
-
-              {['curriculum', 'system', 'marketing'].map((category) => {
-                const score = result.category_scores?.[category] || 0
-                const color = category === 'curriculum' ? '#10b981' : category === 'system' ? '#8b5cf6' : '#f59e0b'
-
-                return (
-                  <div key={category} style={{ marginBottom: '14px' }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginBottom: '6px'
-                    }}>
-                      <span style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: '600' }}>
-                        {getCategoryNameKo(category)}
-                      </span>
-                      <span style={{ fontSize: '12px', color: color, fontWeight: '600' }}>
-                        {score}%
-                      </span>
-                    </div>
-                    <div style={{
-                      width: '100%',
-                      height: '8px',
-                      background: 'rgba(59, 130, 246, 0.1)',
-                      borderRadius: '999px',
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{
-                        width: `${score}%`,
-                        height: '100%',
-                        background: color,
-                        borderRadius: '999px',
-                        transition: 'width 0.5s'
-                      }} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* 레이더 차트 */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.3)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px',
-              padding: '20px'
-            }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px', color: '#e2e8f0' }}>
-                균형도 분석
-              </h3>
-              <div style={{ maxWidth: '280px', margin: '0 auto' }}>
-                <Radar data={chartData} options={chartOptions} />
-              </div>
-            </div>
-          </div>
-
-          {/* 강점 & 병목 */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: result.strengths?.length > 0 ? 'repeat(2, 1fr)' : '1fr',
-            gap: '16px',
-            marginBottom: '24px'
-          }}>
-            {result.strengths?.length > 0 && (
-              <div style={{
-                background: 'rgba(16, 185, 129, 0.1)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '18px'
-              }}>
-                <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#10b981' }}>
-                  강점
-                </h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {result.strengths.map((s, i) => (
-                    <li key={i} style={{ fontSize: '12px', color: '#cbd5e1', marginBottom: '6px' }}>
-                      <span style={{ color: '#10b981', marginRight: '6px' }}>•</span>
-                      {getCategoryNameKo(s)} 체계화 우수
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div style={{
-              background: 'rgba(245, 158, 11, 0.1)',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              borderRadius: '12px',
-              padding: '18px'
-            }}>
-              <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#f59e0b' }}>
-                집중 영역
-              </h3>
-              <p style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>
-                <span style={{ color: '#f59e0b', fontWeight: '600' }}>
-                  {getCategoryNameKo(result.bottleneck)}
-                </span> 부분을 보강하면 다음 레벨로 성장할 수 있습니다
-              </p>
-            </div>
-          </div>
-
-          {/* 액션 플랜 */}
-          <div style={{
-            background: 'rgba(15, 23, 42, 0.3)',
-            border: '2px solid rgba(59, 130, 246, 0.4)',
-            borderRadius: '12px',
-            padding: '24px'
-          }}>
-            <h2 style={{
-              fontSize: '17px',
-              fontWeight: '600',
-              marginBottom: '18px',
-              color: '#e2e8f0'
-            }}>
-              Level {result.effective_level + 1}로 가는 액션 플랜
-            </h2>
-
-            {result.next_actions && result.next_actions.length > 0 ? (
-              <div style={{ display: 'grid', gap: '14px' }}>
-                {result.next_actions.map((action, idx) => (
-                  <div key={idx} style={{
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    border: '1px solid rgba(59, 130, 246, 0.2)',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    borderLeft: '3px solid #3b82f6'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
-                      <div style={{
-                        width: '24px',
-                        height: '24px',
-                        background: '#3b82f6',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        color: 'white',
-                        flexShrink: 0
-                      }}>
-                        {action.priority}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#e2e8f0', margin: 0 }}>
-                            {action.title}
-                          </h3>
-                          {action.time && (
-                            <span style={{
-                              fontSize: '10px',
-                              color: '#64748b',
-                              background: 'rgba(59, 130, 246, 0.15)',
-                              padding: '2px 6px',
-                              borderRadius: '3px'
-                            }}>
-                              {action.time}
-                            </span>
-                          )}
-                        </div>
-                        <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px', lineHeight: '1.5' }}>
-                          {action.description}
-                        </p>
-                        {action.link && (
-                          <Link
-                            href={action.link}
-                            style={{
-                              display: 'inline-block',
-                              fontSize: '12px',
-                              color: '#3b82f6',
-                              textDecoration: 'none',
-                              fontWeight: '600'
-                            }}
-                          >
-                            바로 시작하기 →
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '12px' }}>
-                축하합니다! 현재 레벨에서 할 수 있는 모든 것을 갖추셨습니다.
-              </p>
-            )}
-          </div>
-
-          {/* CTA */}
-          <div style={{ marginTop: '24px', textAlign: 'center' }}>
-            <button
-              onClick={() => router.push('/')}
-              style={{
-                padding: '12px 32px',
-                borderRadius: '8px',
-                border: 'none',
-                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
-              대시보드에서 실행하기
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // 메인 렌더
   return (
-    <>
-      {step === 'intro' ? (
-        // Intro 화면은 사이드바 있음
-        <div className="app-layout">
-          {/* Left Sidebar Navigation */}
-          <aside className="sidebar">
-            <Link href="/" className="sidebar-logo">
-              EduRichBrain
-            </Link>
+    <div className="app-layout">
+      {/* Left Sidebar Navigation */}
+      <aside className="sidebar">
+        <Link href="/" className="sidebar-logo">
+          EduRichBrain
+        </Link>
 
-            <nav className="sidebar-nav">
-              <Link href="/" className="sidebar-link">제품</Link>
-              <Link href="/pricing" className="sidebar-link">요금제</Link>
-              <Link href="/diagnosis" className="sidebar-link active">경영진단</Link>
-              <Link href="/blog" className="sidebar-link">블로그</Link>
-              <Link href="/about" className="sidebar-link">회사</Link>
-              <Link href="/demo" className="sidebar-link">데모</Link>
-            </nav>
+        <nav className="sidebar-nav">
+          <Link href="/" className="sidebar-link">제품</Link>
+          <Link href="/pricing" className="sidebar-link">요금제</Link>
+          <Link href="/diagnosis" className="sidebar-link active">경영진단</Link>
+          <Link href="/blog" className="sidebar-link">블로그</Link>
+          <Link href="/about" className="sidebar-link">회사</Link>
+          <Link href="/demo" className="sidebar-link">데모</Link>
+        </nav>
 
-            <div className="sidebar-footer">
-              <button className="sidebar-icon-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </button>
-            </div>
-          </aside>
-
-          {/* Main Content Area */}
-          <div className="main-area">
-            <div style={{
-              minHeight: '100vh',
-              color: '#e2e8f0',
-              paddingTop: '60px'
-            }}>
-              <IntroScreen />
-            </div>
-          </div>
+        <div className="sidebar-footer">
+          <button className="sidebar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
         </div>
-      ) : (
-        // Input 이후 화면은 사이드바 없음
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="main-area">
         <div style={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
           color: '#e2e8f0',
           paddingTop: '60px'
         }}>
-          <style>{`
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-          `}</style>
+          <div style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '16px 16px' : '24px 20px' }}>
+            {/* Hero Section */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.04))',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+              borderRadius: isMobile ? '10px' : '12px',
+              padding: isMobile ? '20px 16px' : '32px 28px',
+              marginBottom: isMobile ? '20px' : '32px'
+            }}>
+              <h1 style={{
+                fontSize: isMobile ? '20px' : '28px',
+                fontWeight: '600',
+                marginBottom: isMobile ? '8px' : '12px',
+                color: '#e2e8f0',
+                lineHeight: '1.3'
+              }}>
+                우리 학원은 지금 어느 단계일까요?
+              </h1>
 
-          {step === 'input' && <InputScreen />}
-          {step === 'test' && <TestScreen />}
-          {step === 'result' && <ResultScreen />}
+              <p style={{
+                fontSize: isMobile ? '13px' : '15px',
+                color: '#94a3b8',
+                marginBottom: isMobile ? '16px' : '24px',
+                lineHeight: '1.5'
+              }}>
+                실제 발로 뛰며 알게된 학원 경영의 비밀
+              </p>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: isMobile ? '8px' : '12px',
+                marginBottom: isMobile ? '16px' : '24px'
+              }}>
+                {[
+                  { title: '커리큘럼', desc: '학습 관리 체계' },
+                  { title: '시스템', desc: '운영 효율성' },
+                  { title: '마케팅', desc: '홍보 & 브랜딩' }
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    background: 'rgba(15, 23, 42, 0.4)',
+                    border: '1px solid rgba(59, 130, 246, 0.15)',
+                    borderRadius: isMobile ? '6px' : '8px',
+                    padding: isMobile ? '10px 6px' : '14px',
+                    textAlign: 'center'
+                  }}>
+                    <h3 style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '600', marginBottom: '2px', color: '#e2e8f0' }}>
+                      {item.title}
+                    </h3>
+                    <p style={{ fontSize: isMobile ? '9px' : '11px', color: '#64748b' }}>{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  window.open('https://edurichbrain.ai.kr/diagnosis', '_blank')
+                }}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                  color: 'white',
+                  fontSize: isMobile ? '13px' : '14px',
+                  fontWeight: '600',
+                  padding: isMobile ? '10px 20px' : '12px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
+                }}
+              >
+                무료로 5분 진단 시작하기
+              </button>
+
+              <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginTop: isMobile ? '8px' : '10px', textAlign: 'center' }}>
+                66개 질문 • 소요시간 약 5분
+              </p>
+            </div>
+
+            {/* 영상 섹션 */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.3)',
+              border: '1px solid rgba(59, 130, 246, 0.15)',
+              borderRadius: isMobile ? '10px' : '12px',
+              padding: isMobile ? '16px' : '24px',
+              marginBottom: isMobile ? '20px' : '32px'
+            }}>
+              <h2 style={{
+                fontSize: isMobile ? '14px' : '16px',
+                fontWeight: '600',
+                marginBottom: isMobile ? '10px' : '14px',
+                color: '#e2e8f0'
+              }}>
+                레벨테스트 소개 영상
+              </h2>
+              <div style={{
+                aspectRatio: '16/9',
+                maxHeight: isMobile ? '180px' : '280px',
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderRadius: isMobile ? '6px' : '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px dashed rgba(59, 130, 246, 0.2)'
+              }}>
+                <div style={{ textAlign: 'center', color: '#64748b' }}>
+                  <div style={{ fontSize: isMobile ? '24px' : '32px', marginBottom: '8px' }}>▶</div>
+                  <p style={{ fontSize: isMobile ? '11px' : '13px' }}>실제 촬영 영상 영역</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 레벨별 설명 */}
+            <div style={{ marginBottom: isMobile ? '20px' : '32px' }}>
+              <h2 style={{
+                fontSize: isMobile ? '15px' : '18px',
+                fontWeight: '600',
+                marginBottom: isMobile ? '12px' : '16px',
+                color: '#e2e8f0'
+              }}>
+                단계별로 이런 업무를 자세하게 가이드 해드립니다
+              </h2>
+
+              <LevelProgressSelector
+                levels={[
+                  {
+                    level: 1,
+                    name: '태동기: 생존과 본질',
+                    range: '원생 0 ~ 29명',
+                    tasks: [
+                      '강의력이 곧 마케팅이다: "이탈률 0%"를 목표로 아이 한 명 한 명에게 집착하세요.',
+                      '학부모 안심 문자 루틴: "오늘 철수가 함수 부분을 헷갈려해서 이 부분을 꽉 잡았습니다"라는 구체적 피드백 전송.',
+                      '돈 쓰지 않는 홍보: 화려한 광고 대신, 원장님의 교육 철학과 수업 일지를 블로그에 진솔하게 기록하세요.',
+                      '청소도 경영이다: 아이들이 오고 싶게 만드는 청결한 환경과 면학 분위기를 직접 조성하세요.',
+                      '경쟁사 벤치마킹: 우리 동네 1등 학원에 학부모인 척 전화해서 상담 프로세스와 커리큘럼 분석하기.',
+                      '초기 상담의 기술: 등록 강요보다 "아이의 현재 상태"를 정확히 진단하고 공감해주는 데 시간 쏟기.',
+                      '나만의 무기 만들기: 인근 학원들이 못 해주는 것(예: 밤 10시까지 밀착 케어) 한 가지를 확실하게 어필하세요.'
+                    ]
+                  },
+                  {
+                    level: 2,
+                    name: '성장기: 수익모델(돈구멍) 검증',
+                    range: '원생 30 ~ 69명',
+                    tasks: [
+                      '돈 구멍(수익화) 설계: 정규 수업 외에 특강, 보충, 내신 대비 등을 별도 유료 "상품"으로 기획하세요.',
+                      '지역 검색 장악: 네이버에 "동네명+과목" 검색 시 우리 학원이 가장 매력적으로 보이도록 플레이스 세팅하기.',
+                      '1인 한계 돌파(채용): 원장님의 시간을 확보하기 위해 채점, 차량, 청소를 도와줄 아르바이트생 채용.',
+                      '시험 기간의 기적: 내신 대비 기간에 압도적인 관리량을 보여주어 학부모를 우리 편(Fan)으로 만드세요.',
+                      '해피콜 루틴화: 성적이 떨어지거나 사고 쳤을 때만 전화하지 말고, 잘하고 있을 때 칭찬 전화 돌리기.',
+                      '진입 장벽 만들기: "아무나 받지 않는다"는 인식을 심어주기 위해 간단하더라도 입학 레벨테스트 도입.',
+                      '증거 수집: 아이들의 성적 향상 사례, 학부모의 감사 문자를 캡처하여 마케팅 소재로 아카이빙하세요.'
+                    ]
+                  },
+                  {
+                    level: 3,
+                    name: '안정기: 죽음의 계곡 탈출',
+                    range: '원생 70 ~ 109명',
+                    tasks: [
+                      '자체 교재 Vol.1 개발: 시중 교재 짜깁기가 아닌, 우리 학원 로고가 박힌 자체 제본 교재로 전문성 증명.',
+                      '강사 R&R 분담: 원장님은 경영/상담/특목반, 강사는 일반 수업/관리로 역할을 명확히 나누세요.',
+                      '소개팅 쿠션 전략: 바로 청혼(등록)하지 마세요. "학부모 설명회"라는 가벼운 만남으로 썸(신뢰)부터 타세요.',
+                      '블로그 퍼널(Funnel) 완성: 정보성 글(검색) → 교육 철학(설득) → 상담 신청(전환)으로 이어지는 글쓰기 구조.',
+                      '바이럴 이벤트: "친구랑 같이 오면 피자 파티" 등 아이들이 스스로 친구를 데려올 명분(Trigger) 만들어주기.',
+                      '중간 관리자(Key Man) 발굴: 강사들 중 나의 오른팔이 되어줄 "실장급" 리더를 눈여겨보고 키우세요.',
+                      '제 값 받기(Pricing): 이제 싼 맛에 오는 학원이 아닙니다. 수업 가치에 맞는 적정 수강료로 인상안 검토.'
+                    ]
+                  },
+                  {
+                    level: 4,
+                    name: '시스템기: 사상누각 방지',
+                    range: '원생 110 ~ 249명',
+                    tasks: [
+                      '업무 표준화(Manual): 강사가 바뀌어도 수업 퀄리티가 유지되도록 강의 계획서와 상담 매뉴얼 문서화.',
+                      'CRM 시스템 필수 도입: 원장님 머릿속, 엑셀, 수첩에 흩어진 학생 정보를 통합 데이터베이스로 이관.',
+                      '아이언맨 상담 화법: "성적이 나빠요"라고 지적하지 말고, "아이의 잠재력(미래)"을 보여주는 상담 스크립트 정착.',
+                      '타겟 학교 점령: 인근 학교 중 3곳을 정해 그 학교 전교권 학생을 배출하고 "OO학교 전문" 타이틀 확보.',
+                      '객단가(ARPU) 상승: 수업료 외에 교재비, 모의고사비, 코칭비 등 부가 수익 구조를 촘촘하게 설계.',
+                      '데이터 기반 강사 평가: "열심히 해요"가 아닌, 재등록률/성적향상률 등 수치로 강사를 평가하고 보상하세요.',
+                      '온라인 평판 방어: 맘카페나 지역 커뮤니티의 여론을 모니터링하고, 악성 루머에 대응하는 프로세스 구축.'
+                    ]
+                  },
+                  {
+                    level: 5,
+                    name: '기업화: 위임과 이익 극대화',
+                    range: '원생 250 ~ 499명',
+                    tasks: [
+                      '빈 의자 테스트(위임): 원장님이 일주일 휴가를 다녀와도 학원이 문제없이 돌아가는지 시스템 점검.',
+                      '조직도(Org Chart) 세팅: 교수부장, 상담실장, 행정팀장 등 중간 관리자에게 확실한 권한과 책임 부여.',
+                      '고수익 상품군(High-Ticket): 입시 컨설팅, 의대 반, 유학 반 등 수익성이 높은 프리미엄 라인업 런칭.',
+                      '랜드마크 설명회: 100명 이상 모이는 대형 호텔/강당 설명회를 개최하여 지역 1등 이미지를 굳히세요.',
+                      '재무 경영(P&L): 통장 잔고만 보지 말고 월별 손익계산서를 작성하여 불필요한 비용(Leak)을 차단.',
+                      '사내 강사 아카데미: 외부에서 비싼 스타강사를 스카우트하기보다, 신입을 우리 색깔에 맞게 키워내는 교육 시스템.',
+                      '학원 문화(Culture) 정립: "우리는 왜 가르치는가?"에 대한 핵심 가치를 전 직원이 공유하고 내재화.'
+                    ]
+                  },
+                  {
+                    level: 6,
+                    name: '확장기: 브랜드 IP 사업',
+                    range: '원생 500 ~ 999명',
+                    tasks: [
+                      '압도적 브랜딩: 타 학원이 감히 경쟁할 엄두를 못 낼 정도로 지역 내 "대체 불가능한 브랜드" 구축.',
+                      '콘텐츠 자산화(IP): 우리 학원의 교재, 커리큘럼, 테스트지를 외부 판매하거나 출판하여 수익 다각화.',
+                      '2호점 직영 확장: 본점의 성공 시스템을 그대로 복제(Ctrl+C, Ctrl+V)하여 인근 지역으로 영토 확장.',
+                      '하이브리드 교육: 오프라인 강의실의 한계를 넘어 줌(Zoom)이나 VOD 클래스로 수강생 범위 전국 확대.',
+                      '인하우스 마케팅팀: 외주 대행사에 맡기지 말고, 기획/디자인/영상 제작이 가능한 내부 마케팅 부서 가동.',
+                      '사회적 권위 확보: 원장님의 이름으로 된 교육 서적 출판, 언론 인터뷰 등을 통해 "교육 전문가" 포지셔닝.',
+                      '핵심 인재 락인(Lock-in): 스톡옵션이나 파격적인 인센티브 제도로 에이스 강사가 독립하지 않고 머물게 하기.'
+                    ]
+                  },
+                  {
+                    level: 7,
+                    name: '완성기: 전국구 & 엑시트',
+                    range: '원생 1,000명 +',
+                    tasks: [
+                      '가맹 본부(Franchise) 설립: 교육 서비스를 파는 학원에서, "성공 시스템"을 파는 가맹 본사로 비즈니스 모델 전환.',
+                      '부동산 자산화: 매달 나가는 월세를 없애고, 학원 건물을 매입하거나 사옥을 지어 자산 가치 증대.',
+                      '전문 경영인(CEO) 영입: 원장님은 이사회 의장(Visionary)으로 물러나고, 실무는 전문 경영인에게 맡기세요.',
+                      '교육 그룹화: 입시 학원을 넘어 유학원, 스터디카페, 성인 교육 등 연관 비즈니스로 수직 계열화.',
+                      '엑시트(Exit) 전략: 기업공개(IPO)를 하거나 사모펀드/대기업에 매각하여 평생 일군 가치를 현금화할 준비.',
+                      '사회 공헌(CSR): 장학 재단 설립이나 지역 사회 기부를 통해 "존경받는 교육 기업"으로 유산(Legacy) 남기기.',
+                      '완전한 자유: 시스템이 돈을 벌어다 주는 구조를 완성하고, 원장님은 진정으로 원하는 새로운 꿈에 도전하세요.'
+                    ]
+                  }
+                ]}
+                defaultLevel={null}
+              />
+            </div>
+
+            {/* 실제 사용자 후기 */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.3)',
+              border: '1px solid rgba(59, 130, 246, 0.15)',
+              borderRadius: isMobile ? '10px' : '12px',
+              padding: isMobile ? '16px' : '24px',
+              marginBottom: isMobile ? '20px' : '32px'
+            }}>
+              <h2 style={{
+                fontSize: isMobile ? '14px' : '16px',
+                fontWeight: '600',
+                marginBottom: isMobile ? '12px' : '16px',
+                color: '#e2e8f0'
+              }}>
+                실제 원장님들의 후기
+              </h2>
+
+              <div style={{ display: 'grid', gap: isMobile ? '10px' : '12px' }}>
+                {[
+                  {
+                    name: '김** 원장님',
+                    academy: '서울 강남구 학원',
+                    before: 'Level 3',
+                    after: 'Level 4',
+                    review: '마케팅 부분이 병목이라는 걸 처음 알았어요. 조언대로 SNS를 시작했더니 3개월 만에 원생 15명이 늘었습니다!'
+                  },
+                  {
+                    name: '이** 원장님',
+                    academy: '경기 분당구 교습소',
+                    before: 'Level 2',
+                    after: 'Level 3',
+                    review: '시스템이 없다는 게 가장 큰 문제였어요. CRM 도입하고 체계를 잡으니 학부모 만족도가 확 올랐습니다.'
+                  },
+                  {
+                    name: '박** 원장님',
+                    academy: '부산 해운대구 학원',
+                    before: 'Level 4',
+                    after: 'Level 5',
+                    review: '레벨테스트 결과를 토대로 커리큘럼을 재정비했습니다. 특히 자체교재 비중을 50%까지 올린 게 큰 변화였어요.'
+                  }
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    background: 'rgba(0, 0, 0, 0.2)',
+                    borderRadius: isMobile ? '6px' : '8px',
+                    padding: isMobile ? '12px' : '14px',
+                    border: '1px solid rgba(59, 130, 246, 0.1)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '6px' : '8px' }}>
+                      <div>
+                        <h4 style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#e2e8f0', marginBottom: '2px' }}>
+                          {item.name}
+                        </h4>
+                        <p style={{ fontSize: isMobile ? '10px' : '11px', color: '#64748b' }}>{item.academy}</p>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '4px' : '6px',
+                        fontSize: isMobile ? '10px' : '11px',
+                        fontWeight: '600'
+                      }}>
+                        <span style={{ color: '#f59e0b' }}>{item.before}</span>
+                        <span style={{ color: '#64748b' }}>→</span>
+                        <span style={{ color: '#10b981' }}>{item.after}</span>
+                      </div>
+                    </div>
+
+                    <p style={{ fontSize: isMobile ? '11px' : '12px', color: '#94a3b8', lineHeight: '1.5' }}>
+                      "{item.review}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   )
 }

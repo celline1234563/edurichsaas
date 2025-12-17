@@ -215,69 +215,36 @@ export default function LevelProgressSelector({ levels, defaultLevel = null }) {
                 </div>
 
                 <div>
-                  {/* 1, 7, 8 레벨은 설명 문장, 나머지는 필수 업무 리스트 */}
-                  {[1, 7, 8].includes(currentLevel.level) ? (
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px'
-                    }}>
-                      {currentLevel.tasks?.map((sentence, idx) => (
-                        <p
-                          key={idx}
-                          style={{
-                            fontSize: '13px',
-                            color: '#cbd5e1',
-                            lineHeight: '1.6',
-                            margin: 0
-                          }}
-                        >
-                          {sentence}
-                        </p>
-                      ))}
-                    </div>
-                  ) : (
-                    <>
-                      <p style={{
-                        fontSize: '12px',
-                        color: '#94a3b8',
-                        marginBottom: '10px',
-                        fontWeight: '500'
-                      }}>
-                        *성장을 위해 가장 필수적인 업무
-                      </p>
-                      <ul style={{
-                        listStyle: 'none',
-                        padding: 0,
-                        margin: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                      }}>
-                        {currentLevel.tasks?.map((task, idx) => (
-                          <li
-                            key={idx}
-                            style={{
-                              fontSize: '13px',
-                              color: '#cbd5e1',
-                              paddingLeft: '18px',
-                              position: 'relative',
-                              lineHeight: '1.5'
-                            }}
-                          >
-                            <span style={{
-                              position: 'absolute',
-                              left: 0,
-                              color: '#3b82f6'
-                            }}>
-                              •
-                            </span>
-                            {task}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}>
+                    {currentLevel.tasks?.map((task, idx) => (
+                      <li
+                        key={idx}
+                        style={{
+                          fontSize: '13px',
+                          color: '#cbd5e1',
+                          paddingLeft: '18px',
+                          position: 'relative',
+                          lineHeight: '1.5'
+                        }}
+                      >
+                        <span style={{
+                          position: 'absolute',
+                          left: 0,
+                          color: '#3b82f6'
+                        }}>
+                          •
+                        </span>
+                        {task}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </>
             )
