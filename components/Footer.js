@@ -196,6 +196,7 @@ export default function Footer() {
             문의: <a href="mailto:support@marketingdiet.online" style={{ color: '#60a5fa', textDecoration: 'none' }}>support@marketingdiet.online</a>
           </p>
           <p style={{ marginBottom: '8px' }}>대표 이성연 | 경기도 성남시 분당구 대왕판교로645번길 12 9층 | 사업자 등록번호 331-31-00742 | 전화 010-9619-5797</p>
+          <p style={{ marginBottom: '8px', color: '#60a5fa' }}>카카오 알림 서비스: 에듀 케어 알림</p>
           <p style={{ marginBottom: '16px' }}>© 2022 Marketingdiet Inc, All rights reserved</p>
           <div style={{
             display: 'flex',
