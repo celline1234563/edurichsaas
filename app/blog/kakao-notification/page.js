@@ -299,8 +299,102 @@ export default function KakaoNotificationBlogPage() {
                 <Flowchart />
                 <div style={{ marginTop: '28px', textAlign: 'center', maxWidth: '600px', margin: '28px auto 0' }}>
                   <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>
-                    에듀리치브레인 시스템에서 설정만 하면, <strong style={{ color: 'rgba(255,255,255,0.85)' }}>에듀 알림 채널</strong>을 통해 자동으로 발송됩니다.
+                    에듀리치브레인 시스템에서 설정만 하면, <strong style={{ color: 'rgba(255,255,255,0.85)' }}>에듀케어 알림 채널</strong>을 통해 자동으로 발송됩니다.
                   </p>
+                </div>
+              </div>
+
+              {/* 에듀케어 알림 채널 안내 Section */}
+              <div style={{
+                padding: isMobile ? '24px' : '40px',
+                background: 'rgba(254, 229, 0, 0.08)',
+                borderBottom: '1px solid rgba(254, 229, 0, 0.2)'
+              }}>
+                <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: 'white', marginBottom: '20px' }}>
+                  카카오톡 채널 '에듀케어 알림' 운영 안내
+                </h3>
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px', lineHeight: 1.8, marginBottom: '24px' }}>
+                  본 서비스(에듀리치브레인)를 이용하는 학원의 원활한 <strong style={{ color: '#FEE500' }}>학생 관리(Edu-Care)</strong>를 위해
+                  공식 알림 채널명을 <strong style={{ color: '#FEE500' }}>'에듀케어 알림'</strong>으로 운영합니다.
+                </p>
+
+                {/* 공식 채널 확인 박스 */}
+                <div style={{
+                  background: 'rgba(254, 229, 0, 0.15)',
+                  border: '1px solid rgba(254, 229, 0, 0.3)',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '20px' }}>📢</span>
+                    <span style={{ fontWeight: 'bold', color: '#FEE500', fontSize: '16px' }}>공식 채널 확인</span>
+                  </div>
+                  <div style={{ display: 'grid', gap: '12px' }}>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <span style={{ color: 'rgba(255,255,255,0.6)', minWidth: '80px' }}>채널명:</span>
+                      <span style={{ color: '#FEE500', fontWeight: 'bold' }}>에듀케어 알림</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <span style={{ color: 'rgba(255,255,255,0.6)', minWidth: '80px' }}>서비스명:</span>
+                      <span style={{ color: 'white', fontWeight: '500' }}>에듀리치브레인 (EduRichBrain)</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <span style={{ color: 'rgba(255,255,255,0.6)', minWidth: '80px' }}>운영 사업자:</span>
+                      <span style={{ color: 'white', fontWeight: '500' }}>마케팅 다이어트</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 안내 문구 */}
+                <div style={{
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  borderLeft: '3px solid #3b82f6',
+                  padding: '16px',
+                  borderRadius: '0 8px 8px 0'
+                }}>
+                  <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
+                    ※ <strong style={{ color: '#FEE500' }}>'에듀케어 알림'</strong>은 에듀리치브레인 플랫폼에서 발송되는
+                    <strong> 학부모 상담, 출결 관리 등 학생 케어 서비스 전용</strong> 알림 채널입니다.
+                  </p>
+                </div>
+
+                {/* 서비스 구조 */}
+                <div style={{
+                  marginTop: '24px',
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+                  gap: '12px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '8px',
+                    padding: '16px'
+                  }}>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>🏢</div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginBottom: '4px' }}>대행본사</div>
+                    <div style={{ color: 'white', fontWeight: 'bold', fontSize: '14px' }}>마케팅다이어트</div>
+                  </div>
+                  <div style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '8px',
+                    padding: '16px'
+                  }}>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>💻</div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginBottom: '4px' }}>학원 AI SaaS</div>
+                    <div style={{ color: '#60a5fa', fontWeight: 'bold', fontSize: '14px' }}>에듀리치브레인</div>
+                  </div>
+                  <div style={{
+                    background: 'rgba(254, 229, 0, 0.1)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    border: '1px solid rgba(254, 229, 0, 0.3)'
+                  }}>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>💬</div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginBottom: '4px' }}>학부모 카카오 알림채널</div>
+                    <div style={{ color: '#FEE500', fontWeight: 'bold', fontSize: '14px' }}>에듀케어 알림</div>
+                  </div>
                 </div>
               </div>
 
