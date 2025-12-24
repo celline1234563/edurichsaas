@@ -178,24 +178,7 @@ export default function HomePage() {
             <Link href="/" className="mobile-menu-link active" onClick={closeMobileMenu}>제품</Link>
             <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
             <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
-            <Link href="/blog/kakao-notification" className="mobile-menu-link" onClick={closeMobileMenu} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'rgba(254, 229, 0, 0.1)',
-              borderLeft: '3px solid #FEE500',
-              paddingLeft: '13px'
-            }}>
-              <span>에듀케어</span>
-              <span style={{
-                fontSize: '10px',
-                padding: '2px 6px',
-                background: '#FEE500',
-                color: '#000',
-                borderRadius: '4px',
-                fontWeight: '700'
-              }}>알림톡</span>
-            </Link>
+            <Link href="/blog/kakao-notification" className="mobile-menu-link" onClick={closeMobileMenu}>에듀케어 알림</Link>
             <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
             <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
             <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
@@ -224,23 +207,7 @@ export default function HomePage() {
           <Link href="/" className="sidebar-link active">제품</Link>
           <Link href="/pricing" className="sidebar-link">요금제</Link>
           <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
-          <Link href="/blog/kakao-notification" className="sidebar-link" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(254, 229, 0, 0.1)',
-            borderLeft: '2px solid #FEE500'
-          }}>
-            <span>에듀케어</span>
-            <span style={{
-              fontSize: '9px',
-              padding: '2px 5px',
-              background: '#FEE500',
-              color: '#000',
-              borderRadius: '4px',
-              fontWeight: '700'
-            }}>알림톡</span>
-          </Link>
+          <Link href="/blog/kakao-notification" className="sidebar-link">에듀케어 알림</Link>
           <Link href="/blog" className="sidebar-link">블로그</Link>
           <Link href="/about" className="sidebar-link">회사</Link>
           <Link href="/demo" className="sidebar-link">데모</Link>
