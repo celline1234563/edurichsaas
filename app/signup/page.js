@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
-import { MAIN_APP_URL } from '@/lib/constants'
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 import useIsMobile from '@/hooks/useIsMobile'
 
 export default function SignupPage() {
@@ -31,6 +31,7 @@ export default function SignupPage() {
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+  const supabase = createSupabaseBrowserClient()
 
   const roleToDbRole = (r) => (r === 'director' ? 'owner' : r)
 
@@ -85,9 +86,11 @@ export default function SignupPage() {
     if (!validateForm()) return
 
     setIsLoading(true)
+    setErrors({})
+
     try {
       const payload = {
-        role: role === 'director' ? 'owner' : role, // 너 서버는 owner/teacher/manager/assistant
+        role: role === 'director' ? 'owner' : role,
         academyName: role === 'director' ? formData.academyName : null,
         inviteCode: role === 'director' ? null : formData.inviteCode,
         name: formData.name,
@@ -103,34 +106,26 @@ export default function SignupPage() {
         body: JSON.stringify(payload),
       })
 
-      // ✅ JSON 아닌 에러 페이지(HTML) 대비
-      let data = null
       const text = await res.text()
+      let data = {}
+      try { data = text ? JSON.parse(text) : {} } catch { data = { raw: text } }
 
-      try { data = JSON.parse(text) } catch { data = { raw: text } }
-
-      let json = null
-      try { json = JSON.parse(raw) } catch {}
-
-      if (res.ok) {
-        alert('회원가입 완료!')
-        window.location.href = '/' // 또는 로그인 후 이동 페이지
+      if (!res.ok) {
+        if (res.status === 400 && data?.error === 'INVALID_INVITE_CODE') {
+          alert('초대코드가 유효하지 않습니다.')
+          return
+        }
+        alert(`회원가입 실패: ${data?.error || res.status}`)
+        console.log('signup error detail:', data)
         return
       }
 
-      // ✅ 상태코드별 처리
-      if (res.status === 409) {
-        // 서버가 EMAIL_OR_CODE_EXISTS 또는 EMAIL_EXISTS 줄거임
-        alert('이미 가입된 이메일입니다. 다른 이메일을 사용하거나 로그인 해주세요.')
-        return
-      }
+      // ✅ 원장: inviteCode 화면에 보여주고 싶으면 data.inviteCode 사용
+      // alert(`회원가입 완료! 초대코드: ${data.inviteCode || '-'}`)
 
-      if (res.status === 400 && data?.error === 'INVALID_INVITE_CODE') {
-        alert('초대코드가 유효하지 않습니다.')
-        return
-      }
-
-      alert(`회원가입 실패: ${data?.error || res.status}`)
+      // ✅ 이제 로그인/세션 흐름은 너가 이미 만들어둔대로 진행하면 됨
+      // 보통은 바로 /login 보내거나, 로그인 페이지로
+      window.location.href = '/login'
     } finally {
       setIsLoading(false)
     }
@@ -150,6 +145,21 @@ export default function SignupPage() {
   const handleRoleSelect = (selectedRole) => {
     setRole(selectedRole)
     setStep(2)
+  }
+
+  const roleForDb = role === 'director' ? 'owner' : role
+
+  const startSocialSignup = async (provider) => {
+    localStorage.setItem('pending_role', role === 'director' ? 'owner' : role)
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        // callback은 무조건 여기로
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+    if (error) alert(error.message)
   }
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
@@ -605,9 +615,7 @@ export default function SignupPage() {
                 <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '12px', marginBottom: '24px' }}>
                   <button
                     type="button"
-                    onClick={() => {
-                      signIn('google', { callbackUrl: '/signup' })
-                    }}
+                    onClick={() => startSocialSignup('google')}
                     style={{
                       flex: 1,
                       padding: '14px',
@@ -636,9 +644,7 @@ export default function SignupPage() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      signIn('kakao', { callbackUrl: '/signup' })
-                    }}
+                    onClick={() => startSocialSignup('kakao')}
                     style={{
                       flex: 1,
                       padding: '14px',

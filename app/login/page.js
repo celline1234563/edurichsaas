@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BRAIN_BASE_URL } from '@/lib/constants'
 import useIsMobile from '@/hooks/useIsMobile'
+import { supabase } from '@/lib/supabase'
 
 function LoginForm() {
   const [formData, setFormData] = useState({
@@ -50,6 +51,15 @@ function LoginForm() {
     return Object.keys(newErrors).length === 0
   }
 
+  const getBrainRedirect = (searchParams) => {
+    const redirect = searchParams.get('redirect') // diagnosis 기대
+    const token = searchParams.get('token')
+    if (redirect === 'diagnosis' && token) {
+      return `${BRAIN_BASE_URL}/diagnosis/result?token=${encodeURIComponent(token)}`
+    }
+    return `${BRAIN_BASE_URL}` // 일반 로그인 후 brain 홈
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -57,55 +67,24 @@ function LoginForm() {
     setIsLoading(true)
     setLoginError('')
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // rememberMe는 서버에서 세션 만료(days) 조절할 때 쓰고 싶으면 같이 보냄
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          rememberMe: formData.rememberMe,
-        }),
-      })
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    })
 
-      const text = await res.text()
-      let data = {}
-      try {
-        data = text ? JSON.parse(text) : {}
-      } catch {
-        data = { error: 'INVALID_JSON', raw: text }
-      }
-
-      if (!res.ok) {
-        // 서버 에러코드별 메시지 매핑
-        const msg =
-          data?.error === 'INVALID_CREDENTIALS'
-            ? '이메일 또는 비밀번호가 일치하지 않습니다.'
-            : data?.error === 'ACCOUNT_DISABLED'
-              ? '비활성화된 계정입니다. 관리자에게 문의해주세요.'
-              : data?.error === 'LOGIN_FAILED'
-                ? '로그인에 실패했습니다.'
-                : '로그인 중 오류가 발생했습니다.'
-
-        setLoginError(msg)
-        setIsLoading(false)
-        return
-      }
-
-      // ✅ 로그인 성공: 서버가 쿠키를 심어줌(SESSION_COOKIE_NAME)
-      const pendingPayment = sessionStorage.getItem('pendingPayment')
-      if (pendingPayment) {
-        const { plan, cycle } = JSON.parse(pendingPayment)
-        sessionStorage.removeItem('pendingPayment')
-        window.location.href = `/payment?plan=${plan}&cycle=${cycle}`
-      } else {
-        window.location.href = getPostLoginRedirectUrl()
-      }
-    } catch (error) {
-      setLoginError('로그인 중 오류가 발생했습니다.')
+    if (error || !data?.session) {
+      setLoginError('이메일 또는 비밀번호가 일치하지 않습니다.')
       setIsLoading(false)
+      return
     }
+
+    const { access_token, refresh_token } = data.session
+
+    // ✅ 토큰을 해시(fragment)로 붙여서 brain으로 넘김
+    const base = getBrainRedirect(searchParams)
+    const url = `${base}#access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
+
+    window.location.href = url
   }
 
   const handleChange = (e) => {

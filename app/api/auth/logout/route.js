@@ -12,7 +12,7 @@ export async function POST() {
       await supabaseAdmin.from('account_sessions').delete().eq('session_token', token)
     }
 
-    cookieStore.set(SESSION_COOKIE_NAME, '', { ...cookieOptions(), maxAge: 0 })
+    cookieStore.set(SESSION_COOKIE_NAME, '', cookieOptions({ maxAge: 0 }))
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'LOGOUT_FAILED', detail: String(e?.message || e) }, { status: 500 })
