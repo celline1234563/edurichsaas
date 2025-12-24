@@ -168,7 +168,7 @@ export default function DiagnosisPage() {
                   {
                     level: 1,
                     name: '1단계: 생존 (Solo)',
-                    range: '원생 0 ~ 20명',
+                    range: '원생 0 ~ 30명',
                     tasks: [
                       '강의력이 곧 마케팅이다: "이탈률 0%"를 목표로 아이 한 명 한 명에게 집착하세요.',
                       '학부모 안심 문자 루틴: "오늘 철수가 함수 부분을 헷갈려해서 이 부분을 꽉 잡았습니다" 구체적 피드백 전송.',
@@ -182,7 +182,7 @@ export default function DiagnosisPage() {
                   {
                     level: 2,
                     name: '2단계: 최소 조직 (Staff)',
-                    range: '원생 20 ~ 40명',
+                    range: '원생 30 ~ 70명',
                     tasks: [
                       '첫 채용(실장/알바): 원장님의 시간을 확보하기 위해 채점, 차량, 청소를 도와줄 보조 인력 채용.',
                       '수익화 모델(돈 구멍) 설계: 정규 수업 외에 특강, 보충, 내신 대비 등을 별도 유료 "상품"으로 기획하세요.',
@@ -196,7 +196,7 @@ export default function DiagnosisPage() {
                   {
                     level: 3,
                     name: '3단계: 시장 검증 (Teacher)',
-                    range: '원생 40 ~ 70명',
+                    range: '원생 70 ~ 110명',
                     tasks: [
                       '첫 강사 채용: 나(원장)만큼 가르칠 수 있는 강사를 뽑고, 내 노하우를 전수하는 첫 시도.',
                       '자체 교재 Vol.1 개발: 시중 교재 짜깁기가 아닌, 우리 학원 로고가 박힌 자체 제본 교재로 전문성 증명.',
@@ -210,7 +210,7 @@ export default function DiagnosisPage() {
                   {
                     level: 4,
                     name: '4단계: 팀 빌딩 (Team)',
-                    range: '원생 70 ~ 150명',
+                    range: '원생 110 ~ 250명',
                     tasks: [
                       '중간 관리자(Key Man) 발굴: 강사들 중 나의 오른팔이 되어줄 "실장급/팀장급" 리더를 눈여겨보고 키우세요.',
                       '업무 표준화(Manual): 강사가 바뀌어도 수업 퀄리티가 유지되도록 강의 계획서와 상담 매뉴얼 문서화.',
@@ -224,7 +224,7 @@ export default function DiagnosisPage() {
                   {
                     level: 5,
                     name: '5단계: 기업화 (Company)',
-                    range: '원생 150 ~ 300명',
+                    range: '원생 250 ~ 500명',
                     tasks: [
                       '부서별 조직화: 교수부, 상담부, 행정부로 조직을 나누고 각 부서장에게 권한과 책임 위임.',
                       '빈 의자 테스트(위임): 원장님이 일주일 휴가를 다녀와도 학원이 문제없이 돌아가는지 시스템 점검.',
@@ -238,7 +238,7 @@ export default function DiagnosisPage() {
                   {
                     level: 6,
                     name: '6단계: 시스템 완성 (System)',
-                    range: '원생 300 ~ 500명',
+                    range: '원생 500 ~ 1,000명',
                     tasks: [
                       '확장 가능성 확보: 이 시스템 그대로 다른 지역에 심어도 성공할 수 있는지 "복제 가능성" 검증.',
                       '압도적 브랜딩: 타 학원이 감히 경쟁할 엄두를 못 낼 정도로 지역 내 "대체 불가능한 브랜드" 구축.',
@@ -252,7 +252,7 @@ export default function DiagnosisPage() {
                   {
                     level: 7,
                     name: '7단계: 다지점 (Multi)',
-                    range: '원생 500 ~ 1,000명',
+                    range: '원생 1,000명 이상',
                     tasks: [
                       '2호점, 3호점 확장: 본점의 성공 시스템을 그대로 복제(Ctrl+C, Ctrl+V)하여 직영점 확장.',
                       '관리의 복잡성 해결: 지점이 늘어나도 품질이 떨어지지 않도록 "슈퍼바이저(감독관)" 시스템 도입.',
@@ -266,7 +266,7 @@ export default function DiagnosisPage() {
                   {
                     level: 8,
                     name: '8단계: 엑시트 (Exit/Franchise)',
-                    range: '원생 1,000명 +',
+                    range: '지점 6개 이상',
                     tasks: [
                       '가맹 본부(Franchise) 설립: 교육 서비스를 파는 학원에서, "성공 시스템"을 파는 가맹 본사로 비즈니스 모델 전환.',
                       '전문 경영인(CEO) 영입: 원장님은 이사회 의장(Visionary)으로 물러나고, 실무는 전문 경영인에게 맡기세요.',

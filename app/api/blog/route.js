@@ -74,11 +74,11 @@ function getMockStories() {
   return [
     {
       id: 'kakao-notification',
-      title: '학부모님들께 우리 아이의 학습현황을 가장 빠르게 주는 방법 : 카카오톡 알림',
+      title: '[공지] 에듀리치브레인 공식 학부모 알림 서비스 \'에듀케어 알림\' 런칭 안내',
       category: 'EduRichBrain',
-      excerpt: '학원 운영의 모든 알림을 카카오톡으로 자동 발송 — 학부모는 안심하고, 원장님은 업무에서 해방됩니다.',
+      excerpt: '에듀리치브레인에서 학부모 카카오 알림채널 \'에듀케어 알림\'을 정식 런칭합니다. 출결, 상담, 학습 리포트를 자동 발송하세요.',
       coverImage: 'https://img.hankyung.com/photo/202511/02.41917781.1.jpg',
-      date: '2025년 12월 16일',
+      date: '2025년 12월 24일',
       author: 'EduRichBrain',
       published: true,
     },
