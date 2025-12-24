@@ -31,6 +31,7 @@ export default function PricingPage() {
         students: '학생 30명까지',
         crm: '기본 CRM',
         sms: 'SMS 50건/월',
+        kakao: '학원전용 카카오톡 \'에듀케어 알림\' 사용',
         aiUsage: [
           '블로그 4-5편',
           '상담 리포트 10-15건',
@@ -52,6 +53,7 @@ export default function PricingPage() {
         students: '학생 100명까지',
         crm: '전체 CRM 기능',
         sms: 'SMS 300건/월',
+        kakao: '학원전용 카카오톡 \'에듀케어 알림\' 사용',
         aiUsage: [
           '블로그 10-15편',
           '상담 리포트 30-40건',
@@ -75,6 +77,7 @@ export default function PricingPage() {
         students: '학생 300명까지',
         crm: '고급 CRM + 분석',
         sms: 'SMS 1,000건/월',
+        kakao: '학원전용 카카오톡 \'에듀케어 알림\' 사용',
         aiUsage: [
           '블로그 20편',
           '상담 리포트 60건',
@@ -102,6 +105,7 @@ export default function PricingPage() {
         students: '학생 무제한',
         crm: '전용 DB',
         sms: 'SMS 3,000건/월',
+        kakao: '학원전용 카카오톡 \'에듀케어 알림\' 사용',
         aiUsage: [
           '블로그 40편',
           '상담 리포트 150건',
@@ -230,6 +234,7 @@ export default function PricingPage() {
             <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
             <Link href="/pricing" className="mobile-menu-link active" onClick={closeMobileMenu}>요금제</Link>
             <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
+            <Link href="/blog/kakao-notification" className="mobile-menu-link" onClick={closeMobileMenu}>에듀케어 알림</Link>
             <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
             <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
             <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
@@ -258,6 +263,7 @@ export default function PricingPage() {
           <Link href="/" className="sidebar-link">제품</Link>
           <Link href="/pricing" className="sidebar-link active">요금제</Link>
           <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
+          <Link href="/blog/kakao-notification" className="sidebar-link">에듀케어 알림</Link>
           <Link href="/blog" className="sidebar-link">블로그</Link>
           <Link href="/about" className="sidebar-link">회사</Link>
           <Link href="/demo" className="sidebar-link">데모</Link>
@@ -578,6 +584,15 @@ export default function PricingPage() {
                       </svg>
                       <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
                         {plan.features.sms}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#FEE500', marginTop: '2px', flexShrink: 0 }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
+                      </svg>
+                      <span style={{ color: 'rgba(254, 229, 0, 0.9)', fontSize: '14px', fontWeight: '600' }}>
+                        {plan.features.kakao}
                       </span>
                     </div>
                   </div>

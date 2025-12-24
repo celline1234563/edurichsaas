@@ -73,7 +73,8 @@ export default function KakaoNotificationBlogPage() {
             <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
             <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
             <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
-            <Link href="/blog" className="mobile-menu-link active" onClick={closeMobileMenu}>블로그</Link>
+            <Link href="/blog/kakao-notification" className="mobile-menu-link active" onClick={closeMobileMenu}>에듀케어 알림</Link>
+            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
             <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
             <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
           </nav>
@@ -101,7 +102,8 @@ export default function KakaoNotificationBlogPage() {
           <Link href="/" className="sidebar-link">제품</Link>
           <Link href="/pricing" className="sidebar-link">요금제</Link>
           <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
-          <Link href="/blog" className="sidebar-link active">블로그</Link>
+          <Link href="/blog/kakao-notification" className="sidebar-link active">에듀케어 알림</Link>
+          <Link href="/blog" className="sidebar-link">블로그</Link>
           <Link href="/about" className="sidebar-link">회사</Link>
           <Link href="/demo" className="sidebar-link">데모</Link>
         </nav>

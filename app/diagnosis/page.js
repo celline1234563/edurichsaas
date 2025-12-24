@@ -19,6 +19,7 @@ export default function DiagnosisPage() {
           <Link href="/" className="sidebar-link">제품</Link>
           <Link href="/pricing" className="sidebar-link">요금제</Link>
           <Link href="/diagnosis" className="sidebar-link active">경영진단</Link>
+          <Link href="/blog/kakao-notification" className="sidebar-link">에듀케어 알림</Link>
           <Link href="/blog" className="sidebar-link">블로그</Link>
           <Link href="/about" className="sidebar-link">회사</Link>
           <Link href="/demo" className="sidebar-link">데모</Link>
