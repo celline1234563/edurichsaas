@@ -556,6 +556,354 @@ export default function KakaoNotificationBlogPage() {
                 ))}
               </div>
 
+              {/* 에듀케어 알림 상세 섹션 */}
+              <div style={{
+                padding: isMobile ? '48px 24px' : '60px 40px',
+                borderTop: '1px solid rgba(59, 130, 246, 0.2)',
+                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(30, 41, 59, 0.3))'
+              }}>
+                {/* 헤드라인 */}
+                <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                  <h2 style={{
+                    fontSize: isMobile ? '24px' : '32px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    marginBottom: '16px',
+                    lineHeight: 1.4
+                  }}>
+                    학부모님을 안심시키는 학원의 경쟁력,<br />
+                    <span style={{ color: '#FEE500' }}>'에듀케어(Edu-Care)'</span> 알림 서비스
+                  </h2>
+                  <p style={{
+                    fontSize: isMobile ? '15px' : '17px',
+                    color: 'rgba(255,255,255,0.75)',
+                    lineHeight: 1.8,
+                    maxWidth: '800px',
+                    margin: '0 auto'
+                  }}>
+                    에듀리치브레인(EduRichBrain)이 제공하는 프리미엄 학생 관리(Care) 시스템입니다.<br />
+                    소중한 아이들의 안전과 학습 현황, 이제 공식 채널 <strong style={{ color: '#FEE500' }}>[에듀케어 알림]</strong>으로 프로답게 전달하세요.
+                  </p>
+                </div>
+
+                {/* Why 섹션 */}
+                <div style={{ marginBottom: '48px' }}>
+                  <h3 style={{
+                    fontSize: isMobile ? '20px' : '24px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    marginBottom: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <span style={{ color: '#f87171' }}>💡</span>
+                    이 서비스가 왜 필요한가요?
+                  </h3>
+
+                  <div className="glass-input" style={{
+                    padding: isMobile ? '24px' : '32px',
+                    borderRadius: '16px',
+                    marginBottom: '24px'
+                  }}>
+                    <p style={{
+                      fontSize: '16px',
+                      color: 'rgba(255,255,255,0.85)',
+                      lineHeight: 1.8,
+                      marginBottom: '20px'
+                    }}>
+                      학부모님의 불안을 해소하고 신뢰를 쌓는 것은 학원 경영의 핵심입니다.<br />
+                      하지만 기존의 문자 메시지나 개인 카톡은 한계가 있습니다.
+                    </p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div style={{
+                        display: 'flex',
+                        gap: '12px',
+                        padding: '16px',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        borderLeft: '3px solid #ef4444',
+                        borderRadius: '8px'
+                      }}>
+                        <span style={{ fontSize: '20px', flexShrink: 0 }}>📱</span>
+                        <div>
+                          <strong style={{ color: '#fca5a5', fontSize: '15px' }}>스팸으로 오해받는 문자</strong>
+                          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginTop: '4px' }}>
+                            텍스트만 전송되는 문자는 학부모님이 놓치기 쉽고, 스팸으로 오해받기도 합니다.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        gap: '12px',
+                        padding: '16px',
+                        background: 'rgba(251, 146, 60, 0.1)',
+                        borderLeft: '3px solid #fb923c',
+                        borderRadius: '8px'
+                      }}>
+                        <span style={{ fontSize: '20px', flexShrink: 0 }}>🔒</span>
+                        <div>
+                          <strong style={{ color: '#fdba74', fontSize: '15px' }}>사생활 침해 없는 소통</strong>
+                          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginTop: '4px' }}>
+                            강사 개인 카톡으로 소통하다 보면 업무 시간 외 연락으로 강사의 피로도가 높아집니다.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        gap: '12px',
+                        padding: '16px',
+                        background: 'rgba(250, 204, 21, 0.1)',
+                        borderLeft: '3px solid #facc15',
+                        borderRadius: '8px'
+                      }}>
+                        <span style={{ fontSize: '20px', flexShrink: 0 }}>⚠️</span>
+                        <div>
+                          <strong style={{ color: '#fde047', fontSize: '15px' }}>전문성 부족</strong>
+                          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginTop: '4px' }}>
+                            단순 텍스트 나열은 우리 학원의 체계적인 관리 시스템을 보여주기에 부족합니다.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      marginTop: '24px',
+                      padding: '16px',
+                      background: 'rgba(59, 130, 246, 0.15)',
+                      borderRadius: '12px',
+                      borderLeft: '4px solid #3b82f6'
+                    }}>
+                      <p style={{ color: '#93c5fd', fontSize: '15px', fontWeight: '600' }}>
+                        👉 에듀케어는 '카카오톡 공식 알림톡'을 통해 학원의 전문성과 신뢰도를 즉각적으로 높여줍니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* What 섹션 - 3가지 핵심 케어 */}
+                <div style={{ marginBottom: '48px' }}>
+                  <h3 style={{
+                    fontSize: isMobile ? '20px' : '24px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    marginBottom: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <span style={{ color: '#60a5fa' }}>✨</span>
+                    원장님의 고민을 해결하는 3가지 핵심 케어(Care) 솔루션
+                  </h3>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {/* 안전 케어 */}
+                    <div className="glass-input" style={{
+                      padding: isMobile ? '24px' : '32px',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(34, 197, 94, 0.3)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '12px',
+                          background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '24px'
+                        }}>🛡️</div>
+                        <div>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '4px 10px',
+                            background: 'rgba(34, 197, 94, 0.2)',
+                            color: '#86efac',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            marginBottom: '4px'
+                          }}>① 안전 케어</span>
+                          <h4 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 'bold', color: 'white' }}>
+                            빈틈없는 등하원 실시간 알림
+                          </h4>
+                        </div>
+                      </div>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px', lineHeight: 1.7, marginBottom: '12px' }}>
+                        "우리 아이가 학원에 잘 도착했나요?"라는 문의 전화가 사라집니다. 학생이 등원하고 하원하는 즉시, '에듀케어 알림' 채널을 통해 학부모님께 실시간으로 안심 알림이 발송됩니다.
+                      </p>
+                      <div style={{
+                        padding: '12px 16px',
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        color: '#86efac'
+                      }}>
+                        <strong>도움되는 점:</strong> 학부모 불안 해소, 데스크 업무량 50% 감소
+                      </div>
+                    </div>
+
+                    {/* 학습 케어 */}
+                    <div className="glass-input" style={{
+                      padding: isMobile ? '24px' : '32px',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(168, 85, 247, 0.3)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '12px',
+                          background: 'linear-gradient(135deg, #a855f7, #9333ea)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '24px'
+                        }}>📊</div>
+                        <div>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '4px 10px',
+                            background: 'rgba(168, 85, 247, 0.2)',
+                            color: '#c4b5fd',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            marginBottom: '4px'
+                          }}>② 학습 케어</span>
+                          <h4 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 'bold', color: 'white' }}>
+                            AI가 분석한 월간 성장 리포트
+                          </h4>
+                        </div>
+                      </div>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px', lineHeight: 1.7, marginBottom: '12px' }}>
+                        에듀리치브레인 AI가 분석한 학생의 성적 변화, 취약점, 학습 태도를 보기 편한 모바일 리포트로 자동 발송합니다.
+                      </p>
+                      <div style={{
+                        padding: '12px 16px',
+                        background: 'rgba(168, 85, 247, 0.1)',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        color: '#c4b5fd'
+                      }}>
+                        <strong>도움되는 점:</strong> 말로만 하는 상담보다 훨씬 강력한 데이터 근거 제시, 재등록률 상승 견인
+                      </div>
+                    </div>
+
+                    {/* 소통 케어 */}
+                    <div className="glass-input" style={{
+                      padding: isMobile ? '24px' : '32px',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(59, 130, 246, 0.3)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '12px',
+                          background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '24px'
+                        }}>💬</div>
+                        <div>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '4px 10px',
+                            background: 'rgba(59, 130, 246, 0.2)',
+                            color: '#93c5fd',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            marginBottom: '4px'
+                          }}>③ 소통 케어</span>
+                          <h4 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 'bold', color: 'white' }}>
+                            놓치지 않는 학원 공지사항
+                          </h4>
+                        </div>
+                      </div>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px', lineHeight: 1.7, marginBottom: '12px' }}>
+                        수업 시간 변경, 보강 안내, 결제일 알림 등 중요한 정보를 카카오톡 알림톡으로 확실하게 전달합니다.
+                      </p>
+                      <div style={{
+                        padding: '12px 16px',
+                        background: 'rgba(59, 130, 246, 0.1)',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        color: '#93c5fd'
+                      }}>
+                        <strong>도움되는 점:</strong> 전달 누락 방지, 학원 운영의 체계화 이미지 구축
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 서비스 이용 안내 박스 */}
+                <div style={{
+                  padding: isMobile ? '28px 24px' : '36px 40px',
+                  background: 'linear-gradient(135deg, rgba(254, 229, 0, 0.15), rgba(254, 229, 0, 0.05))',
+                  border: '2px solid rgba(254, 229, 0, 0.4)',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 32px rgba(254, 229, 0, 0.15)'
+                }}>
+                  <h3 style={{
+                    fontSize: isMobile ? '18px' : '20px',
+                    fontWeight: 'bold',
+                    color: '#FEE500',
+                    marginBottom: '20px',
+                    textAlign: 'center'
+                  }}>
+                    📋 서비스 이용 안내
+                  </h3>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                    gap: '16px'
+                  }}>
+                    <div style={{
+                      padding: '16px',
+                      background: 'rgba(15, 23, 42, 0.6)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(254, 229, 0, 0.2)'
+                    }}>
+                      <div style={{ fontSize: '13px', color: 'rgba(254, 229, 0, 0.7)', marginBottom: '6px' }}>서비스명</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>에듀케어 (Edu-Care)</div>
+                    </div>
+                    <div style={{
+                      padding: '16px',
+                      background: 'rgba(15, 23, 42, 0.6)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(254, 229, 0, 0.2)'
+                    }}>
+                      <div style={{ fontSize: '13px', color: 'rgba(254, 229, 0, 0.7)', marginBottom: '6px' }}>기능</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>에듀리치브레인 연동 학생 관리 및 알림 발송</div>
+                    </div>
+                    <div style={{
+                      padding: '16px',
+                      background: 'rgba(15, 23, 42, 0.6)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(254, 229, 0, 0.2)'
+                    }}>
+                      <div style={{ fontSize: '13px', color: 'rgba(254, 229, 0, 0.7)', marginBottom: '6px' }}>공식 발송 채널명</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>에듀케어 알림 (@educare_alarm)</div>
+                    </div>
+                    <div style={{
+                      padding: '16px',
+                      background: 'rgba(15, 23, 42, 0.6)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(254, 229, 0, 0.2)'
+                    }}>
+                      <div style={{ fontSize: '13px', color: 'rgba(254, 229, 0, 0.7)', marginBottom: '6px' }}>운영사</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>마케팅 다이어트</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* CTA Section */}
               <div className="diagnosis-section" style={{
                 padding: isMobile ? '32px 24px' : '48px 40px',
