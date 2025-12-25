@@ -35,13 +35,18 @@ function getSafeNextUrl(nextRaw) {
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url)
-
   const code = searchParams.get('code')
-  const flow = searchParams.get('flow') // "diagnosis"면 진단에서 온 것
-  const nextRaw = searchParams.get('next') // brain으로 돌아갈 전체 URL
+
+  // ✅ 여기 추가: 진단 플로우 쿼리 유지
+  const redirect = searchParams.get('redirect')
+  const token = searchParams.get('token')
+
+  const diagnosisQuery =
+    redirect === 'diagnosis' && token
+      ? `?redirect=diagnosis&token=${encodeURIComponent(token)}`
+      : ''
 
   if (!code) {
-    // 로그인 페이지는 너네 SaaS 라우팅에 맞게 수정
     return NextResponse.redirect(`${origin}/login?error=NO_CODE`)
   }
 
@@ -54,15 +59,6 @@ export async function GET(request) {
     return NextResponse.redirect(`${origin}/login?error=OAUTH_CALLBACK_FAILED`)
   }
 
-  // ✅ 진단에서 온 경우에만: 안전한 next로 복귀
-  if (flow === 'diagnosis') {
-    const safeNext = getSafeNextUrl(nextRaw)
-    if (safeNext) {
-      return NextResponse.redirect(safeNext)
-    }
-    // 안전하지 않으면 그냥 기본 경로로 보냄
-  }
-
-  // 기본: 기존대로 소셜 추가정보 페이지
-  return NextResponse.redirect(`${origin}/signup/social`)
+  // ✅ 소셜 추가정보 페이지도 진단 플로우면 쿼리 그대로 전달
+  return NextResponse.redirect(`${origin}/signup/social${diagnosisQuery}`)
 }

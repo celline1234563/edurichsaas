@@ -166,17 +166,31 @@ export default function SignupPage() {
   const roleForDb = role === 'director' ? 'owner' : role
 
   const startSocialSignup = async (provider) => {
-    localStorage.setItem('pending_role', role === 'director' ? 'owner' : role)
+    localStorage.setItem('pending_role', roleForDb)
+
+    // ✅ 진단 redirect 정보 저장
+    const redirect = searchParams.get('redirect')
+    const token = searchParams.get('token')
+
+    if (redirect === 'diagnosis' && token) {
+        localStorage.setItem(
+        'post_auth_redirect',
+        JSON.stringify({
+            type: 'diagnosis',
+            token,
+        })
+        )
+    }
 
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        // callback은 무조건 여기로
-        redirectTo: `${window.location.origin}/auth/callback?redirect=${redirect || ''}&token=${token || ''}`,
-      },
+        provider,
+        options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        },
     })
+
     if (error) alert(error.message)
-  }
+    }
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
   const closeMobileMenu = () => setMobileMenuOpen(false)

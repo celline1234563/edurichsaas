@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BRAIN_BASE_URL } from '@/lib/constants'
 import useIsMobile from '@/hooks/useIsMobile'
-import { supabase } from '@/lib/supabase'
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 function LoginForm() {
   const [formData, setFormData] = useState({
@@ -20,6 +20,19 @@ function LoginForm() {
   const isMobile = useIsMobile()
 
   const searchParams = useSearchParams()
+  const supabase = createSupabaseBrowserClient()
+
+  const buildDiagnosisQuery = () => {
+    const redirect = searchParams.get('redirect')
+    const token = searchParams.get('token')
+    if (redirect === 'diagnosis' && token) {
+      return `?redirect=diagnosis&token=${encodeURIComponent(token)}`
+    }
+    return ''
+  }
+
+  const diagnosisQuery = buildDiagnosisQuery()
+
 
   const getPostLoginRedirectUrl = () => {
     // 진단 결과에서 넘어온 케이스만 복귀
@@ -80,11 +93,22 @@ function LoginForm() {
 
     const { access_token, refresh_token } = data.session
 
-    // ✅ 토큰을 해시(fragment)로 붙여서 brain으로 넘김
-    const base = getBrainRedirect(searchParams)
-    const url = `${base}#access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
+    // ✅ 1) "진단보고서에서 넘어온 로그인"인지 판별
+    const redirect = searchParams.get('redirect') // "diagnosis" 기대
+    const token = searchParams.get('token')
 
-    window.location.href = url
+    const isDiagnosisFlow = redirect === 'diagnosis' && !!token
+
+    // ✅ 2) 진단 플로우면 brain의 진단 결과로 복귀 (token query 유지)
+    // ✅ 3) 일반 로그인이면 SaaS 내부 기본 경로로 이동
+    const baseUrl = isDiagnosisFlow
+      ? `${BRAIN_BASE_URL}/diagnosis/result?token=${encodeURIComponent(token)}`
+      : `${window.location.origin}/` // 필요하면 '/dashboard' 등으로 바꿔
+
+    // ✅ brain에서 세션 세팅할 수 있게 hash(fragment)에 토큰 전달
+    const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
+
+    window.location.href = `${baseUrl}#${hash}`
   }
 
   const handleChange = (e) => {
