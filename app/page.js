@@ -469,14 +469,73 @@ export default function HomePage() {
               fontWeight: '500',
               color: '#64748b'
             }}>
-              {['EduRichBrain Business', '검색하기', '리서치', '더 보기'].map((link, idx) => (
-                <a key={idx} href="#" style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {['AI 리포트', '경영진단', '커리큘럼', '에듀케어 알림톡'].map((link, idx) => (
+                <a key={idx} href={link === '에듀케어 알림톡' ? '/blog/kakao-notification' : '#'} style={{
+                  color: link === '에듀케어 알림톡' ? '#FEE500' : 'inherit',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontWeight: link === '에듀케어 알림톡' ? '600' : '500'
+                }}>
                   {link}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ opacity: 0 }}>
-                    <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  {link === '에듀케어 알림톡' && (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 3c-4.97 0-9 3.13-9 7 0 2.49 1.66 4.7 4.26 5.95-.19.7-.69 2.53-.78 2.92-.12.53.19.53.4.35.26-.22 3.07-2.09 3.59-2.45.49.07 1 .11 1.53.11 4.97 0 9-3.13 9-7s-4.03-7-9-7z" />
+                    </svg>
+                  )}
                 </a>
               ))}
+            </div>
+
+            {/* 에듀케어 알림톡 연동 소개 카드 */}
+            <div style={{
+              marginTop: '48px',
+              padding: isMobile ? '20px' : '24px 32px',
+              background: 'linear-gradient(135deg, rgba(254, 229, 0, 0.15), rgba(254, 229, 0, 0.05))',
+              border: '1px solid rgba(254, 229, 0, 0.3)',
+              borderRadius: '16px',
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              alignItems: 'center',
+              gap: '20px',
+              maxWidth: '700px'
+            }}>
+              <div style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background: '#FEE500',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <svg style={{ width: '28px', height: '28px' }} viewBox="0 0 24 24" fill="#3C1E1E">
+                  <path d="M12 3c-4.97 0-9 3.13-9 7 0 2.49 1.66 4.7 4.26 5.95-.19.7-.69 2.53-.78 2.92-.12.53.19.53.4.35.26-.22 3.07-2.09 3.59-2.45.49.07 1 .11 1.53.11 4.97 0 9-3.13 9-7s-4.03-7-9-7z" />
+                </svg>
+              </div>
+              <div style={{ flex: 1, textAlign: isMobile ? 'center' : 'left' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#FEE500', marginBottom: '6px' }}>
+                  에듀케어(Edu-Care) 알림톡 연동
+                </h3>
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
+                  학부모 안심 알림을 공식 카카오톡 채널 '에듀케어 알림'으로 자동 발송합니다.
+                  <br />등하원, 학습 리포트, 상담 일정을 실시간으로 전달하세요.
+                </p>
+              </div>
+              <Link href="/blog/kakao-notification" style={{
+                padding: '10px 20px',
+                background: '#FEE500',
+                color: '#3C1E1E',
+                borderRadius: '10px',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap'
+              }}>
+                자세히 보기
+              </Link>
             </div>
           </div>
 

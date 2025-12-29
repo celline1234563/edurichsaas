@@ -213,6 +213,40 @@ export default function KakaoNotificationBlogPage() {
               zIndex: 20
             }}>
 
+              {/* 공식 채널 안내 배너 */}
+              <div style={{
+                padding: isMobile ? '20px' : '24px 40px',
+                background: 'linear-gradient(135deg, rgba(254, 229, 0, 0.2), rgba(254, 229, 0, 0.1))',
+                borderBottom: '2px solid rgba(254, 229, 0, 0.4)',
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                gap: isMobile ? '12px' : '16px'
+              }}>
+                <div style={{
+                  padding: '8px 14px',
+                  background: '#FEE500',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  flexShrink: 0
+                }}>
+                  <svg style={{ width: '20px', height: '20px' }} viewBox="0 0 24 24" fill="#3C1E1E">
+                    <path d="M12 3c-4.97 0-9 3.13-9 7 0 2.49 1.66 4.7 4.26 5.95-.19.7-.69 2.53-.78 2.92-.12.53.19.53.4.35.26-.22 3.07-2.09 3.59-2.45.49.07 1 .11 1.53.11 4.97 0 9-3.13 9-7s-4.03-7-9-7z" />
+                  </svg>
+                  <span style={{ fontWeight: 'bold', color: '#3C1E1E', fontSize: '14px' }}>공식 채널</span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: 'white', fontSize: isMobile ? '14px' : '15px', fontWeight: '600', marginBottom: '4px' }}>
+                    에듀리치브레인 서비스의 공식 알림 채널은 <span style={{ color: '#FEE500' }}>'에듀케어 알림'</span>입니다.
+                  </p>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}>
+                    상호: 마케팅 다이어트 | 대표: 이성연 | 사업자번호: , 510-27-91, , 540
+                  </p>
+                </div>
+              </div>
+
               {/* Intro Section */}
               <div style={{
                 padding: isMobile ? '24px' : '40px',

@@ -74,9 +74,9 @@ function getMockStories() {
   return [
     {
       id: 'kakao-notification',
-      title: '[공지] 에듀리치브레인 공식 학부모 알림 서비스 \'에듀케어 알림\' 런칭 안내',
+      title: '[공지] 학부모 전용 자동 알림 서비스 \'에듀케어 알림\' 정식 런칭',
       category: 'EduRichBrain',
-      excerpt: '에듀리치브레인에서 학부모 카카오 알림채널 \'에듀케어 알림\'을 정식 런칭합니다. 출결, 상담, 학습 리포트를 자동 발송하세요.',
+      excerpt: '에듀리치브레인 서비스의 공식 알림 채널 \'에듀케어 알림\'을 정식 런칭합니다. 출결, 상담, 학습 리포트를 자동 발송하세요.',
       coverImage: 'https://img.hankyung.com/photo/202511/02.41917781.1.jpg',
       date: '2025년 12월 24일',
       author: 'EduRichBrain',
