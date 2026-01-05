@@ -8,6 +8,11 @@ function PaymentFailContent() {
   const searchParams = useSearchParams()
   const code = searchParams.get('code')
   const message = searchParams.get('message')
+  const plan = searchParams.get('plan')
+  const cycle = searchParams.get('cycle')
+
+  // 플랜 정보가 있으면 결제 페이지로, 없으면 요금제 페이지로
+  const retryUrl = plan ? `/payment?plan=${plan}&cycle=${cycle || 'monthly'}` : '/pricing'
 
   const getErrorMessage = () => {
     switch (code) {
@@ -107,7 +112,7 @@ function PaymentFailContent() {
       {/* 버튼 */}
       <div style={{ display: 'flex', gap: '12px' }}>
         <Link
-          href="/pricing"
+          href={retryUrl}
           style={{
             flex: 1,
             padding: '16px',

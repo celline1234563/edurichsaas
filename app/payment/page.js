@@ -16,7 +16,6 @@ export default function PaymentPage() {
   const [authChecking, setAuthChecking] = useState(true)
   const [userData, setUserData] = useState(null)
   const [sdkReady, setSdkReady] = useState(false)
-  const [selectedMethod, setSelectedMethod] = useState('CARD')
 
   const paymentRef = useRef(null)
 
@@ -153,61 +152,18 @@ export default function PaymentPage() {
     setIsLoading(true)
 
     try {
-      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      const orderName = `${selectedPlan.name} ${billingCycle === 'monthly' ? '월간' : '연간'} 구독`
-      const price = getPrice()
-
-      // 전화번호 정제 (하이픈, 공백 제거)
-      const cleanPhone = userData?.phone?.replace(/[^0-9]/g, '') || null
-
-      // 기본 결제 요청 파라미터
-      const paymentParams = {
-        method: selectedMethod,
-        amount: {
-          currency: 'KRW',
-          value: price
-        },
-        orderId,
-        orderName,
-        successUrl: `${window.location.origin}/payment/success`,
-        failUrl: `${window.location.origin}/payment/fail`,
+      // 정기결제(빌링) - requestBillingAuth() 사용
+      // 카드 등록 후 빌링키 발급 → 이후 자동결제
+      await paymentRef.current.requestBillingAuth({
+        method: 'CARD', // 자동결제(빌링)는 카드만 지원
+        successUrl: `${window.location.origin}/payment/billing-success?plan=${selectedPlan.id}&cycle=${billingCycle}`,
+        failUrl: `${window.location.origin}/payment/fail?plan=${selectedPlan.id}&cycle=${billingCycle}`,
         customerEmail: userData?.email,
-        customerName: userData?.name || userData?.academyName || '고객'
-      }
-
-      // 전화번호가 유효한 경우에만 추가
-      if (cleanPhone && cleanPhone.length >= 10) {
-        paymentParams.customerMobilePhone = cleanPhone
-      }
-
-      // 결제수단별 추가 옵션
-      if (selectedMethod === 'CARD') {
-        paymentParams.card = {
-          useEscrow: false,
-          flowMode: 'DEFAULT',
-          useCardPoint: false,
-          useAppCardOnly: false
-        }
-      } else if (selectedMethod === 'TRANSFER') {
-        paymentParams.transfer = {
-          cashReceipt: { type: '소득공제' },
-          useEscrow: false
-        }
-      } else if (selectedMethod === 'VIRTUAL_ACCOUNT') {
-        paymentParams.virtualAccount = {
-          cashReceipt: { type: '소득공제' },
-          useEscrow: false,
-          validHours: 24
-        }
-      }
-
-      console.log('결제 요청 파라미터:', paymentParams)
-
-      // payment().requestPayment() 방식 - 결제창이 바로 열림
-      await paymentRef.current.requestPayment(paymentParams)
+        customerName: userData?.name || userData?.academyName || '고객',
+      })
     } catch (error) {
-      console.error('결제 요청 실패:', error)
-      alert(`결제 요청에 실패했습니다: ${error.message}`)
+      console.error('카드 등록 요청 실패:', error)
+      alert(`카드 등록 요청에 실패했습니다: ${error.message}`)
       setIsLoading(false)
     }
   }
@@ -345,53 +301,51 @@ export default function PaymentPage() {
                   fontSize: '20px',
                   fontWeight: '600',
                   color: '#ffffff',
-                  marginBottom: '24px'
+                  marginBottom: '16px'
                 }}>
-                  결제 수단 선택
+                  정기결제 카드 등록
                 </h2>
 
-                {/* 결제수단 선택 UI */}
+                {/* 정기결제 안내 */}
                 <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '12px',
+                  padding: '20px',
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.25)',
+                  borderRadius: '12px',
                   marginBottom: '24px'
                 }}>
-                  {[
-                    { id: 'CARD', name: '신용/체크카드', icon: '💳' },
-                    { id: 'TRANSFER', name: '계좌이체', icon: '🏦' },
-                    { id: 'VIRTUAL_ACCOUNT', name: '가상계좌', icon: '📋' }
-                  ].map((method) => (
-                    <button
-                      key={method.id}
-                      onClick={() => setSelectedMethod(method.id)}
-                      style={{
-                        padding: '16px 12px',
-                        background: selectedMethod === method.id
-                          ? 'rgba(59, 130, 246, 0.2)'
-                          : 'rgba(255, 255, 255, 0.05)',
-                        border: selectedMethod === method.id
-                          ? '2px solid #3b82f6'
-                          : '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      <span style={{ fontSize: '24px' }}>{method.icon}</span>
-                      <span style={{
-                        fontSize: '13px',
-                        fontWeight: selectedMethod === method.id ? '600' : '400',
-                        color: selectedMethod === method.id ? '#3b82f6' : 'rgba(255, 255, 255, 0.7)'
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginBottom: '12px'
+                  }}>
+                    <span style={{ fontSize: '28px' }}>💳</span>
+                    <div>
+                      <div style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#ffffff'
                       }}>
-                        {method.name}
-                      </span>
-                    </button>
-                  ))}
+                        신용/체크카드 자동결제
+                      </div>
+                      <div style={{
+                        fontSize: '13px',
+                        color: 'rgba(255, 255, 255, 0.6)'
+                      }}>
+                        카드 등록 후 매월 자동으로 결제됩니다
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: '12px',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    lineHeight: '1.6'
+                  }}>
+                    • 첫 결제: 카드 등록 직후 진행<br/>
+                    • 다음 결제: 매월 같은 날 자동 결제<br/>
+                    • 언제든 구독 취소 가능
+                  </div>
                 </div>
 
                 {/* 결제 버튼 */}
@@ -415,7 +369,7 @@ export default function PaymentPage() {
                     marginBottom: '12px'
                   }}
                 >
-                  {isLoading ? '결제 진행 중...' : !sdkReady ? 'SDK 로딩 중...' : `${getPrice().toLocaleString()}원 결제하기`}
+                  {isLoading ? '카드 등록 중...' : !sdkReady ? 'SDK 로딩 중...' : `카드 등록 후 ${getPrice().toLocaleString()}원 결제`}
                 </button>
 
                 {/* 보안 안내 */}
