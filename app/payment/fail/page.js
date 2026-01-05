@@ -1,9 +1,10 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function PaymentFailPage() {
+function PaymentFailContent() {
   const searchParams = useSearchParams()
   const code = searchParams.get('code')
   const message = searchParams.get('message')
@@ -29,6 +30,139 @@ export default function PaymentFailPage() {
 
   return (
     <div style={{
+      maxWidth: '500px',
+      width: '100%',
+      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+      backdropFilter: 'blur(20px)',
+      border: '1px solid rgba(239, 68, 68, 0.25)',
+      borderRadius: '24px',
+      padding: '40px',
+      textAlign: 'center',
+      boxShadow: '0 20px 60px rgba(239, 68, 68, 0.1)'
+    }}>
+      {/* 실패 아이콘 */}
+      <div style={{
+        width: '80px',
+        height: '80px',
+        margin: '0 auto 24px',
+        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6l12 12" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+
+      <h1 style={{
+        fontSize: '28px',
+        fontWeight: '600',
+        color: '#ffffff',
+        marginBottom: '12px'
+      }}>
+        결제 실패
+      </h1>
+
+      <p style={{
+        fontSize: '16px',
+        color: 'rgba(255, 255, 255, 0.7)',
+        marginBottom: '16px'
+      }}>
+        {getErrorMessage()}
+      </p>
+
+      {code && (
+        <p style={{
+          fontSize: '13px',
+          color: 'rgba(255, 255, 255, 0.4)',
+          marginBottom: '32px',
+          fontFamily: 'monospace'
+        }}>
+          오류 코드: {code}
+        </p>
+      )}
+
+      {/* 안내 메시지 */}
+      <div style={{
+        background: 'rgba(239, 68, 68, 0.1)',
+        border: '1px solid rgba(239, 68, 68, 0.2)',
+        borderRadius: '12px',
+        padding: '16px',
+        marginBottom: '24px',
+        textAlign: 'left'
+      }}>
+        <p style={{
+          fontSize: '14px',
+          color: 'rgba(255, 255, 255, 0.7)',
+          lineHeight: '1.6',
+          margin: 0
+        }}>
+          결제가 정상적으로 처리되지 않았습니다.
+          카드 정보를 확인하시거나, 다른 결제 수단으로 다시 시도해 주세요.
+        </p>
+      </div>
+
+      {/* 버튼 */}
+      <div style={{ display: 'flex', gap: '12px' }}>
+        <Link
+          href="/pricing"
+          style={{
+            flex: 1,
+            padding: '16px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            borderRadius: '12px',
+            color: '#ffffff',
+            fontSize: '16px',
+            fontWeight: '600',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}
+        >
+          다시 시도
+        </Link>
+        <Link
+          href="/"
+          style={{
+            flex: 1,
+            padding: '16px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '12px',
+            color: '#ffffff',
+            fontSize: '16px',
+            fontWeight: '600',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}
+        >
+          홈으로
+        </Link>
+      </div>
+
+      {/* 고객센터 안내 */}
+      <p style={{
+        marginTop: '24px',
+        fontSize: '13px',
+        color: 'rgba(255, 255, 255, 0.5)'
+      }}>
+        문제가 계속되면{' '}
+        <a
+          href="mailto:support@edurichbrain.ai.kr"
+          style={{ color: '#3b82f6', textDecoration: 'none' }}
+        >
+          고객센터
+        </a>
+        로 문의해 주세요.
+      </p>
+    </div>
+  )
+}
+
+export default function PaymentFailPage() {
+  return (
+    <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
       display: 'flex',
@@ -36,134 +170,11 @@ export default function PaymentFailPage() {
       justifyContent: 'center',
       padding: '20px'
     }}>
-      <div style={{
-        maxWidth: '500px',
-        width: '100%',
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(239, 68, 68, 0.25)',
-        borderRadius: '24px',
-        padding: '40px',
-        textAlign: 'center',
-        boxShadow: '0 20px 60px rgba(239, 68, 68, 0.1)'
-      }}>
-        {/* 실패 아이콘 */}
-        <div style={{
-          width: '80px',
-          height: '80px',
-          margin: '0 auto 24px',
-          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6l12 12" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-
-        <h1 style={{
-          fontSize: '28px',
-          fontWeight: '600',
-          color: '#ffffff',
-          marginBottom: '12px'
-        }}>
-          결제 실패
-        </h1>
-
-        <p style={{
-          fontSize: '16px',
-          color: 'rgba(255, 255, 255, 0.7)',
-          marginBottom: '16px'
-        }}>
-          {getErrorMessage()}
-        </p>
-
-        {code && (
-          <p style={{
-            fontSize: '13px',
-            color: 'rgba(255, 255, 255, 0.4)',
-            marginBottom: '32px',
-            fontFamily: 'monospace'
-          }}>
-            오류 코드: {code}
-          </p>
-        )}
-
-        {/* 안내 메시지 */}
-        <div style={{
-          background: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid rgba(239, 68, 68, 0.2)',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '24px',
-          textAlign: 'left'
-        }}>
-          <p style={{
-            fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.7)',
-            lineHeight: '1.6',
-            margin: 0
-          }}>
-            결제가 정상적으로 처리되지 않았습니다.
-            카드 정보를 확인하시거나, 다른 결제 수단으로 다시 시도해 주세요.
-          </p>
-        </div>
-
-        {/* 버튼 */}
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <Link
-            href="/pricing"
-            style={{
-              flex: 1,
-              padding: '16px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              borderRadius: '12px',
-              color: '#ffffff',
-              fontSize: '16px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              textAlign: 'center'
-            }}
-          >
-            다시 시도
-          </Link>
-          <Link
-            href="/"
-            style={{
-              flex: 1,
-              padding: '16px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '12px',
-              color: '#ffffff',
-              fontSize: '16px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              textAlign: 'center'
-            }}
-          >
-            홈으로
-          </Link>
-        </div>
-
-        {/* 고객센터 안내 */}
-        <p style={{
-          marginTop: '24px',
-          fontSize: '13px',
-          color: 'rgba(255, 255, 255, 0.5)'
-        }}>
-          문제가 계속되면{' '}
-          <a
-            href="mailto:support@edurichbrain.ai.kr"
-            style={{ color: '#3b82f6', textDecoration: 'none' }}
-          >
-            고객센터
-          </a>
-          로 문의해 주세요.
-        </p>
-      </div>
+      <Suspense fallback={
+        <div style={{ color: '#ffffff', fontSize: '18px' }}>로딩 중...</div>
+      }>
+        <PaymentFailContent />
+      </Suspense>
     </div>
   )
 }

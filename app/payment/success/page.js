@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 const BRAIN_BASE_URL = 'https://edurichbrain.ai.kr'
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState('processing') // processing, success, error
   const [paymentData, setPaymentData] = useState(null)
@@ -80,25 +80,17 @@ export default function PaymentSuccessPage() {
 
   return (
     <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
+      maxWidth: '500px',
+      width: '100%',
+      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+      backdropFilter: 'blur(20px)',
+      border: '1px solid rgba(59, 130, 246, 0.25)',
+      borderRadius: '24px',
+      padding: '40px',
+      textAlign: 'center',
+      boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
     }}>
-      <div style={{
-        maxWidth: '500px',
-        width: '100%',
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(59, 130, 246, 0.25)',
-        borderRadius: '24px',
-        padding: '40px',
-        textAlign: 'center',
-        boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
-      }}>
-        {status === 'processing' && (
+      {status === 'processing' && (
           <>
             <div style={{
               width: '80px',
@@ -331,7 +323,25 @@ export default function PaymentSuccessPage() {
             </div>
           </>
         )}
-      </div>
+    </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }}>
+      <Suspense fallback={
+        <div style={{ color: '#ffffff', fontSize: '18px' }}>로딩 중...</div>
+      }>
+        <PaymentSuccessContent />
+      </Suspense>
     </div>
   )
 }

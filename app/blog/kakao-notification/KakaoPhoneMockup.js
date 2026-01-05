@@ -79,12 +79,12 @@ const PhoneFrame = ({ children }) => (
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '10px',
+          fontSize: '8px',
           fontWeight: 'bold',
           color: '#3C1E1E'
-        }}>에듀</div>
+        }}>에듀케어</div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#1f2937' }}>에듀 알림</span>
+          <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#1f2937' }}>에듀케어 알림</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ padding: '2px 6px', background: '#e5e7eb', fontSize: '10px', borderRadius: '4px', color: '#6b7280' }}>채널</span>
           </div>
@@ -170,12 +170,12 @@ const KakaoBubble = ({ children, time }) => (
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '10px',
+        fontSize: '8px',
         fontWeight: 'bold',
         color: '#3C1E1E'
-      }}>에듀</div>
+      }}>에듀케어</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: '500' }}>에듀 알림</span>
+        <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: '500' }}>에듀케어 알림</span>
         <div style={{
           background: 'white',
           padding: '12px',
