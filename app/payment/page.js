@@ -1,63 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
+
+// API 개별 연동 키 (test_ck_로 시작) - payment() 메서드용
+const TOSS_CLIENT_KEY = 'test_ck_yZqmkKeP8gpnEQad79Pn3bQRxB9l'
 
 export default function PaymentPage() {
   const isMobile = useIsMobile()
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [billingCycle, setBillingCycle] = useState('monthly')
-  const [formData, setFormData] = useState({
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvc: '',
-    agreePayment: false
-  })
-  const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [authChecking, setAuthChecking] = useState(true)
+  const [userData, setUserData] = useState(null)
+  const [sdkReady, setSdkReady] = useState(false)
+  const [selectedMethod, setSelectedMethod] = useState('CARD')
 
-  useEffect(() => {
-    // 커스텀 세션 체크
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/auth/me')
-        if (!res.ok) {
-          // 로그인되지 않은 경우 로그인 페이지로 리다이렉션
-          alert('결제를 진행하려면 먼저 로그인이 필요합니다.')
-          const params = new URLSearchParams(window.location.search)
-          const plan = params.get('plan')
-          const cycle = params.get('cycle')
-          sessionStorage.setItem('pendingPayment', JSON.stringify({ plan, cycle }))
-          window.location.href = '/login'
-          return
-        }
-
-        setIsLoggedIn(true)
-        setAuthChecking(false)
-
-        // URL에서 선택한 플랜 가져오기
-        const params = new URLSearchParams(window.location.search)
-        const plan = params.get('plan')
-        const cycle = params.get('cycle')
-
-        if (plan) {
-          const planData = plans.find(p => p.id === plan)
-          setSelectedPlan(planData)
-        }
-        if (cycle) {
-          setBillingCycle(cycle)
-        }
-      } catch {
-        alert('인증 확인 중 오류가 발생했습니다.')
-        window.location.href = '/login'
-      }
-    }
-    checkAuth()
-  }, [])
+  const paymentRef = useRef(null)
 
   const plans = [
     {
@@ -90,86 +51,83 @@ export default function PaymentPage() {
     }
   ]
 
-  const validateForm = () => {
-    const newErrors = {}
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) {
+          alert('결제를 진행하려면 먼저 로그인이 필요합니다.')
+          const params = new URLSearchParams(window.location.search)
+          const plan = params.get('plan')
+          const cycle = params.get('cycle')
+          sessionStorage.setItem('pendingPayment', JSON.stringify({ plan, cycle }))
+          window.location.href = '/login'
+          return
+        }
 
-    if (!formData.cardNumber || formData.cardNumber.replace(/\s/g, '').length !== 16) {
-      newErrors.cardNumber = '카드번호 16자리를 입력해주세요'
-    }
-    if (!formData.cardName) {
-      newErrors.cardName = '카드 소유자 이름을 입력해주세요'
-    }
-    if (!formData.expiryDate || !/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
-      newErrors.expiryDate = '유효기간을 MM/YY 형식으로 입력해주세요'
-    }
-    if (!formData.cvc || formData.cvc.length < 3) {
-      newErrors.cvc = 'CVC 3자리를 입력해주세요'
-    }
-    if (!formData.agreePayment) {
-      newErrors.agreePayment = '결제 동의가 필요합니다'
-    }
+        const data = await res.json()
+        setUserData(data.user)
+        setIsLoggedIn(true)
+        setAuthChecking(false)
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+        const params = new URLSearchParams(window.location.search)
+        const plan = params.get('plan')
+        const cycle = params.get('cycle')
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    let processedValue = value
-
-    // 카드번호 자동 포맷팅
-    if (name === 'cardNumber') {
-      processedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim()
+        if (plan) {
+          const planData = plans.find(p => p.id === plan)
+          setSelectedPlan(planData)
+        }
+        if (cycle) {
+          setBillingCycle(cycle)
+        }
+      } catch {
+        alert('인증 확인 중 오류가 발생했습니다.')
+        window.location.href = '/login'
+      }
     }
+    checkAuth()
+  }, [])
 
-    // 유효기간 자동 포맷팅
-    if (name === 'expiryDate') {
-      processedValue = value.replace(/\D/g, '')
-      if (processedValue.length >= 2) {
-        processedValue = processedValue.slice(0, 2) + '/' + processedValue.slice(2, 4)
+  // 토스페이먼츠 SDK 로드 및 payment 인스턴스 초기화
+  useEffect(() => {
+    if (!isLoggedIn || !selectedPlan || authChecking) return
+
+    const loadTossPayments = async () => {
+      // SDK 스크립트 로드
+      if (!window.TossPayments) {
+        const script = document.createElement('script')
+        script.src = 'https://js.tosspayments.com/v2/standard'
+        script.async = true
+        script.onload = initializePayment
+        document.head.appendChild(script)
+      } else {
+        initializePayment()
       }
     }
 
-    // CVC 숫자만
-    if (name === 'cvc') {
-      processedValue = value.replace(/\D/g, '').slice(0, 4)
+    const initializePayment = async () => {
+      try {
+        const customerKey = userData?.id || `customer_${Date.now()}`
+        console.log('TossPayments 초기화 시작:', { customerKey, clientKey: TOSS_CLIENT_KEY })
+
+        const tossPayments = window.TossPayments(TOSS_CLIENT_KEY)
+
+        // payment() 메서드로 결제 인스턴스 생성 (API 개별 연동 키 방식)
+        const payment = tossPayments.payment({ customerKey })
+        paymentRef.current = payment
+
+        setSdkReady(true)
+        console.log('토스페이먼츠 SDK 초기화 완료')
+      } catch (error) {
+        console.error('토스페이먼츠 SDK 초기화 실패:', error)
+        console.error('에러 상세:', error.message, error.code)
+        alert(`결제 SDK 초기화 실패: ${error.message || error}`)
+      }
     }
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : processedValue
-    }))
-
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
-    }
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!validateForm()) return
-
-    setIsLoading(true)
-
-    // 임시 결제 처리 로직
-    setTimeout(() => {
-      setIsLoading(false)
-
-      // 결제 정보 저장
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}')
-      localStorage.setItem('userData', JSON.stringify({
-        ...userData,
-        subscriptionType: selectedPlan?.id,
-        billingCycle: billingCycle,
-        paymentDate: new Date().toISOString(),
-        aiPoints: selectedPlan?.aiPoints
-      }))
-
-      // 결제 성공 페이지로 바로 이동 (alert 제거)
-      const academyName = userData.academyName || userData.name || '회원'
-      window.location.href = `/payment-success?plan=${selectedPlan?.name}&academy=${encodeURIComponent(academyName)}`
-    }, 2000)
-  }
+    loadTossPayments()
+  }, [isLoggedIn, selectedPlan, authChecking, userData])
 
   const getPrice = () => {
     if (!selectedPlan) return 0
@@ -184,6 +142,88 @@ export default function PaymentPage() {
   const getDiscount = () => {
     if (!selectedPlan || billingCycle === 'monthly') return 0
     return Math.round((1 - (selectedPlan.yearlyPrice / 12) / selectedPlan.monthlyPrice) * 100)
+  }
+
+  const handlePayment = async () => {
+    if (!paymentRef.current || !sdkReady) {
+      alert('결제 SDK가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.')
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const orderName = `${selectedPlan.name} ${billingCycle === 'monthly' ? '월간' : '연간'} 구독`
+      const price = getPrice()
+
+      // 전화번호 정제 (하이픈, 공백 제거)
+      const cleanPhone = userData?.phone?.replace(/[^0-9]/g, '') || null
+
+      // 기본 결제 요청 파라미터
+      const paymentParams = {
+        method: selectedMethod,
+        amount: {
+          currency: 'KRW',
+          value: price
+        },
+        orderId,
+        orderName,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+        customerEmail: userData?.email,
+        customerName: userData?.name || userData?.academyName || '고객'
+      }
+
+      // 전화번호가 유효한 경우에만 추가
+      if (cleanPhone && cleanPhone.length >= 10) {
+        paymentParams.customerMobilePhone = cleanPhone
+      }
+
+      // 결제수단별 추가 옵션
+      if (selectedMethod === 'CARD') {
+        paymentParams.card = {
+          useEscrow: false,
+          flowMode: 'DEFAULT',
+          useCardPoint: false,
+          useAppCardOnly: false
+        }
+      } else if (selectedMethod === 'TRANSFER') {
+        paymentParams.transfer = {
+          cashReceipt: { type: '소득공제' },
+          useEscrow: false
+        }
+      } else if (selectedMethod === 'VIRTUAL_ACCOUNT') {
+        paymentParams.virtualAccount = {
+          cashReceipt: { type: '소득공제' },
+          useEscrow: false,
+          validHours: 24
+        }
+      }
+
+      console.log('결제 요청 파라미터:', paymentParams)
+
+      // payment().requestPayment() 방식 - 결제창이 바로 열림
+      await paymentRef.current.requestPayment(paymentParams)
+    } catch (error) {
+      console.error('결제 요청 실패:', error)
+      alert(`결제 요청에 실패했습니다: ${error.message}`)
+      setIsLoading(false)
+    }
+  }
+
+  if (authChecking) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ color: '#ffffff', fontSize: '18px' }}>인증 확인 중...</div>
+      </div>
+    )
   }
 
   return (
@@ -217,13 +257,13 @@ export default function PaymentPage() {
             color: '#ffffff',
             marginBottom: '8px'
           }}>
-            결제 정보 입력
+            결제하기
           </h1>
           <p style={{
             fontSize: isMobile ? '14px' : '16px',
             color: 'rgba(255, 255, 255, 0.6)'
           }}>
-            안전한 결제를 위해 정보를 입력해주세요
+            토스페이먼츠로 안전하게 결제하세요
           </p>
         </div>
 
@@ -235,7 +275,7 @@ export default function PaymentPage() {
           alignItems: 'start'
         }}>
           {/* 주문 요약 (모바일에서 먼저 표시) */}
-          {isMobile && (
+          {isMobile && selectedPlan && (
             <div style={{
               background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
               backdropFilter: 'blur(20px)',
@@ -253,66 +293,44 @@ export default function PaymentPage() {
               }}>
                 주문 요약
               </h2>
-
-              {selectedPlan ? (
-                <>
-                  <div style={{
-                    marginBottom: '16px',
-                    padding: '16px',
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(59, 130, 246, 0.2)'
-                  }}>
-                    <div style={{
-                      fontSize: '18px',
-                      fontWeight: '600',
-                      color: '#3b82f6',
-                      marginBottom: '4px'
-                    }}>
-                      {selectedPlan.name}
-                    </div>
-                    <div style={{
-                      fontSize: '13px',
-                      color: 'rgba(255, 255, 255, 0.6)'
-                    }}>
-                      {billingCycle === 'monthly' ? '월간 구독' : '연간 구독'}
-                    </div>
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    color: '#ffffff'
-                  }}>
-                    <span>총 결제금액</span>
-                    <span style={{ color: '#3b82f6' }}>
-                      {getPrice().toLocaleString()}원
-                    </span>
-                  </div>
-                </>
-              ) : (
+              <div style={{
+                marginBottom: '16px',
+                padding: '16px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                borderRadius: '12px',
+                border: '1px solid rgba(59, 130, 246, 0.2)'
+              }}>
                 <div style={{
-                  textAlign: 'center',
-                  padding: '20px',
-                  color: 'rgba(255, 255, 255, 0.5)'
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: '#3b82f6',
+                  marginBottom: '4px'
                 }}>
-                  <p style={{ marginBottom: '8px', fontSize: '13px' }}>선택된 플랜이 없습니다</p>
-                  <Link href="/pricing" style={{
-                    color: '#3b82f6',
-                    textDecoration: 'none',
-                    fontSize: '13px',
-                    fontWeight: '500'
-                  }}>
-                    요금제 페이지로 이동 →
-                  </Link>
+                  {selectedPlan.name}
                 </div>
-              )}
+                <div style={{
+                  fontSize: '13px',
+                  color: 'rgba(255, 255, 255, 0.6)'
+                }}>
+                  {billingCycle === 'monthly' ? '월간 구독' : '연간 구독'}
+                </div>
+              </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#ffffff'
+              }}>
+                <span>총 결제금액</span>
+                <span style={{ color: '#3b82f6' }}>
+                  {getPrice().toLocaleString()}원
+                </span>
+              </div>
             </div>
           )}
 
-          {/* 결제 폼 */}
+          {/* 결제 위젯 영역 */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
             backdropFilter: 'blur(20px)',
@@ -321,451 +339,315 @@ export default function PaymentPage() {
             padding: isMobile ? '24px 20px' : '40px',
             boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
           }}>
-            <h2 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#ffffff',
-              marginBottom: '24px'
-            }}>
-              카드 정보
-            </h2>
-
-            <form onSubmit={handleSubmit}>
-              {/* 카드번호 */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  marginBottom: '8px'
-                }}>
-                  카드번호
-                </label>
-                <input
-                  type="text"
-                  name="cardNumber"
-                  value={formData.cardNumber}
-                  onChange={handleChange}
-                  placeholder="1234 5678 9012 3456"
-                  maxLength="19"
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    background: 'rgba(15, 23, 42, 0.6)',
-                    border: errors.cardNumber ? '1px solid #ef4444' : '1px solid rgba(59, 130, 246, 0.2)',
-                    borderRadius: '12px',
-                    color: '#ffffff',
-                    fontSize: '15px',
-                    outline: 'none',
-                    transition: 'all 0.2s'
-                  }}
-                />
-                {errors.cardNumber && (
-                  <p style={{ marginTop: '6px', fontSize: '13px', color: '#ef4444' }}>
-                    {errors.cardNumber}
-                  </p>
-                )}
-              </div>
-
-              {/* 카드 소유자 */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  marginBottom: '8px'
-                }}>
-                  카드 소유자
-                </label>
-                <input
-                  type="text"
-                  name="cardName"
-                  value={formData.cardName}
-                  onChange={handleChange}
-                  placeholder="HONG GILDONG"
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    background: 'rgba(15, 23, 42, 0.6)',
-                    border: errors.cardName ? '1px solid #ef4444' : '1px solid rgba(59, 130, 246, 0.2)',
-                    borderRadius: '12px',
-                    color: '#ffffff',
-                    fontSize: '15px',
-                    outline: 'none'
-                  }}
-                />
-                {errors.cardName && (
-                  <p style={{ marginTop: '6px', fontSize: '13px', color: '#ef4444' }}>
-                    {errors.cardName}
-                  </p>
-                )}
-              </div>
-
-              {/* 유효기간 & CVC */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px',
-                marginBottom: '24px'
-              }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    marginBottom: '8px'
-                  }}>
-                    유효기간
-                  </label>
-                  <input
-                    type="text"
-                    name="expiryDate"
-                    value={formData.expiryDate}
-                    onChange={handleChange}
-                    placeholder="MM/YY"
-                    maxLength="5"
-                    style={{
-                      width: '100%',
-                      padding: '14px 16px',
-                      background: 'rgba(15, 23, 42, 0.6)',
-                      border: errors.expiryDate ? '1px solid #ef4444' : '1px solid rgba(59, 130, 246, 0.2)',
-                      borderRadius: '12px',
-                      color: '#ffffff',
-                      fontSize: '15px',
-                      outline: 'none'
-                    }}
-                  />
-                  {errors.expiryDate && (
-                    <p style={{ marginTop: '6px', fontSize: '13px', color: '#ef4444' }}>
-                      {errors.expiryDate}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    marginBottom: '8px'
-                  }}>
-                    CVC
-                  </label>
-                  <input
-                    type="text"
-                    name="cvc"
-                    value={formData.cvc}
-                    onChange={handleChange}
-                    placeholder="123"
-                    maxLength="4"
-                    style={{
-                      width: '100%',
-                      padding: '14px 16px',
-                      background: 'rgba(15, 23, 42, 0.6)',
-                      border: errors.cvc ? '1px solid #ef4444' : '1px solid rgba(59, 130, 246, 0.2)',
-                      borderRadius: '12px',
-                      color: '#ffffff',
-                      fontSize: '15px',
-                      outline: 'none'
-                    }}
-                  />
-                  {errors.cvc && (
-                    <p style={{ marginTop: '6px', fontSize: '13px', color: '#ef4444' }}>
-                      {errors.cvc}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* 결제 동의 */}
-              <div style={{
-                marginBottom: '24px',
-                padding: '20px',
-                background: 'rgba(59, 130, 246, 0.08)',
-                borderRadius: '12px',
-                border: '1px solid rgba(59, 130, 246, 0.15)'
-              }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'start',
-                  cursor: 'pointer'
-                }}>
-                  <input
-                    type="checkbox"
-                    name="agreePayment"
-                    checked={formData.agreePayment}
-                    onChange={handleChange}
-                    style={{
-                      marginRight: '12px',
-                      marginTop: '3px',
-                      width: '18px',
-                      height: '18px',
-                      cursor: 'pointer'
-                    }}
-                  />
-                  <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)', lineHeight: '1.5' }}>
-                    위 카드로 <strong>{getPrice().toLocaleString()}원</strong>을 결제하는 것에 동의합니다.
-                    구독은 언제든지 취소할 수 있으며, 다음 결제일 전까지 요금이 청구되지 않습니다.
-                  </span>
-                </label>
-                {errors.agreePayment && (
-                  <p style={{ fontSize: '13px', color: '#ef4444', marginLeft: '30px', marginTop: '8px' }}>
-                    {errors.agreePayment}
-                  </p>
-                )}
-              </div>
-
-              {/* 결제 버튼 */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '16px',
-                  background: isLoading ? 'rgba(59, 130, 246, 0.5)' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                  border: 'none',
-                  borderRadius: '12px',
-                  color: '#ffffff',
-                  fontSize: '16px',
+            {selectedPlan ? (
+              <>
+                <h2 style={{
+                  fontSize: '20px',
                   fontWeight: '600',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s',
-                  boxShadow: isLoading ? 'none' : '0 8px 24px rgba(30, 58, 138, 0.4)',
-                  marginBottom: '12px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLoading) {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(30, 58, 138, 0.6)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isLoading) {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(30, 58, 138, 0.4)'
-                  }
-                }}
-              >
-                {isLoading ? '결제 처리 중...' : `${getPrice().toLocaleString()}원 결제하기`}
-              </button>
+                  color: '#ffffff',
+                  marginBottom: '24px'
+                }}>
+                  결제 수단 선택
+                </h2>
 
-              {/* 보안 안내 */}
+                {/* 결제수단 선택 UI */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '12px',
+                  marginBottom: '24px'
+                }}>
+                  {[
+                    { id: 'CARD', name: '신용/체크카드', icon: '💳' },
+                    { id: 'TRANSFER', name: '계좌이체', icon: '🏦' },
+                    { id: 'VIRTUAL_ACCOUNT', name: '가상계좌', icon: '📋' }
+                  ].map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setSelectedMethod(method.id)}
+                      style={{
+                        padding: '16px 12px',
+                        background: selectedMethod === method.id
+                          ? 'rgba(59, 130, 246, 0.2)'
+                          : 'rgba(255, 255, 255, 0.05)',
+                        border: selectedMethod === method.id
+                          ? '2px solid #3b82f6'
+                          : '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <span style={{ fontSize: '24px' }}>{method.icon}</span>
+                      <span style={{
+                        fontSize: '13px',
+                        fontWeight: selectedMethod === method.id ? '600' : '400',
+                        color: selectedMethod === method.id ? '#3b82f6' : 'rgba(255, 255, 255, 0.7)'
+                      }}>
+                        {method.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* 결제 버튼 */}
+                <button
+                  onClick={handlePayment}
+                  disabled={isLoading || !sdkReady}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    background: (isLoading || !sdkReady)
+                      ? 'rgba(59, 130, 246, 0.5)'
+                      : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    color: '#ffffff',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: (isLoading || !sdkReady) ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s',
+                    boxShadow: (isLoading || !sdkReady) ? 'none' : '0 8px 24px rgba(30, 58, 138, 0.4)',
+                    marginBottom: '12px'
+                  }}
+                >
+                  {isLoading ? '결제 진행 중...' : !sdkReady ? 'SDK 로딩 중...' : `${getPrice().toLocaleString()}원 결제하기`}
+                </button>
+
+                {/* 보안 안내 */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontSize: '13px',
+                  color: 'rgba(255, 255, 255, 0.5)'
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="currentColor" opacity="0.5"/>
+                  </svg>
+                  토스페이먼츠 보안 결제
+                </div>
+              </>
+            ) : (
               <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '13px',
+                textAlign: 'center',
+                padding: '60px 20px',
                 color: 'rgba(255, 255, 255, 0.5)'
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="currentColor" opacity="0.5"/>
-                </svg>
-                256비트 SSL 암호화로 안전하게 보호됩니다
+                <p style={{ marginBottom: '16px', fontSize: '16px' }}>선택된 플랜이 없습니다</p>
+                <Link href="/pricing" style={{
+                  color: '#3b82f6',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  요금제 페이지로 이동 →
+                </Link>
               </div>
-            </form>
+            )}
           </div>
 
           {/* 주문 요약 (데스크톱에서만 표시) */}
           {!isMobile && (
-          <div style={{
-            position: 'sticky',
-            top: '40px'
-          }}>
             <div style={{
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '24px',
-              padding: '32px',
-              boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
+              position: 'sticky',
+              top: '40px'
             }}>
-              <h2 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#ffffff',
-                marginBottom: '24px'
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '24px',
+                padding: '32px',
+                boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
               }}>
-                주문 요약
-              </h2>
+                <h2 style={{
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  marginBottom: '24px'
+                }}>
+                  주문 요약
+                </h2>
 
-              {selectedPlan ? (
-                <>
-                  {/* 플랜 정보 */}
-                  <div style={{
-                    marginBottom: '24px',
-                    padding: '20px',
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(59, 130, 246, 0.2)'
-                  }}>
+                {selectedPlan ? (
+                  <>
+                    {/* 플랜 정보 */}
                     <div style={{
-                      fontSize: '20px',
-                      fontWeight: '600',
-                      color: '#3b82f6',
-                      marginBottom: '8px'
+                      marginBottom: '24px',
+                      padding: '20px',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(59, 130, 246, 0.2)'
                     }}>
-                      {selectedPlan.name}
-                    </div>
-                    <div style={{
-                      fontSize: '14px',
-                      color: 'rgba(255, 255, 255, 0.6)',
-                      marginBottom: '12px'
-                    }}>
-                      {billingCycle === 'monthly' ? '월간 구독' : '연간 구독'}
-                    </div>
-                    <div style={{
-                      fontSize: '13px',
-                      color: 'rgba(255, 255, 255, 0.5)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="#60a5fa"/>
-                      </svg>
-                      매월 {selectedPlan.aiPoints.toLocaleString()} AI 포인트
-                    </div>
-                  </div>
-
-                  {/* 가격 상세 */}
-                  <div style={{
-                    marginBottom: '24px'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginBottom: '12px',
-                      fontSize: '14px',
-                      color: 'rgba(255, 255, 255, 0.7)'
-                    }}>
-                      <span>기본 요금</span>
-                      <span>
-                        {billingCycle === 'monthly'
-                          ? `${selectedPlan.monthlyPrice.toLocaleString()}원/월`
-                          : `${selectedPlan.yearlyPrice.toLocaleString()}원/년`
-                        }
-                      </span>
+                      <div style={{
+                        fontSize: '20px',
+                        fontWeight: '600',
+                        color: '#3b82f6',
+                        marginBottom: '8px'
+                      }}>
+                        {selectedPlan.name}
+                      </div>
+                      <div style={{
+                        fontSize: '14px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        marginBottom: '12px'
+                      }}>
+                        {billingCycle === 'monthly' ? '월간 구독' : '연간 구독'}
+                      </div>
+                      <div style={{
+                        fontSize: '13px',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="#60a5fa"/>
+                        </svg>
+                        매월 {selectedPlan.aiPoints.toLocaleString()} AI 포인트
+                      </div>
                     </div>
 
-                    {billingCycle === 'yearly' && (
+                    {/* 가격 상세 */}
+                    <div style={{
+                      marginBottom: '24px'
+                    }}>
                       <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         marginBottom: '12px',
                         fontSize: '14px',
-                        color: '#86efac'
+                        color: 'rgba(255, 255, 255, 0.7)'
                       }}>
-                        <span>연간 할인</span>
-                        <span>-{getDiscount()}%</span>
+                        <span>기본 요금</span>
+                        <span>
+                          {billingCycle === 'monthly'
+                            ? `${selectedPlan.monthlyPrice.toLocaleString()}원/월`
+                            : `${selectedPlan.yearlyPrice.toLocaleString()}원/년`
+                          }
+                        </span>
                       </div>
-                    )}
 
-                    <div style={{
-                      height: '1px',
-                      background: 'rgba(59, 130, 246, 0.2)',
-                      margin: '16px 0'
-                    }}></div>
+                      {billingCycle === 'yearly' && (
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          marginBottom: '12px',
+                          fontSize: '14px',
+                          color: '#86efac'
+                        }}>
+                          <span>연간 할인</span>
+                          <span>-{getDiscount()}%</span>
+                        </div>
+                      )}
 
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: '18px',
-                      fontWeight: '600',
-                      color: '#ffffff'
-                    }}>
-                      <span>총 결제금액</span>
-                      <span style={{ color: '#3b82f6' }}>
-                        {getPrice().toLocaleString()}원
-                      </span>
-                    </div>
-
-                    {billingCycle === 'yearly' && (
                       <div style={{
-                        marginTop: '8px',
-                        fontSize: '13px',
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        textAlign: 'right'
-                      }}>
-                        월 {getMonthlyPrice().toLocaleString()}원
-                      </div>
-                    )}
-                  </div>
+                        height: '1px',
+                        background: 'rgba(59, 130, 246, 0.2)',
+                        margin: '16px 0'
+                      }}></div>
 
-                  {/* 포함 사항 */}
-                  <div style={{
-                    padding: '20px',
-                    background: 'rgba(15, 23, 42, 0.4)',
-                    borderRadius: '12px',
-                    marginBottom: '20px'
-                  }}>
-                    <div style={{
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '12px'
-                    }}>
-                      포함된 기능
-                    </div>
-                    {[
-                      '상담 관리 시스템',
-                      'AI 커리큘럼 생성',
-                      '마케팅 자동화',
-                      '학생 리포트 자동화',
-                      '데이터 분석 대시보드'
-                    ].map((feature, idx) => (
-                      <div key={idx} style={{
+                      <div style={{
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        marginBottom: '8px',
-                        fontSize: '13px',
-                        color: 'rgba(255, 255, 255, 0.6)'
+                        justifyContent: 'space-between',
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: '#ffffff'
                       }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#3b82f6" strokeWidth="2"/>
-                        </svg>
-                        {feature}
+                        <span>총 결제금액</span>
+                        <span style={{ color: '#3b82f6' }}>
+                          {getPrice().toLocaleString()}원
+                        </span>
                       </div>
-                    ))}
-                  </div>
 
-                  {/* 환불 정책 */}
+                      {billingCycle === 'yearly' && (
+                        <div style={{
+                          marginTop: '8px',
+                          fontSize: '13px',
+                          color: 'rgba(255, 255, 255, 0.5)',
+                          textAlign: 'right'
+                        }}>
+                          월 {getMonthlyPrice().toLocaleString()}원
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 포함 사항 */}
+                    <div style={{
+                      padding: '20px',
+                      background: 'rgba(15, 23, 42, 0.4)',
+                      borderRadius: '12px',
+                      marginBottom: '20px'
+                    }}>
+                      <div style={{
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        marginBottom: '12px'
+                      }}>
+                        포함된 기능
+                      </div>
+                      {[
+                        '상담 관리 시스템',
+                        'AI 커리큘럼 생성',
+                        '마케팅 자동화',
+                        '학생 리포트 자동화',
+                        '데이터 분석 대시보드'
+                      ].map((feature, idx) => (
+                        <div key={idx} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '8px',
+                          fontSize: '13px',
+                          color: 'rgba(255, 255, 255, 0.6)'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#3b82f6" strokeWidth="2"/>
+                          </svg>
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 환불 정책 */}
+                    <div style={{
+                      padding: '16px',
+                      background: 'rgba(59, 130, 246, 0.08)',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.5)',
+                      lineHeight: '1.6'
+                    }}>
+                      <strong style={{ color: 'rgba(255, 255, 255, 0.7)' }}>환불 정책</strong><br/>
+                      구독 후 7일 이내 전액 환불 가능합니다. 이후에는 남은 기간에 대해 일할 계산하여 환불됩니다.
+                    </div>
+                  </>
+                ) : (
                   <div style={{
-                    padding: '16px',
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    color: 'rgba(255, 255, 255, 0.5)',
-                    lineHeight: '1.6'
+                    textAlign: 'center',
+                    padding: '40px 20px',
+                    color: 'rgba(255, 255, 255, 0.5)'
                   }}>
-                    <strong style={{ color: 'rgba(255, 255, 255, 0.7)' }}>환불 정책</strong><br/>
-                    구독 후 7일 이내 전액 환불 가능합니다. 이후에는 남은 기간에 대해 일할 계산하여 환불됩니다.
+                    <p style={{ marginBottom: '16px' }}>선택된 플랜이 없습니다</p>
+                    <Link href="/pricing" style={{
+                      color: '#3b82f6',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}>
+                      요금제 페이지로 이동 →
+                    </Link>
                   </div>
-                </>
-              ) : (
-                <div style={{
-                  textAlign: 'center',
-                  padding: '40px 20px',
-                  color: 'rgba(255, 255, 255, 0.5)'
-                }}>
-                  <p style={{ marginBottom: '16px' }}>선택된 플랜이 없습니다</p>
-                  <Link href="/pricing" style={{
-                    color: '#3b82f6',
-                    textDecoration: 'none',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}>
-                    요금제 페이지로 이동 →
-                  </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
           )}
         </div>
       </div>

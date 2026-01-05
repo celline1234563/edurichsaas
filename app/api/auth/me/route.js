@@ -1,8 +1,7 @@
 // app/api/auth/me/route.js
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { SESSION_COOKIE_NAME } from '@/lib/cookies'
 import { BRAIN_BASE_URL } from '@/lib/constants'
 
 const BRAIN_ORIGIN = BRAIN_BASE_URL
@@ -21,24 +20,33 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
-    const jar = await cookies()
-    const token = jar.get(SESSION_COOKIE_NAME)?.value
-    if (!token) return NextResponse.json({ error: 'NO_SESSION' }, { status: 401 })
+    // Supabase Auth 세션 확인
+    const supabase = await createSupabaseServerClient()
+    const { data: { user }, error } = await supabase.auth.getUser()
 
-    const nowIso = new Date().toISOString()
+    if (error || !user) {
+      return withCors(NextResponse.json({ error: 'NO_SESSION' }, { status: 401 }))
+    }
 
-    const { data, error } = await supabaseAdmin
-      .from('account_sessions')
-      .select('account_id, expires_at')
-      .eq('session_token', token)
-      .gt('expires_at', nowIso)
+    // accounts 테이블에서 추가 정보 가져오기
+    const { data: account } = await supabaseAdmin
+      .from('accounts')
+      .select('id, name, email, role, academy_id, phone')
+      .eq('user_id', user.id)
       .maybeSingle()
 
-    if (error) return NextResponse.json({ error: 'DB_ERROR', detail: error.message }, { status: 500 })
-    if (!data) return NextResponse.json({ error: 'SESSION_EXPIRED' }, { status: 401 })
-
-    return NextResponse.json({ ok: true, accountId: data.account_id })
+    return withCors(NextResponse.json({
+      ok: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: account?.name || user.user_metadata?.name,
+        role: account?.role,
+        academyId: account?.academy_id,
+        phone: account?.phone || user.user_metadata?.phone
+      }
+    }))
   } catch (e) {
-    return NextResponse.json({ error: 'ME_FAILED', detail: String(e?.message || e) }, { status: 500 })
+    return withCors(NextResponse.json({ error: 'ME_FAILED', detail: String(e?.message || e) }, { status: 500 }))
   }
 }

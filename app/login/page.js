@@ -91,24 +91,37 @@ function LoginForm() {
       return
     }
 
-    const { access_token, refresh_token } = data.session
+    // ✅ 1) pendingPayment가 있으면 결제 페이지로 이동
+    const pendingPayment = sessionStorage.getItem('pendingPayment')
+    if (pendingPayment) {
+      try {
+        const { plan, cycle } = JSON.parse(pendingPayment)
+        sessionStorage.removeItem('pendingPayment')
+        if (plan) {
+          window.location.href = `/payment?plan=${plan}&cycle=${cycle || 'monthly'}`
+          return
+        }
+      } catch (e) {
+        sessionStorage.removeItem('pendingPayment')
+      }
+    }
 
-    // ✅ 1) "진단보고서에서 넘어온 로그인"인지 판별
+    // ✅ 2) "진단보고서에서 넘어온 로그인"인지 판별
     const redirect = searchParams.get('redirect') // "diagnosis" 기대
     const token = searchParams.get('token')
 
     const isDiagnosisFlow = redirect === 'diagnosis' && !!token
 
-    // ✅ 2) 진단 플로우면 brain의 진단 결과로 복귀 (token query 유지)
-    // ✅ 3) 일반 로그인이면 SaaS 내부 기본 경로로 이동
-    const baseUrl = isDiagnosisFlow
-      ? `${BRAIN_BASE_URL}/diagnosis/result?token=${encodeURIComponent(token)}`
-      : `${window.location.origin}/` // 필요하면 '/dashboard' 등으로 바꿔
-
-    // ✅ brain에서 세션 세팅할 수 있게 hash(fragment)에 토큰 전달
-    const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
-
-    window.location.href = `${baseUrl}#${hash}`
+    // ✅ 3) 진단 플로우면 brain의 진단 결과로 복귀 (token query 유지)
+    // ✅ 4) 일반 로그인이면 SaaS 내부 기본 경로로 이동
+    if (isDiagnosisFlow) {
+      const { access_token, refresh_token } = data.session
+      const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
+      window.location.href = `${BRAIN_BASE_URL}/diagnosis/result?token=${encodeURIComponent(token)}#${hash}`
+    } else {
+      // 일반 로그인은 해시 없이 바로 홈으로
+      window.location.href = '/'
+    }
   }
 
   const handleChange = (e) => {
