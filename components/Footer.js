@@ -232,7 +232,7 @@ export default function Footer() {
           <p style={{ marginBottom: '8px' }}>
             문의: <a href="mailto:support@marketingdiet.online" style={{ color: '#60a5fa', textDecoration: 'none' }}>support@marketingdiet.online</a>
           </p>
-          <p style={{ marginBottom: '8px' }}>대표 이성연 | 경기도 성남시 분당구 대왕판교로645번길 12 9층 | 사업자 등록번호 331-31-00742 | 전화 010-9619-5797</p>
+          <p style={{ marginBottom: '8px' }}>대표 이성연 | 경기도 성남시 분당구 대왕판교로645번길 12 (삼평동) 7, 9층 168호 | 사업자 등록번호 331-31-00742 | 전화 010-9619-5797</p>
           <p style={{ marginBottom: '8px', color: '#9ca3af', fontSize: '11px' }}>
             마케팅다이어트(대행본사) | 에듀리치브레인(학원 AI SaaS) | 에듀케어알림(학부모 카카오 알림채널)
           </p>
