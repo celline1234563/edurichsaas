@@ -3,12 +3,36 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+
+const BRAIN_BASE_URL = 'https://edurichbrain.ai.kr'
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState('processing') // processing, success, error
   const [paymentData, setPaymentData] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+
+  // 서비스 시작하기 버튼 클릭 핸들러
+  const handleStartService = async () => {
+    try {
+      const supabase = createSupabaseBrowserClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (session) {
+        // 세션이 있으면 토큰과 함께 brain으로 이동
+        const { access_token, refresh_token } = session
+        const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
+        window.location.href = `${BRAIN_BASE_URL}#${hash}`
+      } else {
+        // 세션이 없으면 그냥 brain으로 이동
+        window.location.href = BRAIN_BASE_URL
+      }
+    } catch (error) {
+      console.error('세션 가져오기 실패:', error)
+      window.location.href = BRAIN_BASE_URL
+    }
+  }
 
   useEffect(() => {
     const confirmPayment = async () => {
@@ -216,9 +240,9 @@ export default function PaymentSuccessPage() {
               </a>
             )}
 
-            {/* 홈으로 버튼 */}
-            <Link
-              href="https://edurichbrain.ai.kr"
+            {/* 서비스 시작 버튼 */}
+            <button
+              onClick={handleStartService}
               style={{
                 display: 'block',
                 width: '100%',
@@ -228,12 +252,13 @@ export default function PaymentSuccessPage() {
                 color: '#ffffff',
                 fontSize: '16px',
                 fontWeight: '600',
-                textDecoration: 'none',
+                border: 'none',
+                cursor: 'pointer',
                 textAlign: 'center'
               }}
             >
               서비스 시작하기
-            </Link>
+            </button>
           </>
         )}
 
