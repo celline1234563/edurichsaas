@@ -238,9 +238,34 @@ export default function HomePage() {
               </svg>
             </button>
           </div>
-          <Link href="/signup" className="login-btn">
-            시작하기
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <a
+              href="https://edurichbrain.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '10px 16px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: '600',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              앱 시작
+            </a>
+            <Link href="/signup" className="login-btn">
+              시작하기
+            </Link>
+          </div>
         </header>
 
         {/* Hero Section - New Design */}
