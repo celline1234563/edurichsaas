@@ -177,43 +177,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* 서비스 운영 안내 */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(254, 229, 0, 0.1), rgba(254, 229, 0, 0.05))',
-        borderTop: '1px solid rgba(254, 229, 0, 0.3)',
-        borderBottom: '1px solid rgba(254, 229, 0, 0.3)',
-        padding: isMobile ? '20px' : '24px 0'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 24px',
-          textAlign: 'center'
-        }}>
-          <p style={{
-            fontSize: isMobile ? '12px' : '14px',
-            color: '#ffffff',
-            lineHeight: '1.8'
-          }}>
-            <span style={{
-              display: 'inline-block',
-              padding: '4px 10px',
-              background: '#FEE500',
-              color: '#3C1E1E',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              fontSize: '11px',
-              marginRight: '8px'
-            }}>서비스 운영 안내</span>
-            <span style={{ color: 'rgba(255,255,255,0.9)' }}>
-              '에듀리치브레인'은 마케팅 다이어트의 공식 AI SaaS 브랜드이며, 학부모 알림 및 관리 서비스는 공식 카카오톡 채널인
-            </span>
-            <span style={{ color: '#FEE500', fontWeight: 'bold' }}>'에듀케어 알림'</span>
-            <span style={{ color: 'rgba(255,255,255,0.9)' }}>을 통해 제공됩니다.</span>
-          </p>
-        </div>
-      </div>
-
       {/* 하단 푸터 - 사업자 정보 */}
       <div style={{
         background: '#111111',
