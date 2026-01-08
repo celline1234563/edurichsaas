@@ -9,7 +9,7 @@ export async function POST(request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
     const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY
-    const { paymentKey, orderId, amount } = await request.json()
+    const { paymentKey, orderId, amount, type, points } = await request.json()
 
     if (!paymentKey || !orderId || !amount) {
       return NextResponse.json(
@@ -49,6 +49,7 @@ export async function POST(request) {
     }
 
     // 결제 성공 시 DB에 결제 내역 저장
+    const paymentType = type === 'recharge' ? 'recharge' : 'subscription'
     const { data: paymentHistory, error: paymentError } = await supabase
       .from('payment_history')
       .insert({
@@ -56,12 +57,13 @@ export async function POST(request) {
         payment_key: paymentKey,
         amount: paymentResult.totalAmount,
         payment_status: 'completed',
-        payment_type: 'subscription',
+        payment_type: paymentType,
         payment_method: paymentResult.method,
         card_company: paymentResult.card?.company,
         card_number: paymentResult.card?.number,
         approved_at: paymentResult.approvedAt,
         receipt_url: paymentResult.receipt?.url,
+        points_credited: type === 'recharge' ? points : null,
         raw_response: paymentResult
       })
       .select()
@@ -74,7 +76,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: '결제가 완료되었습니다.',
+      message: type === 'recharge' ? '포인트 충전이 완료되었습니다.' : '결제가 완료되었습니다.',
       data: {
         paymentKey: paymentResult.paymentKey,
         orderId: paymentResult.orderId,
@@ -87,7 +89,9 @@ export async function POST(request) {
           company: paymentResult.card.company,
           number: paymentResult.card.number,
           cardType: paymentResult.card.cardType
-        } : null
+        } : null,
+        type: paymentType,
+        pointsCredited: type === 'recharge' ? points : null
       }
     })
   } catch (error) {

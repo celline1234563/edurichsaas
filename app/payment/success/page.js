@@ -39,6 +39,8 @@ function PaymentSuccessContent() {
       const paymentKey = searchParams.get('paymentKey')
       const orderId = searchParams.get('orderId')
       const amount = searchParams.get('amount')
+      const type = searchParams.get('type') || 'subscription'
+      const points = searchParams.get('points')
 
       if (!paymentKey || !orderId || !amount) {
         setStatus('error')
@@ -56,6 +58,8 @@ function PaymentSuccessContent() {
             paymentKey,
             orderId,
             amount: Number(amount),
+            type,
+            points: points ? Number(points) : null,
           }),
         })
 
@@ -146,14 +150,17 @@ function PaymentSuccessContent() {
               color: '#ffffff',
               marginBottom: '12px'
             }}>
-              결제 완료!
+              {paymentData?.type === 'recharge' ? '포인트 충전 완료!' : '결제 완료!'}
             </h1>
             <p style={{
               fontSize: '16px',
               color: 'rgba(255, 255, 255, 0.7)',
               marginBottom: '32px'
             }}>
-              {paymentData?.orderName || '구독'} 결제가 성공적으로 완료되었습니다.
+              {paymentData?.type === 'recharge'
+                ? `${paymentData?.pointsCredited?.toLocaleString()}P가 충전되었습니다.`
+                : `${paymentData?.orderName || '구독'} 결제가 성공적으로 완료되었습니다.`
+              }
             </p>
 
             {/* 결제 정보 */}
@@ -249,7 +256,7 @@ function PaymentSuccessContent() {
                 textAlign: 'center'
               }}
             >
-              서비스 시작하기
+              {paymentData?.type === 'recharge' ? '서비스로 돌아가기' : '서비스 시작하기'}
             </button>
           </>
         )}

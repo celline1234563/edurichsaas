@@ -8,11 +8,19 @@ function PaymentFailContent() {
   const searchParams = useSearchParams()
   const code = searchParams.get('code')
   const message = searchParams.get('message')
+  const type = searchParams.get('type') || 'subscription'
   const plan = searchParams.get('plan')
   const cycle = searchParams.get('cycle')
+  const pkg = searchParams.get('package')
 
-  // 플랜 정보가 있으면 결제 페이지로, 없으면 요금제 페이지로
-  const retryUrl = plan ? `/payment?plan=${plan}&cycle=${cycle || 'monthly'}` : '/pricing'
+  // 타입에 따라 다시 시도 URL 설정
+  const getRetryUrl = () => {
+    if (type === 'recharge') {
+      return pkg ? `/payment?type=recharge&package=${pkg}` : '/payment?type=recharge'
+    }
+    return plan ? `/payment?type=subscription&plan=${plan}&cycle=${cycle || 'monthly'}` : '/pricing'
+  }
+  const retryUrl = getRetryUrl()
 
   const getErrorMessage = () => {
     switch (code) {
