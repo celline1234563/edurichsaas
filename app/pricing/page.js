@@ -135,6 +135,7 @@ export default function PricingPage() {
   // AI 포인트 충전 패키지
   const pointPackages = [
     {
+      id: 'basic',
       name: '베이직',
       price: 33000,
       points: 10000,
@@ -142,6 +143,7 @@ export default function PricingPage() {
       bonus: null
     },
     {
+      id: 'standard',
       name: '스탠다드',
       price: 55000,
       points: 18000,
@@ -150,6 +152,7 @@ export default function PricingPage() {
       popular: true
     },
     {
+      id: 'premium',
       name: '프리미엄',
       price: 110000,
       points: 40000,
@@ -905,6 +908,7 @@ export default function PricingPage() {
                   )}
 
                   <button
+                    onClick={() => window.location.href = `/payment?type=recharge&package=${pkg.id}`}
                     style={{
                       width: '100%',
                       padding: '14px',
