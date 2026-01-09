@@ -18,6 +18,8 @@ export default function PaymentPage() {
   const [authChecking, setAuthChecking] = useState(true)
   const [userData, setUserData] = useState(null)
   const [sdkReady, setSdkReady] = useState(false)
+  const [hasSubscription, setHasSubscription] = useState(false)
+  const [subscriptionChecking, setSubscriptionChecking] = useState(false)
 
   const paymentRef = useRef(null)
 
@@ -66,11 +68,25 @@ export default function PaymentPage() {
           }
           if (cycle) setBillingCycle(cycle)
         } else if (type === 'recharge') {
-          const pkg = params.get('package')
-          if (pkg) {
-            const pkgData = pointPackages.find(p => p.id === pkg)
-            setSelectedPackage(pkgData)
+          // 포인트 충전은 구독 고객만 가능 - 구독 상태 확인
+          setSubscriptionChecking(true)
+          try {
+            const subRes = await fetch(`/api/subscription/status?userId=${data.user.id}`)
+            if (subRes.ok) {
+              const subData = await subRes.json()
+              if (subData.hasSubscription) {
+                setHasSubscription(true)
+                const pkg = params.get('package')
+                if (pkg) {
+                  const pkgData = pointPackages.find(p => p.id === pkg)
+                  setSelectedPackage(pkgData)
+                }
+              }
+            }
+          } catch (err) {
+            console.error('구독 상태 확인 실패:', err)
           }
+          setSubscriptionChecking(false)
         }
       } catch {
         alert('인증 확인 중 오류가 발생했습니다.')
@@ -238,6 +254,53 @@ export default function PaymentPage() {
           }}>
             {paymentType === 'recharge' ? (
               // 포인트 충전 UI
+              subscriptionChecking ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <div style={{ fontSize: '16px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                    구독 상태 확인 중...
+                  </div>
+                </div>
+              ) : !hasSubscription ? (
+                // 구독이 없는 경우
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    margin: '0 auto 24px',
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#ffffff', marginBottom: '12px' }}>
+                    구독이 필요합니다
+                  </h2>
+                  <p style={{ fontSize: '16px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '32px', lineHeight: '1.6' }}>
+                    포인트 충전은 구독 중인 고객만 이용할 수 있습니다.<br/>
+                    먼저 구독 플랜을 선택해주세요.
+                  </p>
+                  <Link
+                    href="/pricing"
+                    style={{
+                      display: 'inline-block',
+                      padding: '14px 32px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    구독 플랜 보기
+                  </Link>
+                </div>
+              ) : (
               <>
                 <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#ffffff', marginBottom: '24px' }}>
                   충전할 패키지 선택
@@ -338,6 +401,7 @@ export default function PaymentPage() {
                   {isLoading ? '결제 진행 중...' : !sdkReady ? 'SDK 로딩 중...' : !selectedPackage ? '패키지를 선택하세요' : `${selectedPackage.price.toLocaleString()}원 결제하기`}
                 </button>
               </>
+              )
             ) : (
               // 구독 결제 UI (기존)
               hasSelection ? (
@@ -423,7 +487,7 @@ export default function PaymentPage() {
                   주문 요약
                 </h2>
 
-                {paymentType === 'recharge' && selectedPackage ? (
+                {paymentType === 'recharge' && hasSubscription && selectedPackage ? (
                   <>
                     <div style={{
                       marginBottom: '24px',
