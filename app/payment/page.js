@@ -7,9 +7,16 @@ import useIsMobile from '@/hooks/useIsMobile'
 // API 개별 연동 키 (test_ck_로 시작) - payment() 메서드용
 const TOSS_CLIENT_KEY = 'test_ck_yZqmkKeP8gpnEQad79Pn3bQRxB9l'
 
+// 팀원 역할별 가격
+const TEAM_ROLE_PRICES = {
+  instructor: { name: '강사', price: 13000 },
+  staff: { name: '직원', price: 8000 },
+  parttime: { name: '알바', price: 4000 }
+}
+
 export default function PaymentPage() {
   const isMobile = useIsMobile()
-  const [paymentType, setPaymentType] = useState('subscription') // subscription or recharge
+  const [paymentType, setPaymentType] = useState('subscription') // subscription, recharge, or team
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [selectedPackage, setSelectedPackage] = useState(null)
   const [billingCycle, setBillingCycle] = useState('monthly')
@@ -20,6 +27,13 @@ export default function PaymentPage() {
   const [sdkReady, setSdkReady] = useState(false)
   const [hasSubscription, setHasSubscription] = useState(false)
   const [subscriptionChecking, setSubscriptionChecking] = useState(false)
+
+  // 팀원 추가 관련 상태
+  const [teamMembers, setTeamMembers] = useState([]) // 기존 팀원 목록
+  const [teamMembersCost, setTeamMembersCost] = useState(0)
+  const [newMember, setNewMember] = useState({ email: '', name: '', role: 'instructor' })
+  const [teamLoading, setTeamLoading] = useState(false)
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null)
 
   const paymentRef = useRef(null)
 
@@ -67,8 +81,8 @@ export default function PaymentPage() {
             setSelectedPlan(planData)
           }
           if (cycle) setBillingCycle(cycle)
-        } else if (type === 'recharge') {
-          // 포인트 충전은 구독 고객만 가능 - 구독 상태 확인
+        } else if (type === 'recharge' || type === 'team') {
+          // 포인트 충전/팀원 추가는 구독 고객만 가능 - 구독 상태 확인
           setSubscriptionChecking(true)
           try {
             const subRes = await fetch(`/api/subscription/status?userId=${data.user.id}`)
@@ -76,10 +90,28 @@ export default function PaymentPage() {
               const subData = await subRes.json()
               if (subData.hasSubscription) {
                 setHasSubscription(true)
-                const pkg = params.get('package')
-                if (pkg) {
-                  const pkgData = pointPackages.find(p => p.id === pkg)
-                  setSelectedPackage(pkgData)
+                setSubscriptionInfo(subData.subscription)
+
+                if (type === 'recharge') {
+                  const pkg = params.get('package')
+                  if (pkg) {
+                    const pkgData = pointPackages.find(p => p.id === pkg)
+                    setSelectedPackage(pkgData)
+                  }
+                } else if (type === 'team') {
+                  // 기존 팀원 목록 조회
+                  try {
+                    const teamRes = await fetch(`/api/team/list?userId=${data.user.id}`)
+                    if (teamRes.ok) {
+                      const teamData = await teamRes.json()
+                      if (teamData.success) {
+                        setTeamMembers(teamData.data.members)
+                        setTeamMembersCost(teamData.data.totalMonthlyCost)
+                      }
+                    }
+                  } catch (teamErr) {
+                    console.error('팀원 목록 조회 실패:', teamErr)
+                  }
                 }
               }
             }
@@ -98,6 +130,8 @@ export default function PaymentPage() {
 
   // 토스페이먼츠 SDK 로드 및 payment 인스턴스 초기화
   useEffect(() => {
+    // team 타입은 SDK 불필요 (기존 빌링키로 서버에서 결제)
+    if (paymentType === 'team') return
     const hasSelection = paymentType === 'subscription' ? selectedPlan : selectedPackage
     if (!isLoggedIn || !hasSelection || authChecking) return
 
@@ -185,12 +219,113 @@ export default function PaymentPage() {
     }
   }
 
+  // 팀원 초대 (일할 결제 포함)
+  const handleTeamInvite = async () => {
+    if (!newMember.email || !newMember.role) {
+      alert('이메일과 역할을 입력해주세요.')
+      return
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(newMember.email)) {
+      alert('올바른 이메일 형식을 입력해주세요.')
+      return
+    }
+
+    setTeamLoading(true)
+    try {
+      const response = await fetch('/api/team/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userData.id,
+          memberEmail: newMember.email,
+          memberName: newMember.name || '',
+          role: newMember.role
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        alert(result.message || '팀원 초대에 실패했습니다.')
+        return
+      }
+
+      alert(`팀원이 추가되었습니다.\n\n일할 계산: ${result.data.proratedAmount.toLocaleString()}원\n(${result.data.daysRemaining}일분)`)
+
+      // 팀원 목록 새로고침
+      const teamRes = await fetch(`/api/team/list?userId=${userData.id}`)
+      if (teamRes.ok) {
+        const teamData = await teamRes.json()
+        if (teamData.success) {
+          setTeamMembers(teamData.data.members)
+          setTeamMembersCost(teamData.data.totalMonthlyCost)
+        }
+      }
+
+      // 입력 필드 초기화
+      setNewMember({ email: '', name: '', role: 'instructor' })
+    } catch (error) {
+      console.error('팀원 초대 오류:', error)
+      alert('팀원 초대 중 오류가 발생했습니다.')
+    } finally {
+      setTeamLoading(false)
+    }
+  }
+
+  // 팀원 삭제
+  const handleTeamRemove = async (memberId, memberName) => {
+    if (!confirm(`${memberName || '해당 팀원'}을(를) 삭제하시겠습니까?\n다음 결제부터 해당 팀원 비용이 제외됩니다.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/team/remove', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memberId })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        alert(result.message || '팀원 삭제에 실패했습니다.')
+        return
+      }
+
+      // 팀원 목록 새로고침
+      const teamRes = await fetch(`/api/team/list?userId=${userData.id}`)
+      if (teamRes.ok) {
+        const teamData = await teamRes.json()
+        if (teamData.success) {
+          setTeamMembers(teamData.data.members)
+          setTeamMembersCost(teamData.data.totalMonthlyCost)
+        }
+      }
+    } catch (error) {
+      console.error('팀원 삭제 오류:', error)
+      alert('팀원 삭제 중 오류가 발생했습니다.')
+    }
+  }
+
+  // 일할 계산 예상 금액
+  const calculateProratedAmount = (monthlyPrice) => {
+    if (!subscriptionInfo?.next_payment_date) return monthlyPrice
+    const nextPayment = new Date(subscriptionInfo.next_payment_date)
+    const today = new Date()
+    const daysRemaining = Math.max(1, Math.ceil((nextPayment - today) / (1000 * 60 * 60 * 24)))
+    return Math.ceil((monthlyPrice / 30) * daysRemaining)
+  }
+
   const handlePayment = () => {
     if (paymentType === 'subscription') {
       handleBillingPayment()
-    } else {
+    } else if (paymentType === 'recharge') {
       handleRechargePayment()
     }
+    // team 타입은 별도 handleTeamInvite 사용
   }
 
   if (authChecking) {
@@ -207,7 +342,17 @@ export default function PaymentPage() {
     )
   }
 
-  const hasSelection = paymentType === 'subscription' ? selectedPlan : selectedPackage
+  const hasSelection = paymentType === 'subscription' ? selectedPlan : (paymentType === 'recharge' ? selectedPackage : hasSubscription)
+
+  // 페이지 타이틀
+  const getPageTitle = () => {
+    switch (paymentType) {
+      case 'subscription': return '구독 결제'
+      case 'recharge': return 'AI 포인트 충전'
+      case 'team': return '팀원 추가'
+      default: return '결제'
+    }
+  }
 
   return (
     <div style={{
@@ -229,7 +374,7 @@ export default function PaymentPage() {
             EduRichBrain
           </Link>
           <h1 style={{ fontSize: isMobile ? '24px' : '36px', fontWeight: '600', color: '#ffffff', marginBottom: '8px' }}>
-            {paymentType === 'subscription' ? '구독 결제' : 'AI 포인트 충전'}
+            {getPageTitle()}
           </h1>
           <p style={{ fontSize: isMobile ? '14px' : '16px', color: 'rgba(255, 255, 255, 0.6)' }}>
             토스페이먼츠로 안전하게 결제하세요
@@ -252,7 +397,257 @@ export default function PaymentPage() {
             padding: isMobile ? '24px 20px' : '40px',
             boxShadow: '0 20px 60px rgba(30, 58, 138, 0.2)'
           }}>
-            {paymentType === 'recharge' ? (
+            {paymentType === 'team' ? (
+              // 팀원 추가 UI
+              subscriptionChecking ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <div style={{ fontSize: '16px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                    구독 상태 확인 중...
+                  </div>
+                </div>
+              ) : !hasSubscription ? (
+                // 구독이 없는 경우
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    margin: '0 auto 24px',
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#ffffff', marginBottom: '12px' }}>
+                    구독이 필요합니다
+                  </h2>
+                  <p style={{ fontSize: '16px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '32px', lineHeight: '1.6' }}>
+                    팀원 추가는 구독 중인 고객만 이용할 수 있습니다.<br/>
+                    먼저 구독 플랜을 선택해주세요.
+                  </p>
+                  <Link
+                    href="/pricing"
+                    style={{
+                      display: 'inline-block',
+                      padding: '14px 32px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    구독 플랜 보기
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  {/* 현재 팀원 현황 */}
+                  {teamMembers.length > 0 && (
+                    <div style={{ marginBottom: '32px' }}>
+                      <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#ffffff', marginBottom: '16px' }}>
+                        현재 팀원 ({teamMembers.length}명)
+                      </h2>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {teamMembers.map((member) => (
+                          <div
+                            key={member.id}
+                            style={{
+                              padding: '16px',
+                              background: 'rgba(30, 41, 59, 0.5)',
+                              border: '1px solid rgba(51, 65, 85, 0.5)',
+                              borderRadius: '12px',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center'
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontSize: '14px', fontWeight: '600', color: '#ffffff', marginBottom: '4px' }}>
+                                {member.name || member.email}
+                              </div>
+                              <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                {member.roleName} · {member.monthlyPrice.toLocaleString()}원/월
+                                {member.status === 'pending' && (
+                                  <span style={{ marginLeft: '8px', color: '#fbbf24' }}>초대 대기중</span>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => handleTeamRemove(member.id, member.name || member.email)}
+                              style={{
+                                padding: '8px 12px',
+                                background: 'rgba(239, 68, 68, 0.2)',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                borderRadius: '8px',
+                                color: '#ef4444',
+                                fontSize: '13px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{
+                        marginTop: '16px',
+                        padding: '12px 16px',
+                        background: 'rgba(59, 130, 246, 0.1)',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)' }}>월 추가 비용</span>
+                        <span style={{ fontSize: '16px', fontWeight: '600', color: '#3b82f6' }}>
+                          +{teamMembersCost.toLocaleString()}원
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 팀원 추가 폼 */}
+                  <div style={{
+                    padding: '24px',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.25)',
+                    borderRadius: '16px'
+                  }}>
+                    <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#ffffff', marginBottom: '20px' }}>
+                      팀원 추가
+                    </h2>
+
+                    {/* 역할 선택 */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '8px' }}>
+                        역할
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {Object.entries(TEAM_ROLE_PRICES).map(([roleKey, roleData]) => (
+                          <button
+                            key={roleKey}
+                            onClick={() => setNewMember(prev => ({ ...prev, role: roleKey }))}
+                            style={{
+                              flex: '1',
+                              minWidth: '100px',
+                              padding: '12px',
+                              background: newMember.role === roleKey
+                                ? 'rgba(59, 130, 246, 0.3)'
+                                : 'rgba(30, 41, 59, 0.5)',
+                              border: newMember.role === roleKey
+                                ? '2px solid #3b82f6'
+                                : '1px solid rgba(51, 65, 85, 0.5)',
+                              borderRadius: '10px',
+                              cursor: 'pointer',
+                              textAlign: 'center'
+                            }}
+                          >
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#ffffff' }}>
+                              {roleData.name}
+                            </div>
+                            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginTop: '4px' }}>
+                              {roleData.price.toLocaleString()}원/월
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 이메일 입력 */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '8px' }}>
+                        이메일 *
+                      </label>
+                      <input
+                        type="email"
+                        value={newMember.email}
+                        onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
+                        placeholder="팀원 이메일 주소"
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'rgba(15, 23, 42, 0.6)',
+                          border: '1px solid rgba(51, 65, 85, 0.5)',
+                          borderRadius: '10px',
+                          color: '#ffffff',
+                          fontSize: '14px',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    {/* 이름 입력 */}
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '8px' }}>
+                        이름 (선택)
+                      </label>
+                      <input
+                        type="text"
+                        value={newMember.name}
+                        onChange={(e) => setNewMember(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="팀원 이름"
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'rgba(15, 23, 42, 0.6)',
+                          border: '1px solid rgba(51, 65, 85, 0.5)',
+                          borderRadius: '10px',
+                          color: '#ffffff',
+                          fontSize: '14px',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    {/* 일할 계산 안내 */}
+                    <div style={{
+                      padding: '12px 16px',
+                      background: 'rgba(251, 191, 36, 0.15)',
+                      borderRadius: '10px',
+                      marginBottom: '20px'
+                    }}>
+                      <div style={{ fontSize: '13px', color: '#fbbf24', fontWeight: '600', marginBottom: '4px' }}>
+                        일할 계산 안내
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.5' }}>
+                        다음 결제일까지 남은 일수만큼 일할 계산되어 즉시 결제됩니다.<br/>
+                        예상 결제금액: <strong style={{ color: '#ffffff' }}>
+                          {calculateProratedAmount(TEAM_ROLE_PRICES[newMember.role]?.price || 0).toLocaleString()}원
+                        </strong>
+                      </div>
+                    </div>
+
+                    {/* 추가 버튼 */}
+                    <button
+                      onClick={handleTeamInvite}
+                      disabled={teamLoading || !newMember.email}
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        background: (teamLoading || !newMember.email)
+                          ? 'rgba(59, 130, 246, 0.5)'
+                          : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                        border: 'none',
+                        borderRadius: '12px',
+                        color: '#ffffff',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        cursor: (teamLoading || !newMember.email) ? 'not-allowed' : 'pointer',
+                        boxShadow: (teamLoading || !newMember.email) ? 'none' : '0 8px 24px rgba(30, 58, 138, 0.4)'
+                      }}
+                    >
+                      {teamLoading ? '처리 중...' : `${TEAM_ROLE_PRICES[newMember.role]?.name || '팀원'} 추가하기`}
+                    </button>
+                  </div>
+                </>
+              )
+            ) : paymentType === 'recharge' ? (
               // 포인트 충전 UI
               subscriptionChecking ? (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -487,7 +882,42 @@ export default function PaymentPage() {
                   주문 요약
                 </h2>
 
-                {paymentType === 'recharge' && hasSubscription && selectedPackage ? (
+                {paymentType === 'team' && hasSubscription ? (
+                  <>
+                    <div style={{
+                      marginBottom: '24px',
+                      padding: '20px',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(59, 130, 246, 0.2)'
+                    }}>
+                      <div style={{ fontSize: '20px', fontWeight: '600', color: '#3b82f6', marginBottom: '8px' }}>
+                        팀원 관리
+                      </div>
+                      <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '12px' }}>
+                        현재 {teamMembers.length}명의 팀원
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.5)', lineHeight: '1.8' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>강사</span>
+                          <span>{teamMembers.filter(m => m.role === 'instructor').length}명</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>직원</span>
+                          <span>{teamMembers.filter(m => m.role === 'staff').length}명</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>알바</span>
+                          <span>{teamMembers.filter(m => m.role === 'parttime').length}명</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: '600', color: '#ffffff' }}>
+                      <span>월 추가 비용</span>
+                      <span style={{ color: '#3b82f6' }}>+{teamMembersCost.toLocaleString()}원</span>
+                    </div>
+                  </>
+                ) : paymentType === 'recharge' && hasSubscription && selectedPackage ? (
                   <>
                     <div style={{
                       marginBottom: '24px',

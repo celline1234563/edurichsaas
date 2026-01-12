@@ -17,6 +17,16 @@ export async function POST(request) {
       )
     }
 
+    // 팀원 추가 비용 조회
+    const { data: teamMembers } = await supabase
+      .from('team_members')
+      .select('monthly_price, role')
+      .eq('owner_user_id', customerKey)
+      .in('status', ['pending', 'active'])
+
+    const teamMembersCost = teamMembers?.reduce((sum, m) => sum + m.monthly_price, 0) || 0
+    const totalAmount = Number(amount) + teamMembersCost
+
     // 주문 ID 생성
     const orderId = `BILLING_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
 
@@ -31,9 +41,11 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         customerKey,
-        amount: Number(amount),
+        amount: totalAmount,
         orderId,
-        orderName,
+        orderName: teamMembersCost > 0
+          ? `${orderName} + 팀원 ${teamMembers.length}명`
+          : orderName,
       }),
     })
 

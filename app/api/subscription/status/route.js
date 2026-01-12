@@ -18,11 +18,11 @@ export async function GET(request) {
       )
     }
 
-    // 활성 구독 확인
+    // 활성 구독 확인 (customer_key 또는 user_id로 조회)
     const { data: subscription, error } = await supabase
       .from('subscriptions')
       .select('*')
-      .eq('user_id', userId)
+      .or(`customer_key.eq.${userId},user_id.eq.${userId}`)
       .eq('status', 'active')
       .single()
 
