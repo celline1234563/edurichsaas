@@ -40,7 +40,21 @@ function BillingSuccessContent() {
         const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
         window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
       } else {
-        // 세션이 없으면 로그인 페이지로 리다이렉트하면서 돌아올 경로 저장
+        // Supabase 세션이 없으면 API를 통해 세션 복구 시도
+        try {
+          const authRes = await fetch('/api/auth/session')
+          if (authRes.ok) {
+            const authData = await authRes.json()
+            if (authData.session?.access_token) {
+              const hash = `access_token=${encodeURIComponent(authData.session.access_token)}&refresh_token=${encodeURIComponent(authData.session.refresh_token || '')}`
+              window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
+              return
+            }
+          }
+        } catch (e) {
+          console.error('Session recovery failed:', e)
+        }
+        // 세션 복구 실패 시 로그인 필요 알림
         window.location.href = `${BRAIN_BASE_URL}${path}?authRequired=true&from=${encodeURIComponent(path)}`
       }
     } catch (error) {
