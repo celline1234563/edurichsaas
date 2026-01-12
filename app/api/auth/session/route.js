@@ -20,10 +20,19 @@ export async function OPTIONS() {
 export async function GET() {
   try {
     const supabase = await createSupabaseServerClient()
-    const { data: { session }, error } = await supabase.auth.getSession()
 
-    if (error || !session) {
-      return withCors(NextResponse.json({ error: 'NO_SESSION' }, { status: 401 }))
+    // getUser()를 먼저 호출하여 토큰 갱신 강제
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return withCors(NextResponse.json({ error: 'NO_SESSION', detail: userError?.message }, { status: 401 }))
+    }
+
+    // getUser() 성공 후 갱신된 세션 가져오기
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+    if (sessionError || !session) {
+      return withCors(NextResponse.json({ error: 'SESSION_REFRESH_FAILED' }, { status: 401 }))
     }
 
     return withCors(NextResponse.json({

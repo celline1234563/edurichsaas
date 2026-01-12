@@ -31,35 +31,36 @@ function BillingSuccessContent() {
   const navigateWithSession = async (path) => {
     try {
       const supabase = createSupabaseBrowserClient()
-      const { data: { session } } = await supabase.auth.getSession()
 
-      console.log('Session check:', session ? 'exists' : 'null')
+      // 먼저 getUser()로 토큰 갱신 시도
+      const { data: { user } } = await supabase.auth.getUser()
 
-      if (session) {
-        const { access_token, refresh_token } = session
-        const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
-        window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
-      } else {
-        // Supabase 세션이 없으면 API를 통해 세션 복구 시도
-        try {
-          const authRes = await fetch('/api/auth/session')
-          if (authRes.ok) {
-            const authData = await authRes.json()
-            if (authData.session?.access_token) {
-              const hash = `access_token=${encodeURIComponent(authData.session.access_token)}&refresh_token=${encodeURIComponent(authData.session.refresh_token || '')}`
-              window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
-              return
-            }
-          }
-        } catch (e) {
-          console.error('Session recovery failed:', e)
+      if (user) {
+        // getUser 성공 후 갱신된 세션 가져오기
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) {
+          const hash = `access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token || '')}`
+          window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
+          return
         }
-        // 세션 복구 실패 시 로그인 필요 알림
-        window.location.href = `${BRAIN_BASE_URL}${path}?authRequired=true&from=${encodeURIComponent(path)}`
       }
+
+      // 브라우저 세션이 없으면 서버 API를 통해 세션 복구 시도
+      const authRes = await fetch('/api/auth/session', { credentials: 'include' })
+      if (authRes.ok) {
+        const authData = await authRes.json()
+        if (authData.session?.access_token) {
+          const hash = `access_token=${encodeURIComponent(authData.session.access_token)}&refresh_token=${encodeURIComponent(authData.session.refresh_token || '')}`
+          window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
+          return
+        }
+      }
+
+      // 세션 복구 실패 시 로그인 페이지로 리다이렉트
+      window.location.href = `${BRAIN_BASE_URL}/login?redirect=${encodeURIComponent(path)}`
     } catch (error) {
       console.error('Failed to get session:', error)
-      window.location.href = `${BRAIN_BASE_URL}${path}`
+      window.location.href = `${BRAIN_BASE_URL}/login?redirect=${encodeURIComponent(path)}`
     }
   }
 
@@ -373,15 +374,15 @@ function BillingSuccessContent() {
           ) : (
             <div style={{
               padding: '16px',
-              background: 'rgba(251, 191, 36, 0.1)',
-              border: '1px solid rgba(251, 191, 36, 0.2)',
+              background: 'rgba(100, 116, 139, 0.1)',
+              border: '1px solid rgba(100, 116, 139, 0.2)',
               borderRadius: '12px',
               marginBottom: '24px',
               textAlign: 'left'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '18px' }}>👥</span>
-                <span style={{ fontSize: '14px', fontWeight: '600', color: '#fbbf24' }}>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#94a3b8' }}>
                   팀원을 추가하시겠어요?
                 </span>
               </div>
@@ -398,10 +399,10 @@ function BillingSuccessContent() {
                 style={{
                   display: 'inline-block',
                   padding: '8px 16px',
-                  background: 'rgba(251, 191, 36, 0.2)',
-                  border: '1px solid rgba(251, 191, 36, 0.3)',
+                  background: 'rgba(59, 130, 246, 0.15)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
                   borderRadius: '8px',
-                  color: '#fbbf24',
+                  color: '#60a5fa',
                   fontSize: '13px',
                   fontWeight: '500',
                   textDecoration: 'none'
