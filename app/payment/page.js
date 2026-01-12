@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
 
-// API 개별 연동 키 (test_ck_로 시작) - payment() 메서드용
-const TOSS_CLIENT_KEY = 'test_ck_yZqmkKeP8gpnEQad79Pn3bQRxB9l'
+// TODO: 테스트 후 환경변수로 복구 필요 - 문서 테스트 키로 변경
+const TOSS_CLIENT_KEY = 'test_ck_Poxy1XQL8RxKRabndZGLV7nO5Wml'
 
 // 팀원 역할별 가격
 const TEAM_ROLE_PRICES = {

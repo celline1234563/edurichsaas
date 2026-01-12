@@ -8,7 +8,7 @@ export async function POST(request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
     // TODO: 테스트 후 환경변수로 복구 필요
-    const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_Z1aOwX7K8myda0WRzdLj8yQxzvNP'
+    const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_kYG57Eba3G6bEnJY1ZE68pWDOxmA'
     const { authKey, customerKey } = await request.json()
 
     // 디버깅: 환경변수 로드 확인
