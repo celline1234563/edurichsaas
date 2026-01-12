@@ -4,8 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
-
-const BRAIN_BASE_URL = 'https://edurichbrain.ai.kr'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
 const plans = {
   starter: { name: 'Starter', monthlyPrice: 30000, yearlyPrice: 230000 },
@@ -29,9 +28,9 @@ function BillingSuccessContent() {
       if (session) {
         const { access_token, refresh_token } = session
         const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
-        window.location.href = `${BRAIN_BASE_URL}#${hash}`
+        window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription#${hash}`
       } else {
-        window.location.href = BRAIN_BASE_URL
+        window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription`
       }
     } catch (error) {
       console.error('Failed to get session:', error)
@@ -268,6 +267,47 @@ function BillingSuccessContent() {
               정기결제가 등록되었습니다. 매월 같은 날 자동으로 결제됩니다.
               언제든 마이페이지에서 구독을 취소할 수 있습니다.
             </p>
+          </div>
+
+          {/* 팀원 추가 안내 */}
+          <div style={{
+            padding: '16px',
+            background: 'rgba(251, 191, 36, 0.1)',
+            border: '1px solid rgba(251, 191, 36, 0.2)',
+            borderRadius: '12px',
+            marginBottom: '24px',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '18px' }}>👥</span>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#fbbf24' }}>
+                팀원을 추가하시겠어요?
+              </span>
+            </div>
+            <p style={{
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.7)',
+              lineHeight: '1.5',
+              margin: '0 0 12px 0'
+            }}>
+              강사, 직원, 알바를 추가하여 함께 서비스를 이용할 수 있습니다.
+            </p>
+            <Link
+              href="/payment?type=team"
+              style={{
+                display: 'inline-block',
+                padding: '8px 16px',
+                background: 'rgba(251, 191, 36, 0.2)',
+                border: '1px solid rgba(251, 191, 36, 0.3)',
+                borderRadius: '8px',
+                color: '#fbbf24',
+                fontSize: '13px',
+                fontWeight: '500',
+                textDecoration: 'none'
+              }}
+            >
+              팀원 추가하기 →
+            </Link>
           </div>
 
           {/* 영수증 링크 */}

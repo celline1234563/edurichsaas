@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams()
@@ -18,7 +19,7 @@ export default function PaymentSuccessPage() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer)
-          window.location.href = 'https://edurichbrain.ai.kr'
+          window.location.href = BRAIN_BASE_URL
           return 0
         }
         return prev - 1
@@ -254,7 +255,7 @@ export default function PaymentSuccessPage() {
 
         {/* CTA Button */}
         <button
-          onClick={() => window.location.href = 'https://edurichbrain.ai.kr'}
+          onClick={() => window.location.href = BRAIN_BASE_URL}
           style={{
             width: '100%',
             padding: '18px 32px',

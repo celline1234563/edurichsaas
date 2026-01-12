@@ -4,8 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
-
-const BRAIN_BASE_URL = 'https://edurichbrain.ai.kr'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
 export default function DemoPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -106,7 +107,7 @@ export default function DemoPage() {
             <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
             <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
             <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
-            <a href="https://edurichbrain.ai.kr/" target="_blank" rel="noopener noreferrer" className="mobile-menu-link active" onClick={closeMobileMenu}>데모</a>
+            <a href={BRAIN_BASE_URL} target="_blank" rel="noopener noreferrer" className="mobile-menu-link active" onClick={closeMobileMenu}>데모</a>
           </nav>
 
           <div className="mobile-menu-footer">
@@ -242,7 +243,7 @@ export default function DemoPage() {
           boxShadow: '0 0 40px rgba(59, 130, 246, 0.15), inset 0 0 20px rgba(0, 0, 0, 0.3)'
         }}>
           <iframe
-            src="https://edurichbrain.ai.kr/"
+            src={BRAIN_BASE_URL}
             style={{
               width: '100%',
               height: '100%',

@@ -1,6 +1,7 @@
 // app/auth/callback/route.js
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { BRAIN_BASE_URL, SAAS_BASE_URL } from '@/lib/constants'
 
 function getSafeNextUrl(nextRaw) {
   if (!nextRaw) return null
@@ -10,7 +11,8 @@ function getSafeNextUrl(nextRaw) {
 
     // ✅ 허용할 origin(운영 + 로컬 개발)
     const ALLOWED_ORIGINS = new Set([
-      'https://edurichbrain.ai.kr',
+      SAAS_BASE_URL,
+      BRAIN_BASE_URL,
       'http://localhost:3000',
       'http://127.0.0.1:3000',
     ])

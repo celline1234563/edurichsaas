@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
 export default function HomePage() {
   const [authStatus, setAuthStatus] = useState('loading')
@@ -93,7 +94,7 @@ export default function HomePage() {
       return
     }
 
-    window.open('https://edurichbrain.ai.kr/', '_blank')
+    window.open(BRAIN_BASE_URL, '_blank')
   }
 
   const fillSuggestion = (text) => {
@@ -238,7 +239,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <a
-              href="https://edurichbrain.vercel.app"
+              href={BRAIN_BASE_URL}
               target="_blank"
               rel="noopener noreferrer"
               style={{

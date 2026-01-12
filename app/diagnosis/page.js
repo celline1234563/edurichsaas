@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 import LevelProgressSelector from '@/components/LevelProgressSelector'
 
 export default function DiagnosisPage() {
@@ -97,7 +98,7 @@ export default function DiagnosisPage() {
 
               <button
                 onClick={() => {
-                  window.open('https://edurichbrain.ai.kr/diagnosis', '_blank')
+                  window.open(`${BRAIN_BASE_URL}/diagnosis`, '_blank')
                 }}
                 style={{
                   width: '100%',

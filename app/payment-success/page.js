@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import useIsMobile from '@/hooks/useIsMobile'
+import { BRAIN_BASE_URL } from '@/lib/constants'
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
@@ -20,7 +21,7 @@ function PaymentSuccessContent() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer)
-          window.location.href = 'https://edurichbrain.ai.kr'
+          window.location.href = BRAIN_BASE_URL
           return 0
         }
         return prev - 1
@@ -256,7 +257,7 @@ function PaymentSuccessContent() {
 
         {/* CTA Button */}
         <button
-          onClick={() => window.location.href = 'https://edurichbrain.ai.kr'}
+          onClick={() => window.location.href = BRAIN_BASE_URL}
           style={{
             width: '100%',
             padding: isMobile ? '14px 24px' : '18px 32px',
