@@ -13,12 +13,20 @@ const plans = {
   enterprise: { name: 'Enterprise', monthlyPrice: 599000, yearlyPrice: 4800000 }
 }
 
+// 팀원 역할별 가격
+const TEAM_ROLE_PRICES = {
+  instructor: { name: '강사', price: 13000 },
+  staff: { name: '직원', price: 8000 },
+  parttime: { name: '알바', price: 4000 }
+}
+
 function BillingSuccessContent() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState('processing') // processing, success, error
   const [paymentData, setPaymentData] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [retryUrl, setRetryUrl] = useState('/payment')
+  const [addedTeamMembers, setAddedTeamMembers] = useState([])
 
   const handleStartService = async () => {
     try {
@@ -63,8 +71,29 @@ function BillingSuccessContent() {
         return
       }
 
-      const amount = cycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice
-      const orderName = `EduRichBrain ${plan.name} ${cycle === 'monthly' ? '월간' : '연간'} 구독`
+      // sessionStorage에서 팀원 정보 가져오기
+      let pendingTeamMembers = []
+      try {
+        const storedMembers = sessionStorage.getItem('pendingTeamMembers')
+        if (storedMembers) {
+          pendingTeamMembers = JSON.parse(storedMembers)
+        }
+      } catch (e) {
+        console.error('팀원 정보 파싱 오류:', e)
+      }
+
+      // 팀원 비용 계산
+      const teamMembersCost = pendingTeamMembers.reduce(
+        (sum, m) => sum + (TEAM_ROLE_PRICES[m.role]?.price || 0), 0
+      )
+
+      const baseAmount = cycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice
+      const amount = baseAmount + teamMembersCost
+
+      let orderName = `EduRichBrain ${plan.name} ${cycle === 'monthly' ? '월간' : '연간'} 구독`
+      if (pendingTeamMembers.length > 0) {
+        orderName += ` + 팀원 ${pendingTeamMembers.length}명`
+      }
 
       try {
         // 1. 빌링키 발급 API 호출
@@ -84,7 +113,7 @@ function BillingSuccessContent() {
 
         const { billingKey } = billingKeyResult.data
 
-        // 2. 빌링키로 첫 결제 실행
+        // 2. 빌링키로 첫 결제 실행 (팀원 정보 포함)
         const paymentResponse = await fetch('/api/payments/billing/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -94,7 +123,8 @@ function BillingSuccessContent() {
             amount,
             orderName,
             planId,
-            cycle
+            cycle,
+            teamMembers: pendingTeamMembers // 팀원 정보 전달
           })
         })
 
@@ -102,7 +132,11 @@ function BillingSuccessContent() {
 
         if (paymentResult.success) {
           setPaymentData(paymentResult.data)
+          setAddedTeamMembers(pendingTeamMembers)
           setStatus('success')
+
+          // 성공 시 sessionStorage 정리
+          sessionStorage.removeItem('pendingTeamMembers')
         } else {
           setStatus('error')
           setErrorMessage(paymentResult.message || '결제 처리에 실패했습니다.')
@@ -269,46 +303,88 @@ function BillingSuccessContent() {
             </p>
           </div>
 
-          {/* 팀원 추가 안내 */}
-          <div style={{
-            padding: '16px',
-            background: 'rgba(251, 191, 36, 0.1)',
-            border: '1px solid rgba(251, 191, 36, 0.2)',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            textAlign: 'left'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '18px' }}>👥</span>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#fbbf24' }}>
-                팀원을 추가하시겠어요?
-              </span>
-            </div>
-            <p style={{
-              fontSize: '13px',
-              color: 'rgba(255, 255, 255, 0.7)',
-              lineHeight: '1.5',
-              margin: '0 0 12px 0'
+          {/* 팀원 추가 결과 또는 안내 */}
+          {addedTeamMembers.length > 0 ? (
+            <div style={{
+              padding: '16px',
+              background: 'rgba(34, 197, 94, 0.1)',
+              border: '1px solid rgba(34, 197, 94, 0.2)',
+              borderRadius: '12px',
+              marginBottom: '24px',
+              textAlign: 'left'
             }}>
-              강사, 직원, 알바를 추가하여 함께 서비스를 이용할 수 있습니다.
-            </p>
-            <Link
-              href="/payment?type=team"
-              style={{
-                display: 'inline-block',
-                padding: '8px 16px',
-                background: 'rgba(251, 191, 36, 0.2)',
-                border: '1px solid rgba(251, 191, 36, 0.3)',
-                borderRadius: '8px',
-                color: '#fbbf24',
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <span style={{ fontSize: '18px' }}>👥</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#22c55e' }}>
+                  팀원 {addedTeamMembers.length}명 추가 완료
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {addedTeamMembers.map((member, idx) => (
+                  <div key={idx} style={{
+                    padding: '10px 12px',
+                    background: 'rgba(15, 23, 42, 0.4)',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '13px', color: '#ffffff' }}>
+                        {member.name || member.email}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        {TEAM_ROLE_PRICES[member.role]?.name}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                      +{TEAM_ROLE_PRICES[member.role]?.price.toLocaleString()}원/월
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              padding: '16px',
+              background: 'rgba(251, 191, 36, 0.1)',
+              border: '1px solid rgba(251, 191, 36, 0.2)',
+              borderRadius: '12px',
+              marginBottom: '24px',
+              textAlign: 'left'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '18px' }}>👥</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#fbbf24' }}>
+                  팀원을 추가하시겠어요?
+                </span>
+              </div>
+              <p style={{
                 fontSize: '13px',
-                fontWeight: '500',
-                textDecoration: 'none'
-              }}
-            >
-              팀원 추가하기 →
-            </Link>
-          </div>
+                color: 'rgba(255, 255, 255, 0.7)',
+                lineHeight: '1.5',
+                margin: '0 0 12px 0'
+              }}>
+                강사, 직원, 알바를 추가하여 함께 서비스를 이용할 수 있습니다.
+              </p>
+              <Link
+                href="/payment?type=team"
+                style={{
+                  display: 'inline-block',
+                  padding: '8px 16px',
+                  background: 'rgba(251, 191, 36, 0.2)',
+                  border: '1px solid rgba(251, 191, 36, 0.3)',
+                  borderRadius: '8px',
+                  color: '#fbbf24',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  textDecoration: 'none'
+                }}
+              >
+                팀원 추가하기 →
+              </Link>
+            </div>
+          )}
 
           {/* 영수증 링크 */}
           {paymentData?.receipt?.url && (

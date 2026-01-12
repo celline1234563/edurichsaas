@@ -9,7 +9,7 @@ export async function POST(request) {
     )
     // 토스페이먼츠 시크릿 키 (환경변수 우선, fallback으로 하드코딩)
     const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_Z1aOwX7K8myda0WRzdLj8yQxzvNP'
-    const { billingKey, customerKey, amount, orderName, planId, cycle } = await request.json()
+    const { billingKey, customerKey, amount, orderName, planId, cycle, teamMembers: newTeamMembers } = await request.json()
 
     if (!billingKey || !amount || !orderName) {
       return NextResponse.json(
@@ -119,6 +119,34 @@ export async function POST(request) {
 
     if (subscriptionError) {
       console.error('Failed to update subscription:', subscriptionError)
+    }
+
+    // 새 팀원 등록 (구독 결제 시 함께 추가된 팀원)
+    if (newTeamMembers && newTeamMembers.length > 0) {
+      const TEAM_ROLE_PRICES = {
+        instructor: { name: '강사', price: 13000 },
+        staff: { name: '직원', price: 8000 },
+        parttime: { name: '알바', price: 4000 }
+      }
+
+      const teamMembersToInsert = newTeamMembers.map(member => ({
+        owner_user_id: customerKey,
+        member_email: member.email,
+        member_name: member.name || null,
+        role: member.role,
+        role_name: TEAM_ROLE_PRICES[member.role]?.name || member.role,
+        monthly_price: TEAM_ROLE_PRICES[member.role]?.price || 0,
+        status: 'pending', // 초대 대기 상태
+        invited_at: new Date().toISOString()
+      }))
+
+      const { error: teamInsertError } = await supabase
+        .from('team_members')
+        .insert(teamMembersToInsert)
+
+      if (teamInsertError) {
+        console.error('Failed to add team members:', teamInsertError)
+      }
     }
 
     return NextResponse.json({
