@@ -386,27 +386,49 @@ function BillingSuccessContent() {
             </div>
           )}
 
-          {/* 영수증 링크 */}
-          {paymentData?.receipt?.url && (
-            <a
-              href={paymentData.receipt.url}
-              target="_blank"
-              rel="noopener noreferrer"
+          {/* 영수증 및 구독현황 버튼 */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            marginBottom: '24px'
+          }}>
+            {paymentData?.receipt?.url && (
+              <a
+                href={paymentData.receipt.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  borderRadius: '12px',
+                  color: '#3b82f6',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                  textAlign: 'center'
+                }}
+              >
+                영수증 보기
+              </a>
+            )}
+            <Link
+              href="/mypage?tab=subscription"
               style={{
-                display: 'block',
+                flex: 1,
                 padding: '12px',
-                background: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
+                background: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
                 borderRadius: '12px',
-                color: '#3b82f6',
+                color: '#22c55e',
                 fontSize: '14px',
                 textDecoration: 'none',
-                marginBottom: '24px'
+                textAlign: 'center'
               }}
             >
-              영수증 보기
-            </a>
-          )}
+              구독 및 결제현황 확인
+            </Link>
+          </div>
 
           {/* 서비스 시작 버튼 */}
           <button
