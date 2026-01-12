@@ -7,16 +7,9 @@ export async function POST(request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
-    // TODO: 테스트 후 환경변수로 복구 필요
-    const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_kYG57Eba3G6bEnJY1ZE68pWDOxmA'
+    // 토스페이먼츠 시크릿 키 (환경변수 우선, fallback으로 하드코딩)
+    const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_Z1aOwX7K8myda0WRzdLj8yQxzvNP'
     const { authKey, customerKey } = await request.json()
-
-    // 디버깅: 환경변수 로드 확인
-    console.log('=== Billing Issue Debug ===')
-    console.log('TOSS_SECRET_KEY exists:', !!TOSS_SECRET_KEY)
-    console.log('TOSS_SECRET_KEY length:', TOSS_SECRET_KEY?.length)
-    console.log('authKey:', authKey?.substring(0, 10) + '...')
-    console.log('customerKey:', customerKey?.substring(0, 10) + '...')
 
     if (!TOSS_SECRET_KEY) {
       console.error('TOSS_SECRET_KEY is not set!')

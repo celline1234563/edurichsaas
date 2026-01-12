@@ -7,8 +7,8 @@ export async function POST(request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
-    // TODO: 테스트 후 환경변수로 복구 필요
-    const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_kYG57Eba3G6bEnJY1ZE68pWDOxmA'
+    // 토스페이먼츠 시크릿 키 (환경변수 우선, fallback으로 하드코딩)
+    const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY || 'test_sk_Z1aOwX7K8myda0WRzdLj8yQxzvNP'
     const { billingKey, customerKey, amount, orderName, planId, cycle } = await request.json()
 
     if (!billingKey || !amount || !orderName) {
