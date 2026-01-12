@@ -10,6 +10,21 @@ export async function POST(request) {
     const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY
     const { authKey, customerKey } = await request.json()
 
+    // 디버깅: 환경변수 로드 확인
+    console.log('=== Billing Issue Debug ===')
+    console.log('TOSS_SECRET_KEY exists:', !!TOSS_SECRET_KEY)
+    console.log('TOSS_SECRET_KEY length:', TOSS_SECRET_KEY?.length)
+    console.log('authKey:', authKey?.substring(0, 10) + '...')
+    console.log('customerKey:', customerKey?.substring(0, 10) + '...')
+
+    if (!TOSS_SECRET_KEY) {
+      console.error('TOSS_SECRET_KEY is not set!')
+      return NextResponse.json(
+        { success: false, message: '서버 설정 오류: 시크릿 키가 설정되지 않았습니다.' },
+        { status: 500 }
+      )
+    }
+
     if (!authKey || !customerKey) {
       return NextResponse.json(
         { success: false, message: 'authKey와 customerKey가 필요합니다.' },
