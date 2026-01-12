@@ -19,17 +19,17 @@ function PaymentSuccessContent() {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (session) {
-        // 세션이 있으면 토큰과 함께 brain으로 이동
+        // 세션이 있으면 토큰과 함께 마이페이지 구독 탭으로 이동
         const { access_token, refresh_token } = session
         const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
-        window.location.href = `${BRAIN_BASE_URL}#${hash}`
+        window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription#${hash}`
       } else {
-        // 세션이 없으면 그냥 brain으로 이동
-        window.location.href = BRAIN_BASE_URL
+        // 세션이 없으면 마이페이지 구독 탭으로 이동
+        window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription`
       }
     } catch (error) {
       console.error('세션 가져오기 실패:', error)
-      window.location.href = BRAIN_BASE_URL
+      window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription`
     }
   }
 

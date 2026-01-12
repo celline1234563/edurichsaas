@@ -19,7 +19,7 @@ export default function PaymentSuccessPage() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer)
-          window.location.href = BRAIN_BASE_URL
+          window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription`
           return 0
         }
         return prev - 1
@@ -255,7 +255,7 @@ export default function PaymentSuccessPage() {
 
         {/* CTA Button */}
         <button
-          onClick={() => window.location.href = BRAIN_BASE_URL}
+          onClick={() => window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription`}
           style={{
             width: '100%',
             padding: '18px 32px',
