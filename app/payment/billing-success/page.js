@@ -39,8 +39,9 @@ function BillingSuccessContent() {
         // getUser 성공 후 갱신된 세션 가져오기
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.access_token) {
+          // /auth/token-login 엔드포인트를 통해 세션 전달
           const hash = `access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token || '')}`
-          window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
+          window.location.href = `${BRAIN_BASE_URL}/auth/token-login?redirect=${encodeURIComponent(path)}#${hash}`
           return
         }
       }
@@ -51,7 +52,7 @@ function BillingSuccessContent() {
         const authData = await authRes.json()
         if (authData.session?.access_token) {
           const hash = `access_token=${encodeURIComponent(authData.session.access_token)}&refresh_token=${encodeURIComponent(authData.session.refresh_token || '')}`
-          window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
+          window.location.href = `${BRAIN_BASE_URL}/auth/token-login?redirect=${encodeURIComponent(path)}#${hash}`
           return
         }
       }
