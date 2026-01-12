@@ -28,22 +28,34 @@ function BillingSuccessContent() {
   const [retryUrl, setRetryUrl] = useState('/payment')
   const [addedTeamMembers, setAddedTeamMembers] = useState([])
 
-  const handleStartService = async () => {
+  const navigateWithSession = async (path) => {
     try {
       const supabase = createSupabaseBrowserClient()
       const { data: { session } } = await supabase.auth.getSession()
 
+      console.log('Session check:', session ? 'exists' : 'null')
+
       if (session) {
         const { access_token, refresh_token } = session
         const hash = `access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}`
-        window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription#${hash}`
+        window.location.href = `${BRAIN_BASE_URL}${path}#${hash}`
       } else {
-        window.location.href = `${BRAIN_BASE_URL}/mypage?tab=subscription`
+        // 세션이 없으면 로그인 페이지로 리다이렉트하면서 돌아올 경로 저장
+        window.location.href = `${BRAIN_BASE_URL}${path}?authRequired=true&from=${encodeURIComponent(path)}`
       }
     } catch (error) {
       console.error('Failed to get session:', error)
-      window.location.href = BRAIN_BASE_URL
+      window.location.href = `${BRAIN_BASE_URL}${path}`
     }
+  }
+
+  const handleStartService = async () => {
+    await navigateWithSession('/mypage?tab=subscription')
+  }
+
+  const handleCheckSubscription = async (e) => {
+    e.preventDefault()
+    await navigateWithSession('/mypage?tab=subscription')
   }
 
   useEffect(() => {
@@ -412,8 +424,8 @@ function BillingSuccessContent() {
                 영수증 보기
               </a>
             )}
-            <Link
-              href="/mypage?tab=subscription"
+            <button
+              onClick={handleCheckSubscription}
               style={{
                 flex: 1,
                 padding: '12px',
@@ -423,11 +435,12 @@ function BillingSuccessContent() {
                 color: '#22c55e',
                 fontSize: '14px',
                 textDecoration: 'none',
-                textAlign: 'center'
+                textAlign: 'center',
+                cursor: 'pointer'
               }}
             >
               구독 및 결제현황 확인
-            </Link>
+            </button>
           </div>
 
           {/* 서비스 시작 버튼 */}
