@@ -90,23 +90,142 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#020617' }}>
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <button
-          className="mobile-menu-btn"
-          onClick={toggleMobileMenu}
-          aria-label="메뉴 열기"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-      )}
+    <div style={{ minHeight: '100vh', background: '#020617' }}>
+      {/* ===== Top Navbar ===== */}
+      <nav style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        height: '64px',
+        padding: '0 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: 'rgba(2,6,23,0.7)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(34,211,238,0.08)',
+      }}>
+        {/* Logo */}
+        <Link href="/" style={{
+          fontSize: '20px',
+          fontWeight: '700',
+          color: '#ffffff',
+          textDecoration: 'none',
+          letterSpacing: '0.02em',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}>
+          <span style={{ color: '#22d3ee' }}>EduRich</span>Brain
+        </Link>
+
+        {/* Desktop Nav Links */}
+        {!isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+            {[
+              { label: '제품', href: '/' },
+              { label: '요금제', href: '/pricing' },
+              { label: '경영진단', href: '/diagnosis' },
+              { label: '블로그', href: '/blog' },
+              { label: '회사', href: '/about' },
+              { label: '데모', href: '/demo' },
+            ].map((item) => (
+              <Link key={item.label} href={item.href} style={{
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'rgba(203,213,225,0.8)',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}>
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Right: CTA buttons + mobile toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {!isMobile && (
+            <>
+              <a
+                href={BRAIN_BASE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: '8px 16px',
+                  background: 'transparent',
+                  border: '1px solid rgba(71,85,105,0.6)',
+                  borderRadius: '8px',
+                  color: '#e2e8f0',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                }}
+              >
+                앱 시작
+              </a>
+              <Link href="/signup" style={{
+                padding: '8px 20px',
+                background: 'linear-gradient(135deg, #2563eb, #0891b2)',
+                borderRadius: '8px',
+                color: '#ffffff',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
+                boxShadow: '0 0 20px rgba(34,211,238,0.2)',
+              }}>
+                무료로 시작하기
+              </Link>
+            </>
+          )}
+
+          {/* Mobile hamburger */}
+          {isMobile && (
+            <button
+              onClick={toggleMobileMenu}
+              aria-label="메뉴 열기"
+              style={{
+                width: '40px',
+                height: '40px',
+                background: 'none',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#e2e8f0',
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
+          )}
+        </div>
+      </nav>
 
       {/* Mobile Menu Panel */}
       {isMobile && mobileMenuOpen && (
-        <div className="mobile-menu-panel">
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100vh',
+          background: 'rgba(2,6,23,0.98)',
+          backdropFilter: 'blur(20px)',
+          zIndex: 2000,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '80px 24px 24px',
+        }}>
           <button
             onClick={closeMobileMenu}
             style={{
@@ -130,113 +249,55 @@ export default function HomePage() {
             </svg>
           </button>
 
-          <div className="mobile-menu-logo">EduRichBrain</div>
+          <div style={{ fontSize: '24px', fontWeight: '700', color: '#ffffff', marginBottom: '32px', textAlign: 'center' }}>
+            <span style={{ color: '#22d3ee' }}>EduRich</span>Brain
+          </div>
 
-          <nav className="mobile-menu-nav">
-            <Link href="/" className="mobile-menu-link active" onClick={closeMobileMenu}>제품</Link>
-            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
-            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
-            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
-            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
-            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
-          </nav>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {[
+              { label: '제품', href: '/' },
+              { label: '요금제', href: '/pricing' },
+              { label: '경영진단', href: '/diagnosis' },
+              { label: '블로그', href: '/blog' },
+              { label: '회사', href: '/about' },
+              { label: '데모', href: '/demo' },
+            ].map((item) => (
+              <Link key={item.label} href={item.href} onClick={closeMobileMenu} style={{
+                padding: '16px 20px',
+                background: 'rgba(15,23,42,0.6)',
+                border: '1px solid rgba(34,211,238,0.12)',
+                borderRadius: '12px',
+                color: 'rgba(255,255,255,0.8)',
+                textDecoration: 'none',
+                fontSize: '16px',
+              }}>
+                {item.label}
+              </Link>
+            ))}
+          </div>
 
-          <div className="mobile-menu-footer">
-            <Link
-              href="/signup"
-              className="login-btn"
-              onClick={closeMobileMenu}
-              style={{ width: '100%', textAlign: 'center' }}
-            >
-              시작하기
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <Link href="/signup" onClick={closeMobileMenu} style={{
+              display: 'block',
+              width: '100%',
+              padding: '14px 0',
+              background: 'linear-gradient(135deg, #2563eb, #0891b2)',
+              borderRadius: '12px',
+              color: '#ffffff',
+              textDecoration: 'none',
+              fontSize: '16px',
+              fontWeight: '600',
+              textAlign: 'center',
+              boxShadow: '0 0 20px rgba(34,211,238,0.2)',
+            }}>
+              무료로 시작하기
             </Link>
           </div>
         </div>
       )}
 
-      {/* Left Sidebar Navigation (Desktop Only) */}
-      <aside className="sidebar">
-        <Link href="/" className="sidebar-logo">
-          EduRichBrain
-        </Link>
-
-        <nav className="sidebar-nav">
-          <Link href="/" className="sidebar-link active">제품</Link>
-          <Link href="/pricing" className="sidebar-link">요금제</Link>
-          <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
-          <Link href="/blog" className="sidebar-link">블로그</Link>
-          <Link href="/about" className="sidebar-link">회사</Link>
-          <Link href="/demo" className="sidebar-link">데모</Link>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div style={{
-            padding: '16px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
-            border: '1px solid rgba(34, 211, 238, 0.15)'
-          }}>
-            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>학원 경영의 모든 것</p>
-            <p style={{ fontSize: '14px', fontWeight: '600', color: '#ffffff' }}>Pro 플랜 업그레이드</p>
-          </div>
-        </div>
-      </aside>
-
       {/* Main Content Area */}
-      <div className="main-area" style={{ background: '#020617' }}>
-        {/* Top Bar */}
-        <header style={{
-          height: '60px',
-          padding: '0 32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          background: 'rgba(2,6,23,0.6)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(34,211,238,0.08)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <a
-              href={BRAIN_BASE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                padding: '10px 16px',
-                background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              앱 시작
-            </a>
-            <Link href="/signup" style={{
-              padding: '8px 20px',
-              background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-              border: '1px solid rgba(34,211,238,0.4)',
-              borderRadius: '8px',
-              color: '#ffffff',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              boxShadow: '0 4px 12px rgba(34,211,238,0.2)',
-            }}>
-              시작하기
-            </Link>
-          </div>
-        </header>
+      <div style={{ background: '#020617' }}>
 
         {/* === HERO SECTION (3D Neural Brain) === */}
         <HeroSection />
