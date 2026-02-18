@@ -1,11 +1,14 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { Sparkles, Zap, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
+const NeuralNetwork = dynamic(() => import('./NeuralNetwork'), { ssr: false })
+
 export default function HeroSection() {
-  const CONTENT_DELAY = 0.3
+  const CONTENT_DELAY = 0.5
 
   return (
     <section style={{
@@ -103,6 +106,9 @@ export default function HeroSection() {
           pointerEvents: 'none',
         }} />
       </div>
+
+      {/* === Minimal Neural Network overlay === */}
+      <NeuralNetwork />
 
       <div style={{
         position: 'relative',
