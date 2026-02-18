@@ -7,6 +7,7 @@ import useIsMobile from '@/hooks/useIsMobile'
 export default function PricingPage() {
   const [showPointModal, setShowPointModal] = useState(false)
   const [billingCycle, setBillingCycle] = useState('monthly') // 'monthly' or 'yearly'
+  const [expandedPlan, setExpandedPlan] = useState(null)
   const isMobile = useIsMobile()
 
   // 요금제 데이터
@@ -279,7 +280,13 @@ export default function PricingPage() {
           <div className="pricing-grid" style={{
             marginBottom: isMobile ? '80px' : '120px',
           }}>
-            {plans.map((plan, index) => (
+            {plans.map((plan, index) => {
+              const isExpanded = expandedPlan === plan.id
+              const priceText = billingCycle === 'monthly'
+                ? plan.monthlyPrice.toLocaleString()
+                : Math.round(plan.yearlyPrice / 12).toLocaleString()
+
+              return (
               <div
                 key={plan.id}
                 style={{
@@ -288,16 +295,18 @@ export default function PricingPage() {
                   backdropFilter: 'blur(20px) saturate(180%)',
                   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                   border: plan.popular ? '2px solid rgba(59, 130, 246, 0.5)' : '1px solid rgba(59, 130, 246, 0.2)',
-                  borderRadius: '24px',
-                  padding: isMobile ? '32px 24px' : '40px 32px',
+                  borderRadius: isMobile ? '16px' : '24px',
+                  padding: isMobile ? '0' : '40px 32px',
                   boxShadow: plan.popular
                     ? '0 20px 60px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     : '0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   cursor: 'pointer',
                   transform: (plan.popular && !isMobile) ? 'scale(1.05)' : 'scale(1)',
-                  zIndex: plan.popular ? 10 : 1
+                  zIndex: plan.popular ? 10 : 1,
+                  overflow: 'hidden',
                 }}
+                onClick={() => isMobile && setExpandedPlan(isExpanded ? null : plan.id)}
                 onMouseEnter={(e) => {
                   if (!isMobile) {
                     e.currentTarget.style.transform = 'scale(1.05) translateY(-8px)'
@@ -317,8 +326,8 @@ export default function PricingPage() {
                   }
                 }}
               >
-                {/* Popular Badge */}
-                {plan.popular && (
+                {/* Popular Badge - desktop only */}
+                {plan.popular && !isMobile && (
                   <div style={{
                     position: 'absolute',
                     top: '-16px',
@@ -336,238 +345,199 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                {/* Plan Header */}
-                <div style={{ marginBottom: isMobile ? '24px' : '32px' }}>
-                  <h3 style={{
-                    fontSize: isMobile ? '20px' : '24px',
-                    fontWeight: '600',
-                    color: '#ffffff',
-                    marginBottom: '12px'
-                  }}>
-                    {plan.name}
-                  </h3>
-
-                  {/* Price */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{
-                        fontSize: isMobile ? '28px' : '32px',
-                        fontWeight: '700',
-                        color: plan.color
-                      }}>
-                        {billingCycle === 'monthly'
-                          ? plan.monthlyPrice.toLocaleString()
-                          : Math.round(plan.yearlyPrice / 12).toLocaleString()
-                        }원
-                      </span>
-                      <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: isMobile ? '13px' : '14px' }}>/월</span>
-                    </div>
-                    {billingCycle === 'yearly' && (
-                      <p style={{
-                        color: '#86efac',
-                        fontSize: '13px',
-                        marginTop: '4px',
-                        fontWeight: '600'
-                      }}>
-                        연 {plan.yearlyPrice.toLocaleString()}원 (
-                        {Math.round((1 - (plan.yearlyPrice / 12) / plan.monthlyPrice) * 100)}% 할인)
-                      </p>
-                    )}
-                    <p style={{
-                      color: 'rgba(255, 255, 255, 0.4)',
-                      fontSize: '13px',
-                      marginTop: '4px'
+                {/* Mobile Accordion Header */}
+                {isMobile ? (
+                  <div style={{ padding: '20px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                     }}>
-                      VAT 포함
-                    </p>
-                  </div>
-
-                  {/* AI Points */}
-                  <div style={{
-                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(59, 130, 246, 0.2)',
-                    marginBottom: '8px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
+                          {plan.name}
+                        </h3>
+                        {plan.popular && (
+                          <span style={{
+                            padding: '2px 10px',
+                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                            borderRadius: '12px',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            color: '#ffffff',
+                          }}>인기</span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '20px', fontWeight: '700', color: plan.color }}>
+                            {priceText}원
+                          </span>
+                          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>/월</span>
+                        </div>
+                        <svg
+                          width="20" height="20" viewBox="0 0 24 24" fill="none"
+                          style={{
+                            color: '#60a5fa',
+                            transition: 'transform 0.3s',
+                            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginTop: '8px',
+                      color: '#60a5fa',
+                      fontSize: '13px',
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                         <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="currentColor"/>
                       </svg>
-                      <span style={{ color: '#60a5fa', fontSize: '14px', fontWeight: '600' }}>
-                        AI 포인트
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>
-                      {plan.aiPoints.toLocaleString()}P
+                      AI {plan.aiPoints.toLocaleString()}P
+                      {plan.badge && <span style={{ color: '#93c5fd', marginLeft: '8px' }}>· {plan.badge}</span>}
                     </div>
                   </div>
-
-                  {plan.badge && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      color: '#93c5fd',
-                      textAlign: 'center',
-                      fontWeight: '500'
-                    }}>
-                      💡 {plan.badge}
-                    </div>
-                  )}
-                </div>
-
-                {/* Features */}
-                <div style={{ marginBottom: '32px' }}>
-                  <div style={{
-                    fontSize: '13px',
-                    color: 'rgba(147, 197, 253, 0.8)',
-                    fontWeight: '600',
-                    marginBottom: '16px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    포함 사항
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
-                      </svg>
-                      <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                        {plan.features.account}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
-                      </svg>
-                      <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                        {plan.features.students}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
-                      </svg>
-                      <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                        {plan.features.crm}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
-                      </svg>
-                      <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                        {plan.features.sms}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#FEE500', marginTop: '2px', flexShrink: 0 }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
-                      </svg>
-                      <span style={{ color: 'rgba(254, 229, 0, 0.9)', fontSize: '14px', fontWeight: '600' }}>
-                        {plan.features.kakao}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* AI Usage Examples */}
-                  <div style={{
-                    marginTop: '24px',
-                    paddingTop: '20px',
-                    borderTop: '1px solid rgba(59, 130, 246, 0.15)'
-                  }}>
-                    <div style={{
-                      fontSize: '12px',
-                      color: 'rgba(147, 197, 253, 0.7)',
-                      fontWeight: '600',
-                      marginBottom: '12px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em'
-                    }}>
-                      AI 활용 예시
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {plan.features.aiUsage.map((usage, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                          <span style={{ color: '#60a5fa', fontSize: '16px', marginTop: '-2px' }}>•</span>
-                          <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}>
-                            {usage}
+                ) : (
+                  <>
+                    {/* Desktop Plan Header */}
+                    <div style={{ marginBottom: '32px' }}>
+                      <h3 style={{ fontSize: '24px', fontWeight: '600', color: '#ffffff', marginBottom: '12px' }}>
+                        {plan.name}
+                      </h3>
+                      <div style={{ marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                          <span style={{ fontSize: '32px', fontWeight: '700', color: plan.color }}>
+                            {priceText}원
                           </span>
+                          <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '14px' }}>/월</span>
+                        </div>
+                        {billingCycle === 'yearly' && (
+                          <p style={{ color: '#86efac', fontSize: '13px', marginTop: '4px', fontWeight: '600' }}>
+                            연 {plan.yearlyPrice.toLocaleString()}원 ({Math.round((1 - (plan.yearlyPrice / 12) / plan.monthlyPrice) * 100)}% 할인)
+                          </p>
+                        )}
+                        <p style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '13px', marginTop: '4px' }}>VAT 포함</p>
+                      </div>
+                      <div style={{
+                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
+                        padding: '16px', borderRadius: '12px',
+                        border: '1px solid rgba(59, 130, 246, 0.2)', marginBottom: '8px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa' }}>
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="currentColor"/>
+                          </svg>
+                          <span style={{ color: '#60a5fa', fontSize: '14px', fontWeight: '600' }}>AI 포인트</span>
+                        </div>
+                        <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{plan.aiPoints.toLocaleString()}P</div>
+                      </div>
+                      {plan.badge && (
+                        <div style={{
+                          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))',
+                          padding: '8px 12px', borderRadius: '8px', fontSize: '12px',
+                          color: '#93c5fd', textAlign: 'center', fontWeight: '500'
+                        }}>💡 {plan.badge}</div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* Features & CTA - always visible on desktop, accordion on mobile */}
+                <div style={{
+                  ...(isMobile && {
+                    maxHeight: isExpanded ? '800px' : '0px',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.4s ease',
+                    padding: isExpanded ? '0 20px 20px' : '0 20px',
+                  }),
+                }}>
+                  {isMobile && billingCycle === 'yearly' && (
+                    <p style={{ color: '#86efac', fontSize: '12px', marginBottom: '12px', fontWeight: '600' }}>
+                      연 {plan.yearlyPrice.toLocaleString()}원 ({Math.round((1 - (plan.yearlyPrice / 12) / plan.monthlyPrice) * 100)}% 할인)
+                    </p>
+                  )}
+
+                  <div style={{ marginBottom: isMobile ? '20px' : '32px' }}>
+                    <div style={{
+                      fontSize: isMobile ? '12px' : '13px',
+                      color: 'rgba(147, 197, 253, 0.8)',
+                      fontWeight: '600', marginBottom: isMobile ? '12px' : '16px',
+                      textTransform: 'uppercase', letterSpacing: '0.05em'
+                    }}>포함 사항</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '8px' : '12px' }}>
+                      {[plan.features.account, plan.features.students, plan.features.crm, plan.features.sms].map((feat, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
+                          </svg>
+                          <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: isMobile ? '13px' : '14px' }}>{feat}</span>
                         </div>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Premium Features */}
-                  {plan.features.premium && (
-                    <div style={{
-                      marginTop: '20px',
-                      paddingTop: '20px',
-                      borderTop: '1px solid rgba(59, 130, 246, 0.15)'
-                    }}>
-                      <div style={{
-                        fontSize: '12px',
-                        color: 'rgba(147, 197, 253, 0.9)',
-                        fontWeight: '600',
-                        marginBottom: '12px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em'
-                      }}>
-                        프리미엄 혜택
+                      <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: '#FEE500', marginTop: '2px', flexShrink: 0 }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" stroke="currentColor"/>
+                        </svg>
+                        <span style={{ color: 'rgba(254, 229, 0, 0.9)', fontSize: isMobile ? '13px' : '14px', fontWeight: '600' }}>{plan.features.kakao}</span>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {plan.features.premium.map((feature, idx) => (
+                    </div>
+
+                    <div style={{ marginTop: isMobile ? '16px' : '24px', paddingTop: isMobile ? '12px' : '20px', borderTop: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                      <div style={{ fontSize: '12px', color: 'rgba(147, 197, 253, 0.7)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI 활용 예시</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {plan.features.aiUsage.map((usage, idx) => (
                           <div key={idx} style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                            </svg>
-                            <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '13px' }}>
-                              {feature}
-                            </span>
+                            <span style={{ color: '#60a5fa', fontSize: '14px', marginTop: '-1px' }}>•</span>
+                            <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}>{usage}</span>
                           </div>
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
 
-                {/* CTA Button */}
-                <button
-                  onClick={() => handleSelectPlan(plan.id)}
-                  style={{
-                    width: '100%',
-                    padding: '16px',
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    color: '#ffffff',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s',
-                    boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(59, 130, 246, 0.6)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(59, 130, 246, 0.4)'
-                  }}
-                >
-                  지금 시작하기
-                </button>
+                    {plan.features.premium && (
+                      <div style={{ marginTop: isMobile ? '12px' : '20px', paddingTop: isMobile ? '12px' : '20px', borderTop: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                        <div style={{ fontSize: '12px', color: 'rgba(147, 197, 253, 0.9)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>프리미엄 혜택</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {plan.features.premium.map((feature, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ color: '#60a5fa', marginTop: '2px', flexShrink: 0 }}>
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                              </svg>
+                              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '13px' }}>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleSelectPlan(plan.id) }}
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '14px' : '16px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      border: 'none',
+                      borderRadius: '12px',
+                      color: '#ffffff',
+                      fontSize: isMobile ? '15px' : '16px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
+                    }}
+                  >
+                    지금 시작하기
+                  </button>
+                </div>
               </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Additional Staff Section */}
