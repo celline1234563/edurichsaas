@@ -22,10 +22,8 @@ export default function HeroSection() {
       overflow: 'hidden',
       background: '#020617',
     }}>
-      {/* 3D Neural Particle Network */}
       <NeuralBrain />
 
-      {/* Content Container */}
       <div style={{
         position: 'relative',
         zIndex: 30,
@@ -63,17 +61,17 @@ export default function HeroSection() {
             borderRadius: '9999px',
             background: 'rgba(15, 23, 42, 0.6)',
             backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(34, 211, 238, 0.3)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
             marginBottom: '32px',
             pointerEvents: 'auto',
-            boxShadow: '0 0 20px rgba(34, 211, 238, 0.1)',
+            boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)',
           }}
         >
-          <Sparkles style={{ width: '16px', height: '16px', color: '#22d3ee' }} />
+          <Sparkles style={{ width: '16px', height: '16px', color: '#60a5fa' }} />
           <span style={{
             fontSize: '13px',
             fontWeight: '500',
-            color: '#a5f3fc',
+            color: '#93c5fd',
             letterSpacing: '0.05em',
             textTransform: 'uppercase',
           }}>
@@ -103,7 +101,7 @@ export default function HeroSection() {
             fontWeight: '600',
             lineHeight: '1.4',
             marginTop: '8px',
-            background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+            background: 'linear-gradient(to right, #60a5fa, #3b82f6)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>문제를 찾고, 전략을 실행하고,<br />학원을 성장시킵니다.</span>
@@ -148,7 +146,7 @@ export default function HeroSection() {
           <Link href="/diagnosis" style={{
             position: 'relative',
             padding: '16px 32px',
-            background: 'linear-gradient(to right, #2563eb, #06b6d4)',
+            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
             borderRadius: '9999px',
             fontWeight: '600',
             color: '#ffffff',
@@ -215,7 +213,7 @@ export default function HeroSection() {
             style={{
               width: '6px',
               height: '6px',
-              background: '#22d3ee',
+              background: '#3b82f6',
               borderRadius: '50%',
             }}
           />

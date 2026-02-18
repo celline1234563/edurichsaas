@@ -124,11 +124,11 @@ export default function ComparisonSection() {
                     background: 'rgba(59,130,246,0.2)',
                     borderRadius: '50%',
                   }}>
-                    <Check style={{ width: '16px', height: '16px', color: '#22d3ee' }} />
+                    <Check style={{ width: '16px', height: '16px', color: '#60a5fa' }} />
                   </div>
                   <span style={{
                     fontWeight: item.highlight ? '600' : '400',
-                    color: item.highlight ? '#cffafe' : '#ffffff',
+                    color: item.highlight ? '#dbeafe' : '#ffffff',
                   }}>{item.text}</span>
                 </li>
               ))}

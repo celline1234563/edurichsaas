@@ -17,7 +17,7 @@ export default function Footer() {
 
   return (
     <footer style={{
-      marginLeft: isMobile ? '0' : '260px',
+      marginLeft: '0',
       background: '#0a0a1a',
       color: '#9ca3af'
     }}>

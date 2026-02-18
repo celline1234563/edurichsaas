@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -22,12 +21,12 @@ function ComingSoonContent() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%)',
+      background: '#020617',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
-      marginLeft: isMobile ? '0' : '260px'
+      paddingTop: '84px'
     }}>
       <div style={{
         textAlign: 'center',
@@ -112,10 +111,11 @@ export default function ComingSoonPage() {
     <Suspense fallback={
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%)',
+        background: '#020617',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        paddingTop: '64px'
       }}>
         <p style={{ color: '#9ca3af' }}>로딩중...</p>
       </div>

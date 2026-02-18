@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
-import { BRAIN_BASE_URL } from '@/lib/constants'
 import HeroSection from '@/components/HeroSection'
 import WorkflowSection from '@/components/WorkflowSection'
 import ComparisonSection from '@/components/ComparisonSection'
@@ -12,16 +11,9 @@ import { Sparkles, TrendingUp, ArrowRight, BarChart3, Plus } from 'lucide-react'
 export default function HomePage() {
   const [authStatus, setAuthStatus] = useState('loading')
   const isMobile = useIsMobile()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
   const [subscriptionStatus, setSubscriptionStatus] = useState(null)
   const [showAccessModal, setShowAccessModal] = useState(false)
-
-  useEffect(() => {
-    if (!isMobile) {
-      setMobileMenuOpen(false)
-    }
-  }, [isMobile])
 
   useEffect(() => {
     fetch('/api/blog')
@@ -72,18 +64,15 @@ export default function HomePage() {
     checkSubscription()
   }, [authStatus])
 
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
-  const closeMobileMenu = () => setMobileMenuOpen(false)
-
   const categoryColors = {
-    'EduRichBrain': 'rgba(34, 211, 238, 0.15)',
+    'EduRichBrain': 'rgba(59, 130, 246, 0.15)',
     '교육리서치': 'rgba(34, 197, 94, 0.15)',
     '경영리서치': 'rgba(245, 158, 11, 0.15)',
     'AI': 'rgba(168, 85, 247, 0.15)',
   }
 
   const categoryTextColors = {
-    'EduRichBrain': '#22d3ee',
+    'EduRichBrain': '#60a5fa',
     '교육리서치': '#4ade80',
     '경영리서치': '#fbbf24',
     'AI': '#c4b5fd',
@@ -91,211 +80,6 @@ export default function HomePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#020617' }}>
-      {/* ===== Top Navbar ===== */}
-      <nav style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        height: '64px',
-        padding: '0 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: 'rgba(2,6,23,0.7)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(34,211,238,0.08)',
-      }}>
-        {/* Logo */}
-        <Link href="/" style={{
-          fontSize: '20px',
-          fontWeight: '700',
-          color: '#ffffff',
-          textDecoration: 'none',
-          letterSpacing: '0.02em',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}>
-          <span style={{ color: '#22d3ee' }}>EduRich</span>Brain
-        </Link>
-
-        {/* Desktop Nav Links */}
-        {!isMobile && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            {[
-              { label: '제품', href: '/' },
-              { label: '요금제', href: '/pricing' },
-              { label: '경영진단', href: '/diagnosis' },
-              { label: '블로그', href: '/blog' },
-              { label: '회사', href: '/about' },
-              { label: '데모', href: '/demo' },
-            ].map((item) => (
-              <Link key={item.label} href={item.href} style={{
-                fontSize: '14px',
-                fontWeight: '500',
-                color: 'rgba(203,213,225,0.8)',
-                textDecoration: 'none',
-                transition: 'color 0.2s',
-              }}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Right: CTA buttons + mobile toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {!isMobile && (
-            <>
-              <a
-                href={BRAIN_BASE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: '8px 16px',
-                  background: 'transparent',
-                  border: '1px solid rgba(71,85,105,0.6)',
-                  borderRadius: '8px',
-                  color: '#e2e8f0',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                }}
-              >
-                앱 시작
-              </a>
-              <Link href="/signup" style={{
-                padding: '8px 20px',
-                background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-                borderRadius: '8px',
-                color: '#ffffff',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: '600',
-                boxShadow: '0 0 20px rgba(34,211,238,0.2)',
-              }}>
-                무료로 시작하기
-              </Link>
-            </>
-          )}
-
-          {/* Mobile hamburger */}
-          {isMobile && (
-            <button
-              onClick={toggleMobileMenu}
-              aria-label="메뉴 열기"
-              style={{
-                width: '40px',
-                height: '40px',
-                background: 'none',
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: '#e2e8f0',
-              }}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-          )}
-        </div>
-      </nav>
-
-      {/* Mobile Menu Panel */}
-      {isMobile && mobileMenuOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100vh',
-          background: 'rgba(2,6,23,0.98)',
-          backdropFilter: 'blur(20px)',
-          zIndex: 2000,
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '80px 24px 24px',
-        }}>
-          <button
-            onClick={closeMobileMenu}
-            style={{
-              position: 'absolute',
-              top: '16px',
-              right: '16px',
-              width: '40px',
-              height: '40px',
-              background: 'rgba(34, 211, 238, 0.1)',
-              border: '1px solid rgba(34, 211, 238, 0.3)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#ffffff'
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-
-          <div style={{ fontSize: '24px', fontWeight: '700', color: '#ffffff', marginBottom: '32px', textAlign: 'center' }}>
-            <span style={{ color: '#22d3ee' }}>EduRich</span>Brain
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {[
-              { label: '제품', href: '/' },
-              { label: '요금제', href: '/pricing' },
-              { label: '경영진단', href: '/diagnosis' },
-              { label: '블로그', href: '/blog' },
-              { label: '회사', href: '/about' },
-              { label: '데모', href: '/demo' },
-            ].map((item) => (
-              <Link key={item.label} href={item.href} onClick={closeMobileMenu} style={{
-                padding: '16px 20px',
-                background: 'rgba(15,23,42,0.6)',
-                border: '1px solid rgba(34,211,238,0.12)',
-                borderRadius: '12px',
-                color: 'rgba(255,255,255,0.8)',
-                textDecoration: 'none',
-                fontSize: '16px',
-              }}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <Link href="/signup" onClick={closeMobileMenu} style={{
-              display: 'block',
-              width: '100%',
-              padding: '14px 0',
-              background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-              borderRadius: '12px',
-              color: '#ffffff',
-              textDecoration: 'none',
-              fontSize: '16px',
-              fontWeight: '600',
-              textAlign: 'center',
-              boxShadow: '0 0 20px rgba(34,211,238,0.2)',
-            }}>
-              무료로 시작하기
-            </Link>
-          </div>
-        </div>
-      )}
-
       {/* Main Content Area */}
       <div style={{ background: '#020617' }}>
 
@@ -322,7 +106,7 @@ export default function HomePage() {
             left: '25%',
             width: '500px',
             height: '500px',
-            background: 'rgba(8,145,178,0.08)',
+            background: 'rgba(59,130,246,0.08)',
             borderRadius: '50%',
             filter: 'blur(120px)',
             pointerEvents: 'none',
@@ -345,9 +129,9 @@ export default function HomePage() {
                   gap: '8px',
                   padding: '4px 12px',
                   borderRadius: '9999px',
-                  background: 'rgba(8,145,178,0.15)',
-                  border: '1px solid rgba(34,211,238,0.2)',
-                  color: '#22d3ee',
+                  background: 'rgba(59,130,246,0.15)',
+                  border: '1px solid rgba(59,130,246,0.2)',
+                  color: '#60a5fa',
                   fontSize: '12px',
                   fontWeight: '600',
                   marginBottom: '16px',
@@ -440,7 +224,7 @@ export default function HomePage() {
                         backdropFilter: 'blur(12px)',
                         fontSize: '10px',
                         fontWeight: '700',
-                        color: categoryTextColors[post.category] || '#22d3ee',
+                        color: categoryTextColors[post.category] || '#60a5fa',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}>
@@ -463,7 +247,7 @@ export default function HomePage() {
                           width: '4px',
                           height: '4px',
                           borderRadius: '50%',
-                          background: '#22d3ee',
+                          background: '#60a5fa',
                         }} />
                         {post.date}
                       </div>
@@ -485,7 +269,7 @@ export default function HomePage() {
                   background: '#0f172a',
                   border: '1px solid rgba(30,41,59,1)',
                 }}>
-                  <div style={{ height: '160px', background: 'linear-gradient(135deg, #2563eb, #0891b2)' }} />
+                  <div style={{ height: '160px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }} />
                   <div style={{ padding: '20px' }}>
                     <span style={{ color: '#64748b', fontSize: '12px' }}>로딩 중...</span>
                     <h3 style={{ fontSize: '17px', fontWeight: '600', color: '#ffffff' }}>블로그 글을 불러오는 중입니다</h3>
@@ -496,7 +280,7 @@ export default function HomePage() {
 
             {isMobile && (
               <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#22d3ee', fontWeight: '500', textDecoration: 'none' }}>
+                <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#60a5fa', fontWeight: '500', textDecoration: 'none' }}>
                   전체 보기
                   <ArrowRight style={{ width: '16px', height: '16px' }} />
                 </Link>
@@ -577,7 +361,7 @@ export default function HomePage() {
                   }}>
                     우리 학원 경영 레벨,<br />
                     <span style={{
-                      background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+                      background: 'linear-gradient(to right, #60a5fa, #3b82f6)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}>데이터로 확인해보세요.</span>
@@ -660,7 +444,7 @@ export default function HomePage() {
                           </div>
                           <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: '24px', fontWeight: '700', color: '#ffffff' }}>A+</div>
-                            <div style={{ fontSize: '12px', color: '#22d3ee' }}>Excellent</div>
+                            <div style={{ fontSize: '12px', color: '#60a5fa' }}>Excellent</div>
                           </div>
                         </div>
 
@@ -680,13 +464,13 @@ export default function HomePage() {
                                 height: `${height}%`,
                                 minHeight: `${height * 2}px`,
                                 background: i === 3
-                                  ? 'linear-gradient(to top, #2563eb, #22d3ee)'
+                                  ? 'linear-gradient(to top, #2563eb, #60a5fa)'
                                   : '#1e293b',
                                 borderRadius: '8px 8px 0 0',
                                 transition: 'all 1s',
                                 position: 'relative',
                                 overflow: 'hidden',
-                                boxShadow: i === 3 ? '0 0 20px rgba(34,211,238,0.5)' : 'none',
+                                boxShadow: i === 3 ? '0 0 20px rgba(59,130,246,0.5)' : 'none',
                               }}>
                                 {i === 3 && (
                                   <div style={{
@@ -735,7 +519,7 @@ export default function HomePage() {
                         left: '-40px',
                         width: '128px',
                         height: '128px',
-                        background: 'rgba(34,211,238,0.15)',
+                        background: 'rgba(59,130,246,0.15)',
                         borderRadius: '50%',
                         filter: 'blur(32px)',
                       }} />
@@ -769,7 +553,7 @@ export default function HomePage() {
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(34,211,238,0.03)',
+            background: 'rgba(59,130,246,0.03)',
             filter: 'blur(100px)',
             borderRadius: '50%',
             pointerEvents: 'none',
@@ -784,7 +568,7 @@ export default function HomePage() {
             }}>
               EduRichBrain{' '}
               <span style={{
-                background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+                background: 'linear-gradient(to right, #60a5fa, #3b82f6)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>시작하기</span>
@@ -811,7 +595,7 @@ export default function HomePage() {
               <Link href="/demo" style={{
                 width: isMobile ? '100%' : 'auto',
                 padding: '16px 40px',
-                background: 'linear-gradient(to right, #2563eb, #0891b2)',
+                background: 'linear-gradient(to right, #2563eb, #3b82f6)',
                 color: '#ffffff',
                 fontWeight: '700',
                 borderRadius: '12px',
@@ -871,7 +655,7 @@ export default function HomePage() {
             maxWidth: '480px',
             width: '100%',
             background: 'linear-gradient(135deg, rgba(2,6,23,0.95), rgba(15,23,42,0.9))',
-            border: '1px solid rgba(34,211,238,0.3)',
+            border: '1px solid rgba(59,130,246,0.3)',
             borderRadius: '24px',
             padding: isMobile ? '32px 24px' : '48px 40px',
             textAlign: 'center',
@@ -905,7 +689,7 @@ export default function HomePage() {
               width: '80px',
               height: '80px',
               margin: '0 auto 24px',
-              background: 'rgba(34,211,238,0.1)',
+              background: 'rgba(59,130,246,0.1)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -913,11 +697,11 @@ export default function HomePage() {
             }}>
               {subscriptionStatus?.reason === 'unauthenticated' ? (
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               ) : (
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               )}
             </div>
@@ -939,29 +723,29 @@ export default function HomePage() {
 
             {subscriptionStatus?.credits !== undefined && subscriptionStatus?.reason !== 'unauthenticated' && (
               <div style={{
-                background: 'rgba(34,211,238,0.1)',
+                background: 'rgba(59,130,246,0.1)',
                 padding: '16px',
                 borderRadius: '12px',
                 marginBottom: '24px',
-                border: '1px solid rgba(34,211,238,0.2)'
+                border: '1px solid rgba(59,130,246,0.2)'
               }}>
                 <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>보유 크레딧</div>
-                <div style={{ fontSize: '28px', fontWeight: '700', color: '#22d3ee' }}>{(subscriptionStatus?.credits || 0).toLocaleString()}P</div>
+                <div style={{ fontSize: '28px', fontWeight: '700', color: '#60a5fa' }}>{(subscriptionStatus?.credits || 0).toLocaleString()}P</div>
               </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {subscriptionStatus?.reason === 'unauthenticated' ? (
                 <>
-                  <Link href="/login" style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #2563eb, #0891b2)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', boxShadow: '0 8px 24px rgba(34,211,238,0.3)' }}>시작하기</Link>
-                  <Link href="/signup" style={{ padding: '16px 32px', background: 'transparent', border: '2px solid rgba(34,211,238,0.4)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', textDecoration: 'none', textAlign: 'center' }}>회원가입하기</Link>
+                  <Link href="/login" style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', boxShadow: '0 8px 24px rgba(59,130,246,0.3)' }}>시작하기</Link>
+                  <Link href="/signup" style={{ padding: '16px 32px', background: 'transparent', border: '2px solid rgba(59,130,246,0.4)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', textDecoration: 'none', textAlign: 'center' }}>회원가입하기</Link>
                 </>
               ) : (
                 <>
-                  <Link href="/pricing" style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #2563eb, #0891b2)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', boxShadow: '0 8px 24px rgba(34,211,238,0.3)' }}>
+                  <Link href="/pricing" style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', boxShadow: '0 8px 24px rgba(59,130,246,0.3)' }}>
                     {subscriptionStatus?.reason === 'insufficient_credits' ? '크레딧 충전하기' : '요금제 선택하기'}
                   </Link>
-                  <button onClick={() => setShowAccessModal(false)} style={{ padding: '16px 32px', background: 'transparent', border: '2px solid rgba(34,211,238,0.4)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}>닫기</button>
+                  <button onClick={() => setShowAccessModal(false)} style={{ padding: '16px 32px', background: 'transparent', border: '2px solid rgba(59,130,246,0.4)', borderRadius: '12px', color: '#ffffff', fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}>닫기</button>
                 </>
               )}
             </div>

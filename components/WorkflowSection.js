@@ -10,7 +10,7 @@ function FeatureBlock({ step, title, subtitle, description, align, color, icon, 
   const isLeft = align === 'left'
 
   const colorMap = {
-    cyan: { accent: '#22d3ee', bg: 'rgba(34,211,238,0.1)', border: 'rgba(34,211,238,0.3)' },
+    cyan: { accent: '#60a5fa', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
     blue: { accent: '#3b82f6', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
     purple: { accent: '#a855f7', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.3)' },
   }
@@ -148,13 +148,13 @@ function OntologyVisual() {
         height: '96px',
         borderRadius: '50%',
         background: '#1e293b',
-        border: '2px solid rgba(34,211,238,0.5)',
+        border: '2px solid rgba(59,130,246,0.5)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 0 50px rgba(34,211,238,0.2)',
+        boxShadow: '0 0 50px rgba(59,130,246,0.2)',
       }}>
-        <Database style={{ width: '40px', height: '40px', color: '#22d3ee' }} />
+        <Database style={{ width: '40px', height: '40px', color: '#60a5fa' }} />
       </div>
 
       {/* Corner nodes */}
@@ -196,7 +196,7 @@ function OntologyVisual() {
               position: 'absolute',
               width: '4px',
               height: '4px',
-              background: '#22d3ee',
+              background: '#60a5fa',
               borderRadius: '50%',
               top: '50%',
               left: '50%',
@@ -484,7 +484,7 @@ export default function WorkflowSection() {
         left: 0,
         right: 0,
         height: '1px',
-        background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.3), transparent)',
+        background: 'linear-gradient(to right, transparent, rgba(59,130,246,0.3), transparent)',
         opacity: 0.5,
       }} />
 
@@ -499,13 +499,13 @@ export default function WorkflowSection() {
               display: 'inline-block',
               padding: '6px 16px',
               borderRadius: '9999px',
-              border: '1px solid rgba(34,211,238,0.3)',
-              background: 'rgba(34,211,238,0.1)',
-              color: '#67e8f9',
+              border: '1px solid rgba(59,130,246,0.3)',
+              background: 'rgba(59,130,246,0.1)',
+              color: '#93c5fd',
               fontSize: '14px',
               fontWeight: '600',
               marginBottom: '24px',
-              boxShadow: '0 0 15px rgba(34,211,238,0.2)',
+              boxShadow: '0 0 15px rgba(59,130,246,0.2)',
             }}
           >
             PROCESS FLOW
@@ -525,7 +525,7 @@ export default function WorkflowSection() {
           >
             학원 경영의{' '}
             <span style={{
-              background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+              background: 'linear-gradient(to right, #60a5fa, #3b82f6)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>완전 자동화</span>

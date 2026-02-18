@@ -10,7 +10,6 @@ import { useSearchParams } from 'next/navigation'
 export default function SignupPage() {
   const [step, setStep] = useState(1) // 1: 역할 선택, 2: 정보 입력
   const [role, setRole] = useState('') // 'director', 'teacher', 'manager', 'assistant'
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isMobile = useIsMobile()
   const [formData, setFormData] = useState({
     // 공통
@@ -192,113 +191,10 @@ export default function SignupPage() {
     if (error) alert(error.message)
     }
 
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
-  const closeMobileMenu = () => setMobileMenuOpen(false)
-
   return (
     <div className="app-layout">
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <button
-          className="mobile-menu-btn"
-          onClick={toggleMobileMenu}
-          aria-label="메뉴 열기"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-      )}
-
-      {/* Mobile Menu Panel */}
-      {isMobile && mobileMenuOpen && (
-        <div className="mobile-menu-panel">
-          <button
-            onClick={closeMobileMenu}
-            style={{
-              position: 'absolute',
-              top: '16px',
-              right: '16px',
-              width: '40px',
-              height: '40px',
-              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#ffffff'
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-
-          <div className="mobile-menu-logo">EduRichBrain</div>
-
-          <nav className="mobile-menu-nav">
-            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
-            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
-            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
-            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
-            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
-            <Link href="/demo" className="mobile-menu-link" onClick={closeMobileMenu}>데모</Link>
-          </nav>
-
-          <div className="mobile-menu-footer">
-            <Link
-              href="/login"
-              className="login-btn"
-              onClick={closeMobileMenu}
-              style={{ width: '100%', textAlign: 'center' }}
-            >
-              로그인
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Sidebar (Desktop Only) */}
-      <aside className="sidebar">
-        <Link href="/" className="sidebar-logo">
-          EduRichBrain
-        </Link>
-
-        <nav className="sidebar-nav">
-          <Link href="/" className="sidebar-link">제품</Link>
-          <Link href="/pricing" className="sidebar-link">요금제</Link>
-          <Link href="/diagnosis" className="sidebar-link">경영진단</Link>
-          <Link href="/blog" className="sidebar-link">블로그</Link>
-          <Link href="/about" className="sidebar-link">회사</Link>
-          <Link href="/demo" className="sidebar-link">데모</Link>
-        </nav>
-
-        <div className="sidebar-footer">
-          <button className="sidebar-icon-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-      </aside>
-
       {/* Main Content */}
-      <div className="main-area">
-        <header className="top-bar">
-          <button className="search-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-              <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-          <Link href="/login" className="login-btn">
-            로그인
-          </Link>
-        </header>
-
+      <div className="main-area" style={{ paddingTop: '64px' }}>
         <main style={{ padding: isMobile ? '60px 16px 40px' : '80px 32px' }}>
           <div style={{
             maxWidth: step === 1 ? '900px' : '600px',

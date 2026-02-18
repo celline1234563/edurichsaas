@@ -558,11 +558,12 @@ export default function BillingSuccessPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+      background: '#020617',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px'
+      padding: '20px',
+      paddingTop: '84px'
     }}>
       <Suspense fallback={
         <div style={{ color: '#ffffff', fontSize: '18px' }}>Loading...</div>

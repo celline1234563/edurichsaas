@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import useIsMobile from '@/hooks/useIsMobile'
 import { BRAIN_BASE_URL } from '@/lib/constants'
 import LevelProgressSelector from '@/components/LevelProgressSelector'
@@ -10,37 +9,11 @@ export default function DiagnosisPage() {
 
   return (
     <div className="app-layout">
-      {/* Left Sidebar Navigation */}
-      <aside className="sidebar">
-        <Link href="/" className="sidebar-logo">
-          EduRichBrain
-        </Link>
-
-        <nav className="sidebar-nav">
-          <Link href="/" className="sidebar-link">제품</Link>
-          <Link href="/pricing" className="sidebar-link">요금제</Link>
-          <Link href="/diagnosis" className="sidebar-link active">경영진단</Link>
-          <Link href="/blog/kakao-notification" className="sidebar-link">에듀케어 알림</Link>
-          <Link href="/blog" className="sidebar-link">블로그</Link>
-          <Link href="/about" className="sidebar-link">회사</Link>
-          <Link href="/demo" className="sidebar-link">데모</Link>
-        </nav>
-
-        <div className="sidebar-footer">
-          <button className="sidebar-icon-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-      </aside>
-
       {/* Main Content Area */}
-      <div className="main-area">
+      <div className="main-area" style={{ paddingTop: '64px' }}>
         <div style={{
           minHeight: '100vh',
-          color: '#e2e8f0',
-          paddingTop: '60px'
+          color: '#e2e8f0'
         }}>
           <div style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '16px 16px' : '24px 20px' }}>
             {/* Hero Section */}

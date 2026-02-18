@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
-// import Footer from '../components/Footer'
+import Navbar from '@/components/Navbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,11 +20,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body className={`${inter.className} antialiased`}>
-        <div className="min-h-screen flex flex-col">
-          <main className="flex-grow">
+        <Navbar />
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <main style={{ flexGrow: 1 }}>
             {children}
           </main>
-          {/* <Footer /> */}
         </div>
       </body>
     </html>

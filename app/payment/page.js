@@ -356,10 +356,11 @@ export default function PaymentPage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+        background: '#020617',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        paddingTop: '64px'
       }}>
         <div style={{ color: '#ffffff', fontSize: '18px' }}>인증 확인 중...</div>
       </div>
@@ -381,8 +382,8 @@ export default function PaymentPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
-      padding: isMobile ? '24px 16px' : '40px 20px'
+      background: '#020617',
+      padding: isMobile ? '88px 16px 24px' : '104px 20px 40px'
     }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}

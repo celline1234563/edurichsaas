@@ -106,7 +106,8 @@ export default function StoryDetailPage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+        background: '#020617',
+        paddingTop: '64px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -122,7 +123,8 @@ export default function StoryDetailPage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+        background: '#020617',
+        paddingTop: '64px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -151,7 +153,8 @@ export default function StoryDetailPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+      background: '#020617',
+      paddingTop: '64px',
       paddingBottom: '60px',
     }}>
       {/* Hero Section */}

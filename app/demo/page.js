@@ -8,7 +8,6 @@ import { BRAIN_BASE_URL } from '@/lib/constants'
 export default function DemoPage() {
   const [isLoading, setIsLoading] = useState(true)
   const isMobile = useIsMobile()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // iframe 로딩 시뮬레이션
@@ -18,111 +17,17 @@ export default function DemoPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    if (!isMobile) {
-      setMobileMenuOpen(false)
-    }
-  }, [isMobile])
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-  }
-
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false)
-  }
-
   return (
     <div style={{
       width: '100vw',
       height: '100vh',
-      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
+      background: '#020617',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      position: 'relative'
+      position: 'relative',
+      paddingTop: '64px'
     }}>
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <button
-          className="mobile-menu-btn"
-          onClick={toggleMobileMenu}
-          aria-label="메뉴 열기"
-          style={{
-            position: 'fixed',
-            top: '16px',
-            left: '16px',
-            width: '44px',
-            height: '44px',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.15))',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#ffffff',
-            zIndex: 100
-          }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-      )}
-
-      {/* Mobile Menu Panel */}
-      {isMobile && mobileMenuOpen && (
-        <div className="mobile-menu-panel">
-          <button
-            onClick={closeMobileMenu}
-            style={{
-              position: 'absolute',
-              top: '16px',
-              right: '16px',
-              width: '40px',
-              height: '40px',
-              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#ffffff'
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-
-          <div className="mobile-menu-logo">EduRichBrain</div>
-
-          <nav className="mobile-menu-nav">
-            <Link href="/" className="mobile-menu-link" onClick={closeMobileMenu}>제품</Link>
-            <Link href="/pricing" className="mobile-menu-link" onClick={closeMobileMenu}>요금제</Link>
-            <Link href="/diagnosis" className="mobile-menu-link" onClick={closeMobileMenu}>경영진단</Link>
-            <Link href="/blog" className="mobile-menu-link" onClick={closeMobileMenu}>블로그</Link>
-            <Link href="/about" className="mobile-menu-link" onClick={closeMobileMenu}>회사</Link>
-            <a href={BRAIN_BASE_URL} target="_blank" rel="noopener noreferrer" className="mobile-menu-link active" onClick={closeMobileMenu}>데모</a>
-          </nav>
-
-          <div className="mobile-menu-footer">
-            <Link
-              href="/signup"
-              className="login-btn"
-              onClick={closeMobileMenu}
-              style={{ width: '100%', textAlign: 'center' }}
-            >
-              시작하기
-            </Link>
-          </div>
-        </div>
-      )}
-
       {/* Top Bar */}
       <div style={{
         width: '100%',

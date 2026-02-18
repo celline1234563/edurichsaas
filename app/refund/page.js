@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 
 export default function RefundPage() {
@@ -126,8 +126,8 @@ export default function RefundPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #1a1f3a 100%)',
-      padding: '40px 20px'
+      background: '#020617',
+      padding: '104px 20px 40px'
     }}>
       <div style={{
         maxWidth: '800px',

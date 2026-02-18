@@ -24,11 +24,11 @@ function DataNeuron({ position, text, labelOffset = [0.1, 0.1, 0] }) {
       <group position={position}>
         <mesh>
           <sphereGeometry args={[0.08, 16, 16]} />
-          <meshBasicMaterial color="#22d3ee" toneMapped={false} />
+          <meshBasicMaterial color="#60a5fa" toneMapped={false} />
         </mesh>
         <mesh scale={[2.5, 2.5, 2.5]}>
           <sphereGeometry args={[0.08, 16, 16]} />
-          <meshBasicMaterial color="#22d3ee" transparent opacity={0.15} toneMapped={false} />
+          <meshBasicMaterial color="#60a5fa" transparent opacity={0.15} toneMapped={false} />
         </mesh>
         <Html position={labelOffset} center distanceFactor={12} style={{ pointerEvents: 'none' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
@@ -36,11 +36,11 @@ function DataNeuron({ position, text, labelOffset = [0.1, 0.1, 0] }) {
               padding: '6px 12px',
               borderRadius: '8px',
               background: '#0c1629',
-              border: '1px solid rgba(34, 211, 238, 0.4)',
-              boxShadow: '0 0 12px rgba(34,211,238,0.15), 0 4px 16px rgba(0,0,0,0.6)',
+              border: '1px solid rgba(59, 130, 246, 0.4)',
+              boxShadow: '0 0 12px rgba(59,130,246,0.15), 0 4px 16px rgba(0,0,0,0.6)',
             }}>
               <span style={{
-                color: '#a5f3fc',
+                color: '#93c5fd',
                 fontWeight: '700',
                 fontSize: '11px',
                 letterSpacing: '0.04em',
@@ -60,7 +60,7 @@ function NeuralConnection({ start, end, mid }) {
   const points = useMemo(() => curve.getPoints(20), [curve])
 
   const colors = useMemo(() => {
-    const colorStart = new THREE.Color('#22d3ee')
+    const colorStart = new THREE.Color('#60a5fa')
     const colorEnd = new THREE.Color('#818cf8')
     return new Array(points.length).fill(0).map((_, i) => {
       const t = i / (points.length - 1)
@@ -187,7 +187,7 @@ export default function NeuralBrain() {
             ))}
           </group>
           <BrainMatter />
-          <Sparkles count={50} scale={12} size={3} speed={0.4} opacity={0.5} color="#22d3ee" />
+          <Sparkles count={50} scale={12} size={3} speed={0.4} opacity={0.5} color="#60a5fa" />
           <BrainCamera />
         </Canvas>
       </div>
