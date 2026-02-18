@@ -5,10 +5,10 @@ import { motion } from 'framer-motion'
 import { Sparkles, Zap, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
-const NeuralNetwork = dynamic(() => import('./NeuralNetwork'), { ssr: false })
+const NeuralBrain = dynamic(() => import('./NeuralBrain'), { ssr: false })
 
 export default function HeroSection() {
-  const CONTENT_DELAY = 0.5
+  const CONTENT_DELAY = 1.0
 
   return (
     <section style={{
@@ -22,93 +22,7 @@ export default function HeroSection() {
       overflow: 'hidden',
       background: '#020617',
     }}>
-      {/* === CSS Background Layers === */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        {/* Gradient mesh */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: `
-            radial-gradient(ellipse 80% 50% at 50% 50%, rgba(30,58,138,0.15) 0%, transparent 60%),
-            radial-gradient(circle 600px at 20% 60%, rgba(59,130,246,0.08) 0%, transparent 50%),
-            radial-gradient(circle 500px at 80% 30%, rgba(99,102,241,0.06) 0%, transparent 50%)
-          `,
-        }} />
-
-        {/* Dot grid */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'radial-gradient(rgba(148,163,184,0.12) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-        }} />
-
-        {/* Floating orbs */}
-        <div className="hero-orb-1" style={{
-          position: 'absolute',
-          width: '500px',
-          height: '500px',
-          top: '10%',
-          left: '-5%',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-          pointerEvents: 'none',
-        }} />
-        <div className="hero-orb-2" style={{
-          position: 'absolute',
-          width: '400px',
-          height: '400px',
-          bottom: '5%',
-          right: '-5%',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-          pointerEvents: 'none',
-        }} />
-        <div className="hero-orb-3" style={{
-          position: 'absolute',
-          width: '300px',
-          height: '300px',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-          pointerEvents: 'none',
-        }} />
-
-        {/* Subtle horizontal lines */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'linear-gradient(0deg, transparent 49.5%, rgba(148,163,184,0.04) 50%, transparent 50.5%)',
-          backgroundSize: '100% 80px',
-        }} />
-
-        {/* Top fade */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          width: '100%',
-          height: '160px',
-          background: 'linear-gradient(to bottom, #020617, transparent)',
-          pointerEvents: 'none',
-        }} />
-        {/* Bottom fade */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          width: '100%',
-          height: '160px',
-          background: 'linear-gradient(to top, #020617, transparent)',
-          pointerEvents: 'none',
-        }} />
-      </div>
-
-      {/* === Minimal Neural Network overlay === */}
-      <NeuralNetwork />
+      <NeuralBrain />
 
       <div style={{
         position: 'relative',
@@ -117,7 +31,22 @@ export default function HeroSection() {
         margin: '0 auto',
         padding: '0 24px',
         textAlign: 'center',
+        pointerEvents: 'none',
       }}>
+        {/* Text backdrop blur */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: '800px',
+          height: '110%',
+          background: 'radial-gradient(ellipse at center, rgba(2,6,23,0.85) 0%, rgba(2,6,23,0.6) 40%, rgba(2,6,23,0) 70%)',
+          filter: 'blur(30px)',
+          pointerEvents: 'none',
+          zIndex: -1,
+        }} />
 
         {/* Badge */}
         <motion.div
@@ -134,6 +63,7 @@ export default function HeroSection() {
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(59, 130, 246, 0.3)',
             marginBottom: '28px',
+            pointerEvents: 'auto',
             boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)',
           }}
         >
@@ -160,6 +90,7 @@ export default function HeroSection() {
             letterSpacing: '-0.02em',
             marginBottom: '28px',
             lineHeight: '1.1',
+            pointerEvents: 'auto',
             textShadow: '0 4px 30px rgba(0,0,0,0.5)',
           }}
         >
@@ -187,6 +118,7 @@ export default function HeroSection() {
             maxWidth: '680px',
             margin: '0 auto 36px',
             lineHeight: '1.7',
+            pointerEvents: 'auto',
             textShadow: '0 2px 10px rgba(0,0,0,0.5)',
             wordBreak: 'keep-all',
           }}
@@ -208,6 +140,7 @@ export default function HeroSection() {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '16px',
+            pointerEvents: 'auto',
           }}
         >
           <Link href="/diagnosis" style={{
