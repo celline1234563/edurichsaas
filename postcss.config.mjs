@@ -1,4 +1,3 @@
-// Empty PostCSS config - no processing needed
 const config = {
   plugins: {}
 };

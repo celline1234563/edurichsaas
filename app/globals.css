@@ -1242,6 +1242,36 @@ button {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
+/* Line flow animation */
+@keyframes lineFlow {
+  from { stroke-dashoffset: 40; }
+  to { stroke-dashoffset: 0; }
+}
+
+.line-flow {
+  animation: lineFlow 3s linear infinite;
+}
+
+.orb-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.orb-card:hover {
+  border-color: rgba(100, 180, 255, 0.4) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 0 40px rgba(59, 130, 246, 0.1), inset 0 0 25px rgba(59, 130, 246, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Responsive hero orb - hide card details on mobile */
+@media (max-width: 767px) {
+  .orb-card-detail {
+    display: none !important;
+  }
+  .hero-orb-lines {
+    opacity: 0.3;
+  }
+}
+
 .glass-panel {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.5));
   backdrop-filter: blur(20px) saturate(180%);
@@ -1256,4 +1286,10 @@ button {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Spin animation for diagnosis visual */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
