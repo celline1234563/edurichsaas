@@ -276,11 +276,8 @@ export default function PricingPage() {
           </div>
 
           {/* Main Pricing Plans */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
-            gap: isMobile ? '24px' : '20px',
-            marginBottom: isMobile ? '80px' : '120px'
+          <div className="pricing-grid" style={{
+            marginBottom: isMobile ? '80px' : '120px',
           }}>
             {plans.map((plan, index) => (
               <div

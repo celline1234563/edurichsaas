@@ -145,8 +145,9 @@ function BrainMatter() {
 }
 
 function BrainCamera() {
-  const { camera } = useThree()
-  const targetZ = 7
+  const { camera, size } = useThree()
+  const isMobile = size.width < 768
+  const targetZ = isMobile ? 14 : 7
 
   useFrame((state) => {
     camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.02)
