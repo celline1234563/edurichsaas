@@ -73,7 +73,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: CONTENT_DELAY + 0.2, ease: 'easeOut' }}
           style={{
-            fontSize: 'clamp(40px, 7vw, 80px)',
+            fontSize: 'clamp(48px, 8vw, 96px)',
             fontWeight: '800',
             letterSpacing: '-0.02em',
             marginBottom: '24px',
@@ -102,7 +102,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: CONTENT_DELAY + 0.4, ease: 'easeOut' }}
           style={{
-            fontSize: 'clamp(16px, 2vw, 20px)',
+            fontSize: 'clamp(18px, 2.2vw, 22px)',
             color: '#cbd5e1',
             maxWidth: '680px',
             margin: '0 auto 40px',

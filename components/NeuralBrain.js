@@ -23,29 +23,27 @@ function DataNeuron({ position, text, labelOffset = [0.1, 0.1, 0] }) {
     <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
       <group position={position}>
         <mesh>
-          <sphereGeometry args={[0.05, 16, 16]} />
+          <sphereGeometry args={[0.08, 16, 16]} />
           <meshBasicMaterial color="#22d3ee" toneMapped={false} />
         </mesh>
-        <mesh scale={[2, 2, 2]}>
-          <sphereGeometry args={[0.05, 16, 16]} />
-          <meshBasicMaterial color="#22d3ee" transparent opacity={0.2} toneMapped={false} />
+        <mesh scale={[2.5, 2.5, 2.5]}>
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshBasicMaterial color="#22d3ee" transparent opacity={0.15} toneMapped={false} />
         </mesh>
-        <Html position={labelOffset} center distanceFactor={15} style={{ pointerEvents: 'none' }}>
+        <Html position={labelOffset} center distanceFactor={12} style={{ pointerEvents: 'none' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
             <div style={{
-              padding: '4px 8px',
-              borderRadius: '6px',
-              background: 'rgba(15, 23, 42, 0.8)',
-              border: '1px solid rgba(34, 211, 238, 0.3)',
-              backdropFilter: 'blur(12px)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              background: '#0c1629',
+              border: '1px solid rgba(34, 211, 238, 0.4)',
+              boxShadow: '0 0 12px rgba(34,211,238,0.15), 0 4px 16px rgba(0,0,0,0.6)',
             }}>
               <span style={{
-                color: '#cffafe',
+                color: '#a5f3fc',
                 fontWeight: '700',
-                fontSize: '10px',
-                letterSpacing: '0.05em',
-                opacity: 0.9,
+                fontSize: '11px',
+                letterSpacing: '0.04em',
               }}>
                 {text}
               </span>
