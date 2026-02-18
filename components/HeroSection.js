@@ -35,6 +35,20 @@ export default function HeroSection() {
         textAlign: 'center',
         pointerEvents: 'none',
       }}>
+        {/* Text backdrop blur */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: '800px',
+          height: '110%',
+          background: 'radial-gradient(ellipse at center, rgba(2,6,23,0.85) 0%, rgba(2,6,23,0.6) 40%, rgba(2,6,23,0) 70%)',
+          filter: 'blur(30px)',
+          pointerEvents: 'none',
+          zIndex: -1,
+        }} />
 
         {/* Badge */}
         <motion.div
