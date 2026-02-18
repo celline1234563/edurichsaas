@@ -84,16 +84,15 @@ export default function HeroSection() {
         >
           <span style={{ display: 'block', color: '#ffffff' }}>에듀리치브레인,</span>
           <span style={{
+            display: 'block',
+            fontSize: '0.55em',
+            fontWeight: '600',
+            lineHeight: '1.4',
+            marginTop: '8px',
             background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-          }}>문제를 찾고, 전략을 실행하고,</span>
-          <br />
-          <span style={{
-            background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>학원을 성장시킵니다.</span>
+          }}>문제를 찾고, 전략을 실행하고,<br />학원을 성장시킵니다.</span>
         </motion.h1>
 
         {/* Subheading */}
