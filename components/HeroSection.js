@@ -82,12 +82,18 @@ export default function HeroSection() {
             textShadow: '0 4px 30px rgba(0,0,0,0.5)',
           }}
         >
-          <span style={{ display: 'block', color: '#ffffff' }}>학원 경영의 미래,</span>
+          <span style={{ display: 'block', color: '#ffffff' }}>에듀리치브레인,</span>
           <span style={{
             background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-          }}>에듀리치브레인이 재정의합니다.</span>
+          }}>문제를 찾고, 전략을 실행하고,</span>
+          <br />
+          <span style={{
+            background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>학원을 성장시킵니다.</span>
         </motion.h1>
 
         {/* Subheading */}
@@ -106,10 +112,9 @@ export default function HeroSection() {
             wordBreak: 'keep-all',
           }}
         >
-          데이터를 단순히 시각화하는 것에 그치지 마세요.{' '}
-          <span style={{ color: '#ffffff', fontWeight: '500' }}>에듀리치브레인</span>은
-          학원의 온톨로지를 연결하고, 건강 상태를 진단하며,
-          원클릭 성장 전략을 실행합니다.
+          학원 부자, 경영 부자, 시간 부자 —{' '}
+          <span style={{ color: '#ffffff', fontWeight: '500' }}>원장님의 학원의 주도권을 되찾아드리는</span>{' '}
+          데이터 + AI 전략 비서
         </motion.p>
 
         {/* Buttons */}
