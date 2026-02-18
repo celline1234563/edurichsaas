@@ -1276,6 +1276,19 @@ button {
 }
 
 @media (max-width: 767px) {
+  .hero-buttons {
+    flex-direction: column !important;
+    width: 100%;
+    padding: 0 20px;
+  }
+  .hero-buttons a {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center;
+  }
+}
+
+@media (max-width: 767px) {
   .pricing-grid {
     display: flex !important;
     flex-direction: column !important;

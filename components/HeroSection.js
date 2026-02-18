@@ -62,7 +62,7 @@ export default function HeroSection() {
             background: 'rgba(15, 23, 42, 0.6)',
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(59, 130, 246, 0.3)',
-            marginBottom: '32px',
+            marginBottom: '28px',
             pointerEvents: 'auto',
             boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)',
           }}
@@ -88,7 +88,7 @@ export default function HeroSection() {
             fontSize: 'clamp(48px, 8vw, 96px)',
             fontWeight: '800',
             letterSpacing: '-0.02em',
-            marginBottom: '24px',
+            marginBottom: '28px',
             lineHeight: '1.1',
             pointerEvents: 'auto',
             textShadow: '0 4px 30px rgba(0,0,0,0.5)',
@@ -116,7 +116,7 @@ export default function HeroSection() {
             fontSize: 'clamp(18px, 2.2vw, 22px)',
             color: '#cbd5e1',
             maxWidth: '680px',
-            margin: '0 auto 40px',
+            margin: '0 auto 36px',
             lineHeight: '1.7',
             pointerEvents: 'auto',
             textShadow: '0 2px 10px rgba(0,0,0,0.5)',
@@ -133,9 +133,9 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: CONTENT_DELAY + 0.6, ease: 'easeOut' }}
+          className="hero-buttons"
           style={{
             display: 'flex',
-            flexDirection: 'row',
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'center',

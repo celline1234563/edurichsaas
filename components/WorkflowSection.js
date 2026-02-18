@@ -84,24 +84,7 @@ function FeatureBlock({ step, title, subtitle, description, align, color, icon, 
             fontSize: '18px',
             lineHeight: '1.7',
             wordBreak: 'keep-all',
-            marginBottom: '32px',
           }}>{description}</p>
-
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: c.accent,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-          }}>
-            자세히 살펴보기
-            <ArrowRight style={{ width: '20px', height: '20px' }} />
-          </button>
         </motion.div>
 
         {/* Visual Content */}
@@ -473,7 +456,7 @@ export default function WorkflowSection() {
   return (
     <section style={{
       position: 'relative',
-      padding: '128px 0',
+      padding: 'clamp(64px, 8vw, 100px) 0',
       background: '#020617',
       overflow: 'hidden',
     }}>

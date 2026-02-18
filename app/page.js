@@ -94,7 +94,7 @@ export default function HomePage() {
 
         {/* === INSIGHTS / LATEST NEWS SECTION === */}
         <section style={{
-          padding: isMobile ? '80px 16px' : '128px 24px',
+          padding: isMobile ? '64px 16px' : '100px 24px',
           background: '#020617',
           position: 'relative',
           overflow: 'hidden',
@@ -252,10 +252,10 @@ export default function HomePage() {
                         {post.date}
                       </div>
                       <h3 className="line-clamp-2" style={{
-                        fontSize: '17px',
+                        fontSize: '20px',
                         fontWeight: '700',
                         color: '#e2e8f0',
-                        lineHeight: '1.5',
+                        lineHeight: '1.4',
                       }}>
                         {post.title}
                       </h3>
@@ -272,7 +272,7 @@ export default function HomePage() {
                   <div style={{ height: '160px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }} />
                   <div style={{ padding: '20px' }}>
                     <span style={{ color: '#64748b', fontSize: '12px' }}>로딩 중...</span>
-                    <h3 style={{ fontSize: '17px', fontWeight: '600', color: '#ffffff' }}>블로그 글을 불러오는 중입니다</h3>
+                    <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#ffffff' }}>블로그 글을 불러오는 중입니다</h3>
                   </div>
                 </article>
               )}
@@ -544,7 +544,7 @@ export default function HomePage() {
 
         {/* === CTA SECTION === */}
         <section style={{
-          padding: isMobile ? '80px 16px' : '120px 24px',
+          padding: isMobile ? '64px 16px' : '100px 24px',
           maxWidth: '900px',
           margin: '0 auto',
           textAlign: 'center',
@@ -581,8 +581,8 @@ export default function HomePage() {
               marginBottom: isMobile ? '40px' : '48px',
               lineHeight: '1.7',
             }}>
-              지금 바로 시작하고 학원 경영의 새로운 기준을 경험하세요.
-              <br />데이터로 증명된 성과가 기다리고 있습니다.
+              1,500가지 경영 지표 분석부터 맞춤 코칭까지.
+              <br />지금 바로 시작하고, 데이터로 증명된 성과를 경험하세요.
             </p>
 
             <div style={{
@@ -603,7 +603,7 @@ export default function HomePage() {
                 textDecoration: 'none',
                 textAlign: 'center',
               }}>
-                무료 체험
+                무료로 시작하기
               </Link>
               <Link href="/demo" style={{
                 width: isMobile ? '100%' : 'auto',
@@ -617,7 +617,7 @@ export default function HomePage() {
                 textDecoration: 'none',
                 textAlign: 'center',
               }}>
-                데모 보기
+                데모 체험하기
               </Link>
             </div>
           </div>

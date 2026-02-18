@@ -6,7 +6,7 @@ import { Check, X, User } from 'lucide-react'
 export default function ComparisonSection() {
   return (
     <section style={{
-      padding: '80px 0',
+      padding: 'clamp(64px, 8vw, 100px) 0',
       background: '#020617',
       borderTop: '1px solid rgba(15,23,42,1)',
     }}>
@@ -30,7 +30,7 @@ export default function ComparisonSection() {
               borderRadius: '16px',
               border: '1px solid rgba(30,41,59,1)',
               background: 'rgba(15,23,42,0.3)',
-              opacity: 0.7,
+              opacity: 0.6,
               transition: 'all 0.5s',
             }}
           >
@@ -81,7 +81,7 @@ export default function ComparisonSection() {
               borderRadius: '16px',
               border: '1px solid rgba(59,130,246,0.3)',
               background: 'linear-gradient(to bottom, rgba(15,23,42,1), rgba(30,58,138,0.1))',
-              boxShadow: '0 0 50px rgba(37,99,235,0.15)',
+              boxShadow: '0 0 60px rgba(37,99,235,0.25), 0 0 120px rgba(37,99,235,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
