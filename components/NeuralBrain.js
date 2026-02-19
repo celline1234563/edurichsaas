@@ -73,9 +73,9 @@ function NeuralConnection({ start, end, mid }) {
       points={points}
       color="white"
       vertexColors={colors}
-      lineWidth={3}
+      lineWidth={1.5}
       transparent
-      opacity={0.4}
+      opacity={0.2}
     />
   )
 }
@@ -88,8 +88,6 @@ function SynapseNetwork() {
     pts.forEach((start, i) => {
       const targets = [
         pts[(i + 1) % pts.length],
-        pts[(i + 3) % pts.length],
-        pts[(i + 5) % pts.length],
       ]
       targets.forEach((end) => {
         const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5)

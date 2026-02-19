@@ -42,8 +42,8 @@ export default function HeroSection() {
           width: '90%',
           maxWidth: '800px',
           height: '110%',
-          background: 'radial-gradient(ellipse at center, rgba(2,6,23,0.85) 0%, rgba(2,6,23,0.6) 40%, rgba(2,6,23,0) 70%)',
-          filter: 'blur(30px)',
+          background: 'radial-gradient(ellipse at center, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.75) 40%, rgba(2,6,23,0) 70%)',
+          filter: 'blur(40px)',
           pointerEvents: 'none',
           zIndex: -1,
         }} />
