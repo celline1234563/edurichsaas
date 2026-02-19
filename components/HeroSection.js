@@ -33,30 +33,17 @@ export default function HeroSection() {
         textAlign: 'center',
         pointerEvents: 'none',
       }}>
-        {/* Circular dark backdrop */}
+        {/* Text backdrop blur */}
         <div style={{
           position: 'absolute',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 'min(90vw, 620px)',
-          height: 'min(90vw, 620px)',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.85) 50%, rgba(2,6,23,0) 75%)',
-          pointerEvents: 'none',
-          zIndex: -1,
-        }} />
-        {/* Glowing ring */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 'min(85vw, 580px)',
-          height: 'min(85vw, 580px)',
-          borderRadius: '50%',
-          border: '1px solid rgba(59,130,246,0.15)',
-          boxShadow: '0 0 40px rgba(59,130,246,0.08), inset 0 0 40px rgba(59,130,246,0.05)',
+          width: '90%',
+          maxWidth: '800px',
+          height: '110%',
+          background: 'radial-gradient(ellipse at center, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.75) 40%, rgba(2,6,23,0) 70%)',
+          filter: 'blur(40px)',
           pointerEvents: 'none',
           zIndex: -1,
         }} />
