@@ -55,9 +55,10 @@ function DataNeuron({ position, text, labelOffset = [0.1, 0.1, 0] }) {
   )
 }
 
-function NeuralConnection({ start, end, mid }) {
+function NeuralConnection({ start, end, mid, speed = 1 }) {
   const curve = useMemo(() => new THREE.QuadraticBezierCurve3(start, mid, end), [start, mid, end])
   const points = useMemo(() => curve.getPoints(20), [curve])
+  const lineRef = useRef()
 
   const colors = useMemo(() => {
     const colorStart = new THREE.Color('#60a5fa')
@@ -68,14 +69,26 @@ function NeuralConnection({ start, end, mid }) {
     })
   }, [points])
 
+  // Animate dash offset for flowing data effect
+  useFrame((state) => {
+    if (lineRef.current) {
+      lineRef.current.material.dashOffset -= 0.02 * speed
+    }
+  })
+
   return (
     <Line
+      ref={lineRef}
       points={points}
       color="white"
       vertexColors={colors}
-      lineWidth={1.5}
+      lineWidth={2.5}
       transparent
-      opacity={0.2}
+      opacity={0.3}
+      dashed
+      dashScale={8}
+      dashSize={3}
+      gapSize={2}
     />
   )
 }
@@ -98,7 +111,7 @@ function SynapseNetwork() {
         dir.y += (Math.random() - 0.5) * 0.5
         dir.z += (Math.random() - 0.5) * 0.5
         mid.add(dir.normalize().multiplyScalar(dist * 0.3))
-        conns.push({ start, end, mid })
+        conns.push({ start, end, mid, speed: 0.6 + Math.random() * 0.8 })
       })
     })
     return conns
@@ -107,7 +120,7 @@ function SynapseNetwork() {
   return (
     <group>
       {connections.map((conn, i) => (
-        <NeuralConnection key={i} start={conn.start} end={conn.end} mid={conn.mid} />
+        <NeuralConnection key={i} start={conn.start} end={conn.end} mid={conn.mid} speed={conn.speed} />
       ))}
     </group>
   )
