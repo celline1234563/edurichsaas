@@ -190,16 +190,16 @@ export default function Footer() {
           fontSize: '12px',
           color: '#6b7280'
         }}>
-          <p style={{ fontWeight: '500', color: '#9ca3af', marginBottom: '8px' }}>마케팅 다이어트</p>
-          <p style={{ marginBottom: '8px' }}>통신판매신고번호 : 2022-성남분당A-0669</p>
+          <p style={{ fontWeight: '500', color: '#9ca3af', marginBottom: '8px' }}>본랩(BornLab)</p>
+          <p style={{ marginBottom: '8px' }}>통신판매업번호 : 제 2026-별내-0616호</p>
           <p style={{ marginBottom: '8px' }}>
             문의: <a href="mailto:support@marketingdiet.online" style={{ color: '#60a5fa', textDecoration: 'none' }}>support@marketingdiet.online</a>
           </p>
-          <p style={{ marginBottom: '8px' }}>대표 이성연 | 경기도 성남시 분당구 대왕판교로645번길 12 (삼평동) 7, 9층 168호 | 사업자 등록번호 331-31-00742 | 전화 010-9619-5797</p>
+          <p style={{ marginBottom: '8px' }}>대표 이성연 | 경기도 남양주시 별내중앙로 26, 5층 504호 엠20호(별내동, 진영엔타워) | 사업자 등록번호 876-27-02251</p>
           <p style={{ marginBottom: '8px', color: '#9ca3af', fontSize: '11px' }}>
-            마케팅다이어트(대행본사) | 에듀리치브레인(학원 AI SaaS) | 에듀케어알림(학부모 카카오 알림채널)
+            본랩(BornLab) | 에듀리치브레인(학원 AI SaaS) | 에듀케어알림(학부모 카카오 알림채널)
           </p>
-          <p style={{ marginBottom: '16px' }}>© 2022 Marketingdiet Inc, All rights reserved</p>
+          <p style={{ marginBottom: '16px' }}>© 2025 BornLab Inc, All rights reserved</p>
           <div style={{
             display: 'flex',
             justifyContent: 'center',

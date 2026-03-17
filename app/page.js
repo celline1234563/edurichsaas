@@ -623,16 +623,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer style={{
-          padding: isMobile ? '48px 16px 24px' : '48px 24px 24px',
-          textAlign: 'center',
-          color: '#64748b',
-          fontSize: '14px',
-          borderTop: '1px solid rgba(15,23,42,1)',
-        }}>
-          <p>&copy; 2024 EduRichBrain. All rights reserved.</p>
-        </footer>
       </div>
 
       {/* Access Required Modal */}
