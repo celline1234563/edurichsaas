@@ -66,7 +66,7 @@ export default function AIConsentPage() {
               lineHeight: '1.8',
               margin: 0,
             }}>
-              마케팅다이어트(이하 "회사")는 EduRichBrain 서비스 내 AI 기능을 통해 생성된 대화 내용 및 콘텐츠의 저장·활용에 관하여 아래와 같이 안내드리며, 이용자의 동의를 받고자 합니다.
+              본랩(BornLab)(이하 "회사")는 EduRichBrain 서비스 내 AI 기능을 통해 생성된 대화 내용 및 콘텐츠의 저장·활용에 관하여 아래와 같이 안내드리며, 이용자의 동의를 받고자 합니다.
             </p>
           </div>
 
@@ -234,7 +234,7 @@ export default function AIConsentPage() {
               <Table
                 headers={['항목', '내용']}
                 rows={[
-                  ['회사명', '마케팅다이어트'],
+                  ['회사명', '본랩(BornLab)'],
                   ['개인정보 보호책임자', '이성연 / 대표'],
                   ['연락처', 'support@marketingdiet.online'],
                 ]}

@@ -62,7 +62,7 @@ export default function RefundPolicyPage() {
               lineHeight: '1.8',
               margin: 0,
             }}>
-              마케팅다이어트(이하 "회사")는 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 공정하고 투명한 환불 정책을 운영하고 있습니다. 본 정책은 EduRichBrain 서비스의 구독 및 크레딧 패키지 결제에 대한 환불 기준을 안내합니다.
+              본랩(BornLab)(이하 "회사")는 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 공정하고 투명한 환불 정책을 운영하고 있습니다. 본 정책은 EduRichBrain 서비스의 구독 및 크레딧 패키지 결제에 대한 환불 기준을 안내합니다.
             </p>
           </div>
 
@@ -319,7 +319,7 @@ export default function RefundPolicyPage() {
               <Table
                 headers={['항목', '내용']}
                 rows={[
-                  ['회사명', '마케팅다이어트'],
+                  ['회사명', '본랩(BornLab)'],
                   ['이메일', 'support@marketingdiet.online'],
                   ['웹사이트', 'www.edurichbrain.com'],
                 ]}

@@ -62,7 +62,7 @@ export default function TermsPage() {
               lineHeight: '1.8',
               margin: 0,
             }}>
-              본 이용약관(이하 "약관")은 마케팅다이어트(이하 "회사")가 제공하는 EduRichBrain 서비스(이하 "서비스")의 이용에 관한 조건 및 절차, 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다. 서비스를 이용하시기 전에 본 약관을 주의 깊게 읽어주시기 바랍니다.
+              본 이용약관(이하 "약관")은 본랩(BornLab)(이하 "회사")가 제공하는 EduRichBrain 서비스(이하 "서비스")의 이용에 관한 조건 및 절차, 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다. 서비스를 이용하시기 전에 본 약관을 주의 깊게 읽어주시기 바랍니다.
             </p>
           </div>
 
@@ -296,7 +296,7 @@ export default function TermsPage() {
                 marginTop: '16px',
               }}>
                 <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                  <li><strong>회사명:</strong> 마케팅다이어트</li>
+                  <li><strong>회사명:</strong> 본랩(BornLab)</li>
                   <li><strong>이메일:</strong> support@marketingdiet.online</li>
                   <li><strong>웹사이트:</strong> www.edurichbrain.com</li>
                 </ul>

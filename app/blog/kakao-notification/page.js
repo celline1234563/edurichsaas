@@ -136,7 +136,7 @@ export default function KakaoNotificationBlogPage() {
                     에듀리치브레인 서비스의 공식 알림 채널은 <span style={{ color: '#FEE500' }}>'에듀케어 알림'</span>입니다.
                   </p>
                   <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}>
-                    상호: 마케팅 다이어트 | 대표: 이성연 | 사업자번호: , 510-27-91, , 540
+                    상호: 본랩(BornLab) | 대표: 이성연 | 사업자번호: , 510-27-91, , 540
                   </p>
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default function KakaoNotificationBlogPage() {
                     </div>
                     <div style={{ display: 'flex', gap: '12px' }}>
                       <span style={{ color: 'rgba(255,255,255,0.6)', minWidth: '80px' }}>운영 사업자:</span>
-                      <span style={{ color: 'white', fontWeight: '500' }}>마케팅 다이어트</span>
+                      <span style={{ color: 'white', fontWeight: '500' }}>본랩(BornLab)</span>
                     </div>
                   </div>
                 </div>
@@ -304,7 +304,7 @@ export default function KakaoNotificationBlogPage() {
                   }}>
                     <div style={{ fontSize: '24px', marginBottom: '8px' }}>🏢</div>
                     <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginBottom: '4px' }}>대행본사</div>
-                    <div style={{ color: 'white', fontWeight: 'bold', fontSize: '14px' }}>마케팅다이어트</div>
+                    <div style={{ color: 'white', fontWeight: 'bold', fontSize: '14px' }}>본랩(BornLab)</div>
                   </div>
                   <div style={{
                     background: 'rgba(255,255,255,0.05)',
@@ -828,7 +828,7 @@ export default function KakaoNotificationBlogPage() {
                       border: '1px solid rgba(254, 229, 0, 0.2)'
                     }}>
                       <div style={{ fontSize: '13px', color: 'rgba(254, 229, 0, 0.7)', marginBottom: '6px' }}>운영사</div>
-                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>마케팅 다이어트</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>본랩(BornLab)</div>
                     </div>
                   </div>
                 </div>

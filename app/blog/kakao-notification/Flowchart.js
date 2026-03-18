@@ -126,7 +126,7 @@ export default function Flowchart() {
       }}>
 
         <Box
-          title="마케팅 다이어트"
+          title="본랩(BornLab)"
           subtitle="사업자 · 서비스 개발 및 운영 총괄"
           borderColor="#3b82f6"
           icon="🏢"
