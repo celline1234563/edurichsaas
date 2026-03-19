@@ -24,6 +24,22 @@ export default function HeroSection() {
     }}>
       <NeuralBrain />
 
+      {/* Background blur overlay — fades in after hero text appears */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5, delay: CONTENT_DELAY + 1.8, ease: 'easeInOut' }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 10,
+          backdropFilter: 'blur(3px)',
+          WebkitBackdropFilter: 'blur(3px)',
+          background: 'rgba(2, 6, 23, 0.35)',
+          pointerEvents: 'none',
+        }}
+      />
+
       <div style={{
         position: 'relative',
         zIndex: 30,
